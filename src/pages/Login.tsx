@@ -39,7 +39,7 @@ export default function Login() {
   return (
     <>
       <VaultBackground />
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pt-[57px]">
         <VaultHeader
           userName={null}
           isLoggedIn={false}

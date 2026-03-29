@@ -54,7 +54,7 @@ const Index = () => {
   return (
     <>
       <VaultBackground />
-      <div className="min-h-screen flex flex-col vault-flicker">
+      <div className="min-h-screen flex flex-col vault-flicker pt-[57px]">
         <VaultHeader
           userName={getUserName(user)}
           isLoggedIn={!!user}

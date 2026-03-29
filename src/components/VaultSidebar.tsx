@@ -38,7 +38,7 @@ const VaultSidebar = ({ open, activeSection, onSectionChange, onClose }: VaultSi
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -300, opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-          className="fixed top-0 left-0 w-[280px] h-full z-50 flex flex-col overflow-hidden border-r border-primary/20"
+          className="fixed top-[57px] left-0 w-[280px] h-[calc(100%-57px)] z-50 flex flex-col overflow-hidden border-r border-primary/20"
           style={{ background: 'linear-gradient(180deg, hsl(220 35% 10%), hsl(220 40% 6%))' }}
         >
           {/* Top accent bar */}
