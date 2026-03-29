@@ -1,47 +1,39 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+// Redireciona pro app mantendo o pathname atual (ex: /vault-tec#/)
+const goToApp = () => window.location.replace(window.location.pathname + '#/');
+
 export default function AuthCallback() {
   useEffect(() => {
     const isPopup = !!window.opener;
 
     const handleSession = async () => {
-      // Aguarda o Supabase processar a sessão da URL
-      const { data: { session } } = await supabase.auth.getSession();
-
+      await supabase.auth.getSession();
       if (isPopup) {
-        // Estamos dentro do popup — fecha e o pai busca a sessão
         window.close();
       } else {
-        // Mobile redirect — vai direto pro app
-        window.location.replace(window.location.origin + '/#/');
+        goToApp();
       }
-
-      return session;
     };
 
-    // Supabase dispara onAuthStateChange ao processar o código OAuth da URL
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || session) {
         subscription.unsubscribe();
         if (isPopup) {
           window.close();
         } else {
-          window.location.replace(window.location.origin + '/#/');
+          goToApp();
         }
       }
     });
 
-    // Tenta obter a sessão imediatamente também
     handleSession();
 
-    // Fallback: se nada acontecer em 5s, redireciona de volta
+    // Fallback após 5s
     const timeout = setTimeout(() => {
-      if (isPopup) {
-        window.close();
-      } else {
-        window.location.replace(window.location.origin + '/#/');
-      }
+      if (isPopup) window.close();
+      else goToApp();
     }, 5000);
 
     return () => {
