@@ -64,7 +64,7 @@ const Index = () => {
               onSectionChange={setActiveSection}
               onClose={() => setSidebarOpen(false)}
             />
-            <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 sm:px-6 py-6">
+            <main className={`flex-1 w-full ${activeSection === 'nickname' ? 'px-0 py-0' : 'max-w-[1200px] mx-auto px-4 sm:px-6 py-6'}`}>
               {/* Greeting Section — hidden on chat and nickname to maximise space */}
               {activeSection !== 'chat' && activeSection !== 'nickname' && (
                 <motion.div
@@ -111,8 +111,8 @@ const Index = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="rounded-lg border border-primary/30 overflow-hidden"
-                  style={{ height: 'calc(100vh - 120px)', background: 'hsl(220 30% 8%)' }}
+                  className="w-full overflow-hidden"
+                  style={{ height: 'calc(100vh - 64px)', background: 'hsl(220 30% 8%)' }}
                 >
                   <iframe
                     src="https://www.neext.online/nickname"
