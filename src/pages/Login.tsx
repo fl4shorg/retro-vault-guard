@@ -4,6 +4,7 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/hooks/useTheme.tsx';
 import VaultBackground from '@/components/VaultBackground';
+import VaultHeader from '@/components/VaultHeader';
 import VaultLoginScreen from '@/components/VaultLoginScreen';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
@@ -45,12 +46,21 @@ function LoginInner() {
   return (
     <>
       <VaultBackground />
-      <VaultLoginScreen
-        onSignUp={signUp}
-        onSignIn={handleSignIn}
-        onGoogleSignIn={signInWithGoogle}
-        onResetPassword={resetPassword}
-      />
+      <div className="min-h-screen flex flex-col">
+        <VaultHeader
+          userName={null}
+          isLoggedIn={false}
+          sidebarOpen={false}
+          onToggleSidebar={() => {}}
+          onLogout={() => {}}
+        />
+        <VaultLoginScreen
+          onSignUp={signUp}
+          onSignIn={handleSignIn}
+          onGoogleSignIn={signInWithGoogle}
+          onResetPassword={resetPassword}
+        />
+      </div>
     </>
   );
 }
