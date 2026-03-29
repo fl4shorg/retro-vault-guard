@@ -12,6 +12,18 @@ export function useAuth() {
       setLoading(false);
     });
 
+    const storedHash = sessionStorage.getItem('supabase_oauth_hash');
+    if (storedHash) {
+      sessionStorage.removeItem('supabase_oauth_hash');
+      const params = new URLSearchParams(storedHash.replace(/^#/, ''));
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        return () => subscription.unsubscribe();
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
