@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Skull, Layers, Tag, FileText, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
+import { Shield, Skull, Layers, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
