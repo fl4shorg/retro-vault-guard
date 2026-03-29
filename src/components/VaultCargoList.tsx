@@ -74,7 +74,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-sm font-bold text-primary tracking-[0.15em]">
-              DESCRIÇÃO — {cargo.cargo}
+              MANUAL — {cargo.cargo}
             </h3>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
               <X size={18} />
