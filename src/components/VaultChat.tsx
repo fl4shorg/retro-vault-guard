@@ -43,11 +43,25 @@ export default function VaultChat({ userName }: VaultChatProps) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const shouldAutoScrollRef = useRef(true);
 
-  const scrollToBottom = useCallback(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const isNearBottom = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
   }, []);
+
+  const scrollToBottom = useCallback((force = false) => {
+    if (force || shouldAutoScrollRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    shouldAutoScrollRef.current = isNearBottom();
+  }, [isNearBottom]);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -111,6 +125,7 @@ export default function VaultChat({ userName }: VaultChatProps) {
       });
       setText('');
       setReplyTo(null);
+      shouldAutoScrollRef.current = true;
       await fetchMessages();
     } catch {
       toast.error('Erro ao enviar mensagem');
@@ -182,7 +197,7 @@ export default function VaultChat({ userName }: VaultChatProps) {
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin">
+      <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
