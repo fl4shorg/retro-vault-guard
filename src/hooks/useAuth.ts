@@ -45,7 +45,8 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     const mobile = isMobileDevice();
-    const callbackUrl = window.location.origin;
+    // Usa a URL atual da página (sem hash/query), funciona em qualquer subpath
+    const callbackUrl = window.location.href.split('#')[0].split('?')[0];
 
     if (mobile) {
       // Em celular popup é bloqueado — usa redirect direto para o domínio raiz
