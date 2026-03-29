@@ -2,11 +2,29 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Se estamos dentro de um popup com tokens OAuth no hash, seta a sessão e fecha o popup
+    if (window.opener && window.location.hash.includes('access_token')) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if (accessToken && refreshToken) {
+        supabase.auth
+          .setSession({ access_token: accessToken, refresh_token: refreshToken })
+          .then(() => window.close());
+        return;
+      }
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -39,8 +57,20 @@ export function useAuth() {
     if (error) throw error;
   };
 
-  // Retorna a URL do Google OAuth sem redirecionar — quem abre é o chamador
-  const getGoogleOAuthUrl = async (): Promise<string> => {
+  const signInWithGoogle = async () => {
+    const mobile = isMobileDevice();
+
+    if (mobile) {
+      // Em celular popup é bloqueado — usa redirect direto
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      return;
+    }
+
+    // Desktop: abre popup centralizado
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -50,7 +80,49 @@ export function useAuth() {
     });
     if (error) throw error;
     if (!data.url) throw new Error('URL OAuth não retornada');
-    return data.url;
+
+    const width = 500;
+    const height = 620;
+    const left = Math.round(window.screenX + (window.outerWidth - width) / 2);
+    const top = Math.round(window.screenY + (window.outerHeight - height) / 2);
+
+    const popup = window.open(
+      data.url,
+      'google-oauth-popup',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+
+    if (!popup || popup.closed) {
+      // Popup bloqueado pelo navegador — fallback para redirect
+      const { error: fallbackError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (fallbackError) throw fallbackError;
+      return;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const interval = setInterval(async () => {
+        if (popup.closed) {
+          clearInterval(interval);
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            setUser(session.user);
+            resolve();
+          } else {
+            reject(new Error('Login cancelado'));
+          }
+        }
+      }, 500);
+
+      // Timeout de 5 minutos
+      setTimeout(() => {
+        clearInterval(interval);
+        if (!popup.closed) popup.close();
+        reject(new Error('Tempo de login esgotado'));
+      }, 5 * 60 * 1000);
+    });
   };
 
   const signOut = async () => {
@@ -64,5 +136,5 @@ export function useAuth() {
     if (error) throw error;
   };
 
-  return { user, loading, getUserName, signUp, signIn, getGoogleOAuthUrl, signOut, resetPassword };
+  return { user, loading, getUserName, signUp, signIn, signInWithGoogle, signOut, resetPassword };
 }
