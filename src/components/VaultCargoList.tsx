@@ -47,7 +47,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
     try {
       await navigator.clipboard.writeText(cargo.descricao);
       setCopied(true);
-      toast.success('Descrição copiada!');
+      toast.success('Manual copiado!');
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error('Erro ao copiar');
