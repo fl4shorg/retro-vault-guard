@@ -11,20 +11,6 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Se estamos dentro de um popup com tokens OAuth no hash, seta a sessão e fecha o popup
-    if (window.opener && window.location.hash.includes('access_token')) {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const accessToken = params.get('access_token');
-      const refreshToken = params.get('refresh_token');
-      if (accessToken && refreshToken) {
-        supabase.auth
-          .setSession({ access_token: accessToken, refresh_token: refreshToken })
-          .then(() => window.close());
-        return;
-      }
-    }
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -59,12 +45,13 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     const mobile = isMobileDevice();
+    const callbackUrl = window.location.origin + '/auth/callback';
 
     if (mobile) {
-      // Em celular popup é bloqueado — usa redirect direto
+      // Em celular popup é bloqueado — usa redirect direto para /auth/callback
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: callbackUrl },
       });
       if (error) throw error;
       return;
@@ -75,7 +62,7 @@ export function useAuth() {
       provider: 'google',
       options: {
         skipBrowserRedirect: true,
-        redirectTo: window.location.origin,
+        redirectTo: callbackUrl,
       },
     });
     if (error) throw error;
@@ -96,7 +83,7 @@ export function useAuth() {
       // Popup bloqueado pelo navegador — fallback para redirect
       const { error: fallbackError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: callbackUrl },
       });
       if (fallbackError) throw fallbackError;
       return;
