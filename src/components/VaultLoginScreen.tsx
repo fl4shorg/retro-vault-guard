@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Lock, User, Rocket, ArrowRight, Key, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, User, Rocket, ArrowRight, Key, Loader2, X, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface VaultLoginScreenProps {
@@ -13,6 +13,8 @@ interface VaultLoginScreenProps {
 const VaultLoginScreen = ({ onSignUp, onSignIn, onGoogleSignIn, onResetPassword }: VaultLoginScreenProps) => {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [showForgot, setShowForgot] = useState(false);
+  const [showVerify, setShowVerify] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -40,7 +42,8 @@ const VaultLoginScreen = ({ onSignUp, onSignIn, onGoogleSignIn, onResetPassword 
     setLoading(true);
     try {
       await onSignUp(regEmail, regPassword, regName);
-      toast.success('Registro concluído! Verifique seu e-mail.');
+      setVerifyEmail(regEmail);
+      setShowVerify(true);
       setRegName(''); setRegEmail(''); setRegPassword(''); setRegConfirm('');
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); }
@@ -215,6 +218,97 @@ const VaultLoginScreen = ({ onSignUp, onSignIn, onGoogleSignIn, onResetPassword 
           VAULT-TEC INDUSTRIES © 2077
         </p>
       </motion.div>
+
+      {/* Email Verification Modal */}
+      <AnimatePresence>
+        {showVerify && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+            onClick={() => setShowVerify(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.88, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.88, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+              className="w-full max-w-sm rounded-xl overflow-hidden border border-primary/30"
+              style={{ background: 'hsl(220 35% 10% / 0.98)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Top accent */}
+              <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pt-5 pb-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
+                    <Mail size={14} className="text-primary" />
+                  </div>
+                  <p className="font-display text-xs font-bold text-primary tracking-[0.2em] vault-text-glow">
+                    VAULT-TEC COMMS
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowVerify(false)}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center border border-border/40 hover:border-destructive/50 hover:text-destructive text-muted-foreground transition-all"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="px-5 py-5 text-center">
+                {/* Icon */}
+                <div className="relative inline-flex mb-4">
+                  <div className="absolute inset-0 rounded-full blur-xl opacity-30" style={{ background: 'hsl(var(--vault-yellow))' }} />
+                  <div className="relative w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/40 flex items-center justify-center">
+                    <CheckCircle size={30} className="text-primary vault-text-glow" />
+                  </div>
+                </div>
+
+                <h3 className="font-display text-base font-bold text-foreground tracking-[0.15em] mb-1">
+                  REGISTRO CONCLUÍDO
+                </h3>
+                <p className="font-mono text-[10px] text-primary/60 tracking-widest mb-4">
+                  // PROTOCOLO DE VERIFICAÇÃO INICIADO
+                </p>
+
+                {/* Divider */}
+                <div className="h-px bg-border/30 mb-4" />
+
+                <p className="font-body text-sm text-muted-foreground leading-relaxed mb-2">
+                  Um link de verificação foi enviado para:
+                </p>
+                <div className="rounded-lg border border-primary/20 px-4 py-2.5 mb-4" style={{ background: 'hsl(220 30% 8% / 0.8)' }}>
+                  <p className="font-mono text-sm text-primary font-bold tracking-wide break-all">
+                    {verifyEmail}
+                  </p>
+                </div>
+                <p className="font-mono text-[11px] text-muted-foreground/60 leading-relaxed">
+                  Acesse seu e-mail e clique no link para ativar seu acesso ao Vault. Verifique também a pasta de spam.
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="px-5 pb-5">
+                <button
+                  onClick={() => { setShowVerify(false); setTab('login'); }}
+                  className="w-full py-3 rounded font-display font-bold text-sm tracking-[0.15em] transition-all flex items-center justify-center gap-2 vault-badge active:scale-[0.98]"
+                >
+                  <ArrowRight size={15} />
+                  IR PARA O ACESSO
+                </button>
+              </div>
+
+              {/* Bottom accent */}
+              <div className="h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Forgot Password Modal */}
       {showForgot && (

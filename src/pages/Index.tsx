@@ -11,7 +11,6 @@ import VaultCargoList from '@/components/VaultCargoList';
 import VaultProtocolList from '@/components/VaultProtocolList';
 import VaultRulesList from '@/components/VaultRulesList';
 import VaultChat from '@/components/VaultChat';
-import { Toaster } from 'sonner';
 import { Loader2, Zap } from 'lucide-react';
 
 const Index = () => {
@@ -48,18 +47,6 @@ const Index = () => {
   return (
     <>
       <VaultBackground />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: 'hsl(220 30% 12% / 0.95)',
-            border: '1px solid hsl(45 40% 22% / 0.5)',
-            color: 'hsl(45 100% 90%)',
-            fontFamily: 'Share Tech Mono, monospace',
-            fontSize: '13px',
-          },
-        }}
-      />
       <div className="min-h-screen flex flex-col vault-flicker">
         <VaultHeader
           userName={getUserName(user)}

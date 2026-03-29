@@ -14,7 +14,18 @@ const App = () => (
     <ThemeProvider>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'hsl(220 30% 12% / 0.97)',
+            border: '1px solid hsl(45 40% 22% / 0.5)',
+            color: 'hsl(45 100% 90%)',
+            fontFamily: 'Share Tech Mono, monospace',
+            fontSize: '13px',
+          },
+        }}
+      />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
