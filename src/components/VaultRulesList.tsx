@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gavel, ChevronDown, ChevronUp, Download, X,
-  FileText, ImageIcon, Loader2, AlertTriangle, Radio, Hash,
+  FileText, ImageIcon, Loader2, AlertTriangle, Hash,
   Search, Copy, Check
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -382,7 +382,7 @@ export default function VaultRulesList() {
         </div>
         {!loading && !error && (
           <div className="vault-badge rounded px-4 py-1.5 text-[11px] flex items-center gap-2">
-            <Radio size={10} className="animate-pulse" />
+            <Gavel size={10} />
             {filtered.length}/{rules.length} ARTIG{rules.length !== 1 ? 'OS' : 'O'}
           </div>
         )}
