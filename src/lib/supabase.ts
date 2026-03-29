@@ -11,5 +11,16 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   },
 });
 
+const storedHash = sessionStorage.getItem('supabase_oauth_hash');
+if (storedHash) {
+  sessionStorage.removeItem('supabase_oauth_hash');
+  const params = new URLSearchParams(storedHash.replace(/^#/, ''));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  if (accessToken && refreshToken) {
+    supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+  }
+}
+
 export const API_CARGOS_FBI = "https://www.api.neext.online/api/cargosfbi";
 export const API_CARGOS_SKUR = "https://www.api.neext.online/api/cargosskur";
