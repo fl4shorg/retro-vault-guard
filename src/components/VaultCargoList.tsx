@@ -105,7 +105,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
       <button
         onClick={() => setOpen(true)}
         className="flex items-center justify-center w-10 h-10 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-95 transition-all"
-        title="Ver descrição"
+        title="Ver manual"
       >
         <FileText size={16} />
       </button>
