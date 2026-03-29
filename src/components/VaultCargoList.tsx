@@ -88,7 +88,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
             className="w-full py-2.5 rounded font-display font-bold text-xs tracking-[0.15em] transition-all flex items-center justify-center gap-2 vault-badge active:scale-[0.98]"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'COPIADO!' : 'COPIAR DESCRIÇÃO'}
+            {copied ? 'COPIADO!' : 'COPIAR MANUAL'}
           </button>
         </div>
       </motion.div>
