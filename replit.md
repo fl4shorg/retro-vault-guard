@@ -16,7 +16,8 @@ A Fallout-themed personnel management web app (in Portuguese) built with React +
 - `src/hooks/useAuth.ts` — Authentication logic (sign up, sign in, Google, reset password)
 - `src/hooks/useCargos.ts` — Fetches cargo lists from external API
 - `src/pages/Index.tsx` — Main page (login screen or dashboard depending on auth state)
-- `src/components/` — Vault-themed UI components (header, sidebar, login, cargo lists, etc.)
+- `src/components/` — Vault-themed UI components (header, sidebar, login, cargo lists, chat, etc.)
+- `src/components/VaultChat.tsx` — Real-time chat component (polls every 2.5s); supports send, reply, edit, soft-delete
 - `vite.config.ts` — Vite dev server configured for Replit (host `0.0.0.0`, port `5000`)
 
 ## Running the App

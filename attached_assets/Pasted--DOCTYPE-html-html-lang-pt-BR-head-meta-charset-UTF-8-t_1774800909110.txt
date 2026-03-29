@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Vaul Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+body{background:#0d0d0d;color:#fff;}
+.container{max-width:700px;margin:auto;height:100vh;display:flex;flex-direction:column;}
+.header{padding:15px;background:#111;border-bottom:1px solid #222;text-align:center;font-weight:bold;}
+.messages{flex:1;overflow-y:auto;padding:15px;}
+.msg{background:#1a1a1a;padding:12px;border-radius:12px;margin-bottom:12px;max-width:75%;}
+.me{background:#ff007f;margin-left:auto;}
+.deleted{opacity:0.6;font-style:italic;}
+.reply-box{background:#00000060;padding:8px;border-left:3px solid #ff007f;margin-bottom:5px;border-radius:6px;font-size:12px;}
+.actions{display:flex;gap:5px;margin-top:8px;}
+.actions button{flex:1;padding:5px;border:none;border-radius:6px;font-size:12px;cursor:pointer;}
+.reply{background:#444;color:#fff;}
+.edit{background:#007bff;color:#fff;}
+.delete{background:red;color:#fff;}
+.footer{padding:10px;background:#111;border-top:1px solid #222;}
+.footer input{width:100%;padding:10px;border:none;border-radius:6px;margin-top:5px;}
+.footer button{width:100%;padding:10px;margin-top:5px;border:none;border-radius:6px;background:#ff007f;color:#fff;cursor:pointer;}
+.reply-preview{background:#111;padding:8px;border-left:4px solid #ff007f;margin-bottom:5px;border-radius:6px;display:flex;justify-content:space-between;}
+.reply-preview button{background:red;border:none;color:#fff;padding:3px 6px;border-radius:4px;cursor:pointer;}
+.login{position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center;}
+.login-box{background:#111;padding:20px;border-radius:10px;width:90%;max-width:300px;}
+</style>
+</head>
+
+<body>
+
+<div class="login" id="login">
+  <div class="login-box">
+    <h2>Entrar no Chat</h2>
+    <input id="nomeInput" placeholder="Seu nome">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">💬 Vaul Chat</div>
+  <div class="messages" id="msgs"></div>
+  <div class="footer">
+    <div id="replyPreview"></div>
+    <input id="texto" placeholder="Digite..." onkeypress="if(event.key==='Enter') enviarTexto()">
+    <button onclick="enviarTexto()">Enviar</button>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://www.api.neext.online/api/chat";
+
+let userId = localStorage.getItem("uid") || Date.now().toString();
+localStorage.setItem("uid", userId);
+
+let user = localStorage.getItem("nome") || "";
+let replyData = null;
+
+// LOGIN
+function entrar() {
+  const nome = document.getElementById("nomeInput").value.trim();
+  if(!nome) return alert("Digite um nome");
+  user = nome;
+  localStorage.setItem("nome", user);
+  document.getElementById("login").style.display="none";
+}
+
+if(user) document.getElementById("login").style.display="none";
+
+// REPLY
+function responderMsg(id, nome, texto) {
+  replyData = { id, nome, texto };
+  renderReplyPreview();
+}
+
+function renderReplyPreview() {
+  const div = document.getElementById("replyPreview");
+  if(!replyData){
+    div.innerHTML="";
+    return;
+  }
+  div.innerHTML = `
+    <div class="reply-preview">
+      <div>
+        <b>${replyData.nome}</b><br>
+        ${replyData.texto}
+      </div>
+      <button onclick="cancelarReply()">X</button>
+    </div>
+  `;
+}
+
+function cancelarReply() {
+  replyData = null;
+  renderReplyPreview();
+}
+
+// LISTAR MENSAGENS
+async function carregarMensagens() {
+  try {
+    const res = await fetch(API_BASE);
+    const msgs = await res.json();
+    const container = document.getElementById("msgs");
+    container.innerHTML = "";
+
+    msgs.forEach(d => {
+      let html = `<div class="msg ${d.userId===userId?'me':''} ${d.apagado?'deleted':''}">`;
+
+      if(d.reply){
+        html += `<div class="reply-box"><b>${d.reply.nome}</b><br>${d.reply.texto}</div>`;
+      }
+
+      html += `<b>${d.user}</b><br>`;
+      html += d.apagado ? "🚫 Mensagem apagada" : `${d.texto} ${d.editado ? '<small>(editada)</small>' : ''}`;
+
+      html += `<div class="actions">`;
+      if(!d.apagado) html += `<button class="reply" onclick="responderMsg('${d.id}','${d.user}','${(d.texto||"").replace(/'/g,"\\'")}')">Responder</button>`;
+      if(d.userId===userId && !d.apagado){
+        html += `<button class="edit" onclick="editarMsg('${d.id}','${d.texto.replace(/'/g,"\\'")}')">Editar</button>`;
+        html += `<button class="delete" onclick="deletarMsg('${d.id}')">Excluir</button>`;
+      }
+      html += `</div></div>`;
+      container.innerHTML += html;
+    });
+
+    container.scrollTop = container.scrollHeight;
+  } catch(err){
+    console.error(err);
+  }
+}
+
+// ENVIAR MENSAGEM
+async function enviarTexto() {
+  const input = document.getElementById("texto");
+  const texto = input.value.trim();
+  if(!texto) return;
+
+  await fetch(API_BASE, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ user, userId, texto, reply: replyData })
+  });
+
+  input.value="";
+  replyData = null;
+  renderReplyPreview();
+  carregarMensagens();
+}
+
+// EDITAR
+async function editarMsg(id, textoAntigo){
+  const novo = prompt("Editar mensagem:", textoAntigo);
+  if(!novo || novo.trim()==="") return;
+  await fetch(`${API_BASE}/${id}`,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ texto: novo })
+  });
+  carregarMensagens();
+}
+
+// DELETE (soft)
+async function deletarMsg(id){
+  if(!confirm("Excluir mensagem?")) return;
+  await fetch(`${API_BASE}/${id}`, { method:"DELETE" });
+  carregarMensagens();
+}
+
+// atualizar a cada 2s
+setInterval(carregarMensagens, 2000);
+carregarMensagens();
+</script>
+
+</body>
+</html>
