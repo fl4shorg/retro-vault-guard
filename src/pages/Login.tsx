@@ -39,7 +39,7 @@ function LoginInner() {
 
   const handleSignIn = async (email: string, password: string) => {
     await signIn(email, password);
-    goToApp();
+    // goToApp() será chamado pelo useEffect quando user for atualizado via onAuthStateChange
   };
 
   return (

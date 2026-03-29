@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
-// Redireciona pro app mantendo o pathname atual (ex: /vault-tec#/)
 const goToApp = () => window.location.replace(window.location.pathname + '#/');
 
 export default function AuthCallback() {
   useEffect(() => {
     const isPopup = !!window.opener;
+    let done = false;
 
-    const handleSession = async () => {
-      await supabase.auth.getSession();
+    const handleSuccess = () => {
+      if (done) return;
+      done = true;
       if (isPopup) {
         window.close();
       } else {
@@ -17,24 +18,28 @@ export default function AuthCallback() {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || session) {
+    // Supabase detecta automaticamente o #access_token= na URL (detectSessionInUrl: true)
+    // e dispara onAuthStateChange com SIGNED_IN assim que a sessão estiver salva
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
         subscription.unsubscribe();
-        if (isPopup) {
-          window.close();
-        } else {
-          goToApp();
-        }
+        handleSuccess();
       }
     });
 
-    handleSession();
+    // Verifica se a sessão já está disponível (caso Supabase já processou antes de montar)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        subscription.unsubscribe();
+        handleSuccess();
+      }
+    });
 
-    // Fallback após 5s
+    // Fallback: se em 10s nada aconteceu, vai pro app mesmo assim
     const timeout = setTimeout(() => {
-      if (isPopup) window.close();
-      else goToApp();
-    }, 5000);
+      subscription.unsubscribe();
+      handleSuccess();
+    }, 10000);
 
     return () => {
       subscription.unsubscribe();
