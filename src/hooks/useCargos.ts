@@ -29,7 +29,7 @@ function parseApiData(data: Record<string, any> | null): CargoItem[] {
     posicao: item.posicao || 0,
     descricao: item.descricao || '',
     tag: item.tag || '',
-    criadoPor: item.nome || item.criadoPor || 'Sistema',
+    criadoPor: item.nome || item.criadoPor || '',
     atualizadoEm: item.atualizadoEm,
   }));
 }
