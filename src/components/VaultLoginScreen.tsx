@@ -184,7 +184,34 @@ const VaultLoginScreen = ({ onSignUp, onSignIn, onGoogleSignIn, onResetPassword 
           </div>
         </div>
 
-        <p className="text-center font-mono text-[10px] text-muted-foreground/40 mt-6 tracking-[0.3em]">
+        {/* Fallout Warning */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-6 rounded-lg border border-destructive/40 overflow-hidden"
+          style={{ background: 'hsl(0 40% 12% / 0.6)' }}
+        >
+          <div className="flex">
+            {/* Hazard stripes */}
+            <div className="w-2 shrink-0" style={{
+              background: 'repeating-linear-gradient(135deg, hsl(45 100% 50%), hsl(45 100% 50%) 4px, hsl(0 0% 10%) 4px, hsl(0 0% 10%) 8px)',
+            }} />
+            <div className="px-4 py-3 flex items-start gap-3">
+              <span className="text-lg mt-0.5">☢</span>
+              <div>
+                <p className="font-display text-[10px] font-bold text-destructive tracking-[0.2em] mb-1">
+                  ⚠ AVISO DE SEGURANÇA — VAULT-TEC
+                </p>
+                <p className="font-mono text-[10px] text-muted-foreground/70 leading-relaxed">
+                  Área com níveis elevados de radiação. Acesso não autorizado resultará em exposição letal. Violadores serão processados conforme o Protocolo 7-G da Vault-Tec Industries.
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <p className="text-center font-mono text-[10px] text-muted-foreground/40 mt-4 tracking-[0.3em]">
           VAULT-TEC INDUSTRIES © 2077
         </p>
       </motion.div>
