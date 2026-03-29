@@ -7,10 +7,11 @@ interface VaultHeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   onLogout: () => void;
+  positionFixed?: boolean;
 }
 
-const VaultHeader = ({ userName, isLoggedIn, sidebarOpen, onToggleSidebar, onLogout }: VaultHeaderProps) => (
-  <header className="fixed top-0 left-0 right-0 z-50 border-b-2 border-primary/40" style={{ background: 'linear-gradient(180deg, hsl(220 35% 11%), hsl(220 35% 8%))' }}>
+const VaultHeader = ({ userName, isLoggedIn, sidebarOpen, onToggleSidebar, onLogout, positionFixed }: VaultHeaderProps) => (
+  <header className={`${positionFixed ? 'fixed top-0 left-0 right-0' : 'sticky top-0'} z-50 border-b-2 border-primary/40`} style={{ background: 'linear-gradient(180deg, hsl(220 35% 11%), hsl(220 35% 8%))' }}>
     {/* Yellow accent bar */}
     <div className="h-[3px] bg-gradient-to-r from-primary/60 via-primary to-primary/60" />
     <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 py-3">

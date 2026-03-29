@@ -46,6 +46,7 @@ export default function Login() {
           sidebarOpen={false}
           onToggleSidebar={() => {}}
           onLogout={() => {}}
+          positionFixed
         />
         <VaultLoginScreen
           onSignUp={signUp}
