@@ -59,9 +59,7 @@ export function useAuth() {
     const left = Math.round(window.screenX + (window.outerWidth - width) / 2);
     const top = Math.round(window.screenY + (window.outerHeight - height) / 2);
 
-    // 1. Abre o popup SINCRONAMENTE para uma página nossa (mesmo domínio).
-    //    Isso garante que nenhum navegador — incluindo iOS Safari — bloqueie,
-    //    pois a abertura acontece direto no gesto do usuário, sem nenhum await antes.
+    // 1. Abre o popup SINCRONAMENTE (antes de qualquer await) — nunca bloqueado
     const launchUrl = `${window.location.origin}/oauth-launch.html`;
     const popup = window.open(
       launchUrl,
@@ -70,39 +68,53 @@ export function useAuth() {
     );
 
     if (!popup || popup.closed) {
-      throw new Error('Popup bloqueado pelo navegador. Permita popups para este site e tente novamente.');
+      throw new Error('Popup bloqueado. Permita popups para este site e tente novamente.');
     }
 
-    try {
-      // 2. Busca a URL do Google de forma assíncrona (o popup já está aberto, tudo bem)
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          skipBrowserRedirect: true,
-          redirectTo: window.location.origin,
-        },
-      });
+    // 2. Busca a URL do Google (async, enquanto o popup carrega)
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        skipBrowserRedirect: true,
+        redirectTo: window.location.origin,
+      },
+    });
 
-      if (error) {
-        popup.close();
-        throw error;
-      }
-
-      if (!data.url) {
-        popup.close();
-        throw new Error('URL OAuth não retornada');
-      }
-
-      // 3. Envia a URL para o popup via postMessage.
-      //    A página oauth-launch.html recebe e redireciona ela mesma para o Google —
-      //    navegação interna ao popup, sem bloqueio de cross-origin.
-      popup.postMessage({ type: 'VAULT_OAUTH_URL', url: data.url }, window.location.origin);
-    } catch (err) {
+    if (error) {
       popup.close();
-      throw err;
+      throw error;
     }
 
-    // 4. Fica monitorando até o popup fechar (após login bem-sucedido)
+    if (!data.url) {
+      popup.close();
+      throw new Error('URL OAuth não retornada');
+    }
+
+    const oauthUrl = data.url;
+
+    // 3. Espera o popup avisar que carregou (VAULT_POPUP_READY) antes de enviar a URL.
+    //    Se a URL já estava pronta antes do sinal chegar, manda imediatamente ao receber.
+    //    Timeout de segurança de 10s caso o popup não responda.
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        window.removeEventListener('message', handler);
+        popup.close();
+        reject(new Error('Popup não respondeu a tempo'));
+      }, 10000);
+
+      function handler(e: MessageEvent) {
+        if (e.data?.type === 'VAULT_POPUP_READY') {
+          clearTimeout(timeout);
+          window.removeEventListener('message', handler);
+          popup.postMessage({ type: 'VAULT_OAUTH_URL', url: oauthUrl }, window.location.origin);
+          resolve();
+        }
+      }
+
+      window.addEventListener('message', handler);
+    });
+
+    // 4. Monitora o popup até fechar após login bem-sucedido
     return new Promise<void>((resolve, reject) => {
       const interval = setInterval(async () => {
         if (popup.closed) {
@@ -117,7 +129,6 @@ export function useAuth() {
         }
       }, 500);
 
-      // Timeout de 5 minutos
       setTimeout(() => {
         clearInterval(interval);
         if (!popup.closed) popup.close();

@@ -33,6 +33,12 @@
   <div class="spinner"></div>
   <p>AUTORIZANDO ACESSO...</p>
   <script>
+    // Avisa o pai que a página carregou e está pronta para receber a URL
+    if (window.opener) {
+      window.opener.postMessage({ type: 'VAULT_POPUP_READY' }, '*');
+    }
+
+    // Recebe a URL do OAuth e redireciona
     window.addEventListener('message', function (e) {
       if (e.data && e.data.type === 'VAULT_OAUTH_URL') {
         window.location.href = e.data.url;
