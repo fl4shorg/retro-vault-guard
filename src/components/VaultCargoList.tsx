@@ -47,7 +47,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
     try {
       await navigator.clipboard.writeText(cargo.descricao);
       setCopied(true);
-      toast.success('Descrição copiada!');
+      toast.success('Manual copiado!');
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error('Erro ao copiar');
@@ -74,7 +74,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-sm font-bold text-primary tracking-[0.15em]">
-              DESCRIÇÃO — {cargo.cargo}
+              MANUAL — {cargo.cargo}
             </h3>
             <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
               <X size={18} />
@@ -88,7 +88,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
             className="w-full py-2.5 rounded font-display font-bold text-xs tracking-[0.15em] transition-all flex items-center justify-center gap-2 vault-badge active:scale-[0.98]"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'COPIADO!' : 'COPIAR DESCRIÇÃO'}
+            {copied ? 'COPIADO!' : 'COPIAR MANUAL'}
           </button>
         </div>
       </motion.div>
@@ -105,7 +105,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
       <button
         onClick={() => setOpen(true)}
         className="flex items-center justify-center w-10 h-10 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-95 transition-all"
-        title="Ver descrição"
+        title="Ver manual"
       >
         <FileText size={16} />
       </button>
