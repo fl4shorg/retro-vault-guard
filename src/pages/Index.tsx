@@ -14,7 +14,7 @@ import VaultChat from '@/components/VaultChat';
 import { Loader2, Zap } from 'lucide-react';
 
 const Index = () => {
-  const { user, loading: authLoading, getUserName, signUp, signIn, signInWithGoogle, signOut, resetPassword } = useAuth();
+  const { user, loading: authLoading, getUserName, signUp, signIn, getGoogleOAuthUrl, signOut, resetPassword } = useAuth();
   const { fbi, skur, totalFBI, totalSKUR, loading: cargosLoading, loadCargos } = useCargos();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('fbi');
@@ -128,7 +128,7 @@ const Index = () => {
           <VaultLoginScreen
             onSignUp={signUp}
             onSignIn={signIn}
-            onGoogleSignIn={signInWithGoogle}
+            onGetGoogleUrl={getGoogleOAuthUrl}
             onResetPassword={resetPassword}
           />
         )}
