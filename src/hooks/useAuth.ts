@@ -54,30 +54,27 @@ export function useAuth() {
   };
 
   const signInWithGoogle = async () => {
-    const width = 500;
+    const width = 480;
     const height = 620;
     const left = Math.round(window.screenX + (window.outerWidth - width) / 2);
     const top = Math.round(window.screenY + (window.outerHeight - height) / 2);
 
-    // Abre o popup ANTES de qualquer chamada assíncrona — isso é essencial para
-    // que navegadores desktop e mobile não bloqueiem (responde direto ao gesto do usuário)
+    // 1. Abre o popup SINCRONAMENTE para uma página nossa (mesmo domínio).
+    //    Isso garante que nenhum navegador — incluindo iOS Safari — bloqueie,
+    //    pois a abertura acontece direto no gesto do usuário, sem nenhum await antes.
+    const launchUrl = `${window.location.origin}/oauth-launch.html`;
     const popup = window.open(
-      'about:blank',
-      'google-oauth-popup',
+      launchUrl,
+      'vault-google-oauth',
       `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
     );
 
     if (!popup || popup.closed) {
-      // Ainda bloqueado — fallback para redirect
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin },
-      });
-      if (error) throw error;
-      return;
+      throw new Error('Popup bloqueado pelo navegador. Permita popups para este site e tente novamente.');
     }
 
     try {
+      // 2. Busca a URL do Google de forma assíncrona (o popup já está aberto, tudo bem)
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -96,13 +93,16 @@ export function useAuth() {
         throw new Error('URL OAuth não retornada');
       }
 
-      // Navega o popup já aberto para a URL do Google
-      popup.location.href = data.url;
+      // 3. Envia a URL para o popup via postMessage.
+      //    A página oauth-launch.html recebe e redireciona ela mesma para o Google —
+      //    navegação interna ao popup, sem bloqueio de cross-origin.
+      popup.postMessage({ type: 'VAULT_OAUTH_URL', url: data.url }, window.location.origin);
     } catch (err) {
       popup.close();
       throw err;
     }
 
+    // 4. Fica monitorando até o popup fechar (após login bem-sucedido)
     return new Promise<void>((resolve, reject) => {
       const interval = setInterval(async () => {
         if (popup.closed) {
