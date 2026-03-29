@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BookOpen, ChevronDown, ChevronUp, Download, X,
-  FileText, ImageIcon, Loader2, AlertTriangle, Radio, Hash
+  Gavel, ChevronDown, ChevronUp, Download, X,
+  FileText, ImageIcon, Loader2, AlertTriangle, Radio, Hash,
+  Search, Copy, Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +26,16 @@ function parseRules(data: Record<string, any>): Rule[] {
     paragrafos: Array.isArray(item.paragrafos) ? item.paragrafos : [],
     artigdcards: Array.isArray(item.artigdcards) ? item.artigdcards : [],
   }));
+}
+
+function buildRuleText(rule: Rule): string {
+  const lines: string[] = [rule.nome];
+  if (rule.descricao) lines.push(`\n${rule.descricao}`);
+  if (rule.paragrafos.length > 0) {
+    lines.push('');
+    rule.paragrafos.forEach((p, i) => lines.push(`Parágrafo ${i + 1}: ${p}`));
+  }
+  return lines.join('\n');
 }
 
 /* ─── Cards Modal ─────────────────────────────────────────────────────── */
@@ -51,46 +62,51 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
-        initial={{ scale: 0.92, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.92, opacity: 0, y: 20 }}
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="w-full max-w-2xl rounded-xl overflow-hidden border border-border/50"
-        style={{ background: 'hsl(220 35% 9% / 0.98)' }}
+        className="w-full sm:max-w-2xl rounded-t-2xl sm:rounded-xl overflow-hidden border border-border/50 flex flex-col max-h-[90vh]"
+        style={{ background: 'hsl(220 35% 9% / 0.99)' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Top bar */}
-        <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+        <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent shrink-0" />
+
+        {/* Drag handle (mobile) */}
+        <div className="flex justify-center pt-2 pb-1 sm:hidden shrink-0">
+          <div className="w-10 h-1 rounded-full bg-border/60" />
+        </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border/40 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
               <ImageIcon size={15} className="text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-display text-xs font-bold text-primary tracking-[0.2em] vault-text-glow">
                 ARTIGCARDS
               </p>
-              <p className="font-mono text-[9px] text-muted-foreground tracking-widest truncate max-w-[280px]">
+              <p className="font-mono text-[9px] text-muted-foreground tracking-widest truncate max-w-[200px] sm:max-w-[320px]">
                 {rule.nome}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-destructive/50 hover:text-destructive text-muted-foreground transition-all"
+            className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-destructive/50 hover:text-destructive text-muted-foreground transition-all shrink-0"
           >
             <X size={15} />
           </button>
         </div>
 
-        {/* Cards grid */}
-        <div className="p-6">
+        {/* Cards grid — scrollable */}
+        <div className="overflow-y-auto p-4 sm:p-6">
           <p className="font-mono text-[10px] text-primary/60 tracking-[0.3em] mb-4 flex items-center gap-2">
             <span className="h-px flex-1 bg-primary/20" />
             {rule.artigdcards.length} CARD{rule.artigdcards.length !== 1 ? 'S' : ''} DISPONÍVEIS
@@ -104,40 +120,53 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.07 }}
-                className="group relative rounded-lg overflow-hidden border border-border/40 hover:border-primary/40 transition-all"
+                className="rounded-lg overflow-hidden border border-border/40 hover:border-primary/40 transition-all"
                 style={{ background: 'hsl(220 30% 12% / 0.8)' }}
               >
-                <img
-                  src={url}
-                  alt={`ArtigCard ${i + 1}`}
-                  className="w-full object-contain max-h-52"
-                  loading="lazy"
-                />
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                  <p className="font-mono text-[10px] text-primary/80 tracking-widest">
-                    CARD {String(i + 1).padStart(2, '0')}
-                  </p>
-                  <button
-                    onClick={() => handleDownload(url, i)}
-                    data-testid={`btn-download-card-${i}`}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded vault-badge border border-primary/50 text-[11px] font-mono font-bold tracking-widest text-background hover:opacity-90 active:scale-95 transition-all"
-                  >
-                    <Download size={12} />
-                    BAIXAR
-                  </button>
+                <div className="relative group">
+                  <img
+                    src={url}
+                    alt={`ArtigCard ${i + 1}`}
+                    className="w-full object-contain max-h-52"
+                    loading="lazy"
+                  />
+                  {/* Hover overlay — desktop */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex flex-col items-center justify-center gap-2">
+                    <p className="font-mono text-[10px] text-primary/80 tracking-widest">
+                      CARD {String(i + 1).padStart(2, '0')}
+                    </p>
+                    <button
+                      onClick={() => handleDownload(url, i)}
+                      data-testid={`btn-download-card-${i}`}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded vault-badge border border-primary/50 text-[11px] font-mono font-bold tracking-widest text-background hover:opacity-90 active:scale-95 transition-all"
+                    >
+                      <Download size={12} />
+                      BAIXAR
+                    </button>
+                  </div>
+                  {/* Badge */}
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 border border-primary/30 text-primary">
+                    #{String(i + 1).padStart(2, '0')}
+                  </div>
                 </div>
 
-                {/* Card index badge */}
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 border border-primary/30 text-primary">
-                  #{String(i + 1).padStart(2, '0')}
+                {/* Download button always visible on mobile */}
+                <div className="sm:hidden p-2 border-t border-border/30">
+                  <button
+                    onClick={() => handleDownload(url, i)}
+                    data-testid={`btn-download-card-mobile-${i}`}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded vault-badge border border-primary/40 text-[11px] font-mono font-bold tracking-widest text-background active:scale-95 transition-all"
+                  >
+                    <Download size={12} />
+                    BAIXAR CARD {String(i + 1).padStart(2, '0')}
+                  </button>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
 
-        <div className="h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+        <div className="h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent shrink-0" />
       </motion.div>
     </motion.div>
   );
@@ -148,13 +177,25 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
 function RuleCard({ rule, index }: { rule: Rule; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const [showCards, setShowCards] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(buildRuleText(rule));
+      setCopied(true);
+      toast.success('Regra copiada!');
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast.error('Erro ao copiar');
+    }
+  };
 
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.07 }}
+        transition={{ delay: index * 0.06 }}
         className="rounded-xl overflow-hidden border border-border/40 hover:border-primary/30 transition-colors"
         style={{ background: 'hsl(220 30% 12% / 0.7)' }}
       >
@@ -162,40 +203,55 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
         <div className="h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
 
         {/* Rule header */}
-        <div className="px-5 py-4">
-          {/* Rule identifier row */}
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center shrink-0">
-                <BookOpen size={15} className="text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] mb-0.5">
-                  // ARTIGO {String(index + 1).padStart(2, '0')}
-                </p>
-                <h3 className="font-display text-sm font-bold text-foreground tracking-wider leading-tight vault-text-glow">
-                  {rule.nome}
-                </h3>
-              </div>
+        <div className="px-4 sm:px-5 py-4">
+
+          {/* Top row: icon + title + action buttons */}
+          <div className="flex items-start gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center shrink-0 mt-0.5">
+              <Gavel size={15} className="text-primary" />
             </div>
 
-            {/* Expand toggle */}
-            <button
-              onClick={() => setExpanded(v => !v)}
-              data-testid={`btn-expand-rule-${rule.id}`}
-              className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all shrink-0 mt-0.5"
-            >
-              {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
+            <div className="flex-1 min-w-0">
+              <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] mb-0.5">
+                // ARTIGO {String(index + 1).padStart(2, '0')}
+              </p>
+              <h3 className="font-display text-sm font-bold text-foreground tracking-wider leading-tight vault-text-glow break-words">
+                {rule.nome}
+              </h3>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-1.5 shrink-0">
+              {/* Copy */}
+              <button
+                onClick={handleCopy}
+                data-testid={`btn-copy-rule-${rule.id}`}
+                title="Copiar regra"
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+              >
+                {copied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
+              </button>
+              {/* Expand */}
+              <button
+                onClick={() => setExpanded(v => !v)}
+                data-testid={`btn-expand-rule-${rule.id}`}
+                title={expanded ? 'Recolher' : 'Expandir parágrafos'}
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+              >
+                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            </div>
           </div>
 
           {/* Descrição */}
-          <p className="font-body text-sm text-muted-foreground leading-relaxed pl-[44px]">
-            {rule.descricao}
-          </p>
+          {rule.descricao && (
+            <p className="font-body text-sm text-muted-foreground leading-relaxed mt-3 ml-[42px]">
+              {rule.descricao}
+            </p>
+          )}
 
-          {/* Footer row: paragraph count + cards button */}
-          <div className="flex items-center gap-3 mt-4 pl-[44px] flex-wrap">
+          {/* Footer badges row */}
+          <div className="flex flex-wrap items-center gap-2 mt-4 ml-[42px]">
             {rule.paragrafos.length > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-border/40 bg-muted/20">
                 <FileText size={11} className="text-primary/60" />
@@ -209,7 +265,7 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
               <button
                 onClick={() => setShowCards(true)}
                 data-testid={`btn-cards-rule-${rule.id}`}
-                className="flex items-center gap-1.5 px-3 py-1 rounded border border-primary/30 bg-primary/8 hover:bg-primary/15 hover:border-primary/50 text-primary transition-all active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1 rounded border border-primary/30 hover:bg-primary/15 hover:border-primary/50 text-primary transition-all active:scale-95"
               >
                 <ImageIcon size={11} />
                 <span className="font-mono text-[10px] font-bold tracking-widest">
@@ -227,11 +283,13 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.22 }}
               className="overflow-hidden"
             >
-              <div className="border-t border-border/30 px-5 py-4 space-y-4"
-                style={{ background: 'hsl(220 35% 10% / 0.6)' }}>
+              <div
+                className="border-t border-border/30 px-4 sm:px-5 py-4 space-y-4"
+                style={{ background: 'hsl(220 35% 10% / 0.6)' }}
+              >
                 <p className="font-mono text-[10px] text-primary/50 tracking-[0.3em] flex items-center gap-2">
                   <span className="h-px flex-1 bg-primary/15" />
                   PARÁGRAFOS
@@ -241,12 +299,11 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
                 {rule.paragrafos.map((para, pi) => (
                   <motion.div
                     key={pi}
-                    initial={{ opacity: 0, x: -8 }}
+                    initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: pi * 0.05 }}
+                    transition={{ delay: pi * 0.04 }}
                     className="flex gap-3"
                   >
-                    {/* Paragraph number badge */}
                     <div className="shrink-0 mt-0.5">
                       <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 border border-primary/25">
                         <Hash size={10} className="text-primary" />
@@ -256,7 +313,7 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
                       <p className="font-mono text-[9px] text-primary/50 tracking-widest mb-1">
                         PARÁGRAFO {pi + 1}
                       </p>
-                      <p className="font-body text-sm text-foreground/85 leading-relaxed">
+                      <p className="font-body text-sm text-foreground/85 leading-relaxed break-words">
                         {para}
                       </p>
                     </div>
@@ -282,6 +339,7 @@ export default function VaultRulesList() {
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [search, setSearch] = useState('');
 
   const fetchRules = useCallback(async () => {
     try {
@@ -301,13 +359,22 @@ export default function VaultRulesList() {
     fetchRules();
   }, [fetchRules]);
 
+  const filtered = rules.filter(r => {
+    const q = search.toLowerCase();
+    return (
+      r.nome.toLowerCase().includes(q) ||
+      r.descricao.toLowerCase().includes(q) ||
+      r.paragrafos.some(p => p.toLowerCase().includes(q))
+    );
+  });
+
   return (
     <div>
       {/* Section header */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded flex items-center justify-center bg-primary/10 border border-primary/20">
-            <BookOpen size={20} className="text-primary" />
+            <Gavel size={20} className="text-primary" />
           </div>
           <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground tracking-wider">
             Regras
@@ -316,20 +383,43 @@ export default function VaultRulesList() {
         {!loading && !error && (
           <div className="vault-badge rounded px-4 py-1.5 text-[11px] flex items-center gap-2">
             <Radio size={10} className="animate-pulse" />
-            {rules.length} ARTIG{rules.length !== 1 ? 'OS' : 'O'}
+            {filtered.length}/{rules.length} ARTIG{rules.length !== 1 ? 'OS' : 'O'}
           </div>
         )}
       </div>
+
+      {/* Search bar */}
+      {!loading && !error && rules.length > 0 && (
+        <div className="relative mb-4">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="PESQUISAR REGRAS..."
+            data-testid="input-search-rules"
+            className="w-full bg-transparent border border-border/50 rounded-lg pl-10 pr-4 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 placeholder:tracking-widest focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Warning banner */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-lg border border-primary/20 p-4 mb-6 flex items-center gap-3"
+        className="rounded-lg border border-primary/20 p-3 sm:p-4 mb-6 flex items-center gap-3"
         style={{ background: 'hsl(45 100% 55% / 0.04)' }}
       >
-        <AlertTriangle size={16} className="text-primary/70 shrink-0" />
-        <p className="font-mono text-[11px] text-primary/60 tracking-wide">
+        <AlertTriangle size={15} className="text-primary/70 shrink-0" />
+        <p className="font-mono text-[10px] sm:text-[11px] text-primary/60 tracking-wide">
           REGULAMENTO OFICIAL VAULT-TEC — LEIA COM ATENÇÃO ANTES DE OPERAR
         </p>
       </motion.div>
@@ -359,18 +449,26 @@ export default function VaultRulesList() {
             </button>
           </div>
         </div>
-      ) : rules.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="flex items-center justify-center py-24">
           <div className="text-center">
-            <BookOpen size={30} className="text-muted-foreground/30 mx-auto mb-3" />
+            <Search size={30} className="text-muted-foreground/30 mx-auto mb-3" />
             <p className="font-mono text-xs text-muted-foreground tracking-widest">
-              NENHUMA REGRA ENCONTRADA
+              {search ? `NENHUMA REGRA PARA "${search.toUpperCase()}"` : 'NENHUMA REGRA ENCONTRADA'}
             </p>
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="mt-3 font-mono text-[10px] text-primary/60 hover:text-primary tracking-widest underline underline-offset-2 transition-colors"
+              >
+                LIMPAR PESQUISA
+              </button>
+            )}
           </div>
         </div>
       ) : (
         <div className="space-y-4">
-          {rules.map((rule, i) => (
+          {filtered.map((rule, i) => (
             <RuleCard key={rule.id} rule={rule} index={i} />
           ))}
         </div>
