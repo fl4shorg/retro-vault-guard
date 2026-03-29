@@ -1,0 +1,269 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root,
+  [data-theme="vault-tec"] {
+    --background: 220 35% 8%;
+    --foreground: 45 100% 90%;
+
+    --card: 220 30% 12%;
+    --card-foreground: 45 100% 90%;
+
+    --popover: 220 30% 12%;
+    --popover-foreground: 45 100% 90%;
+
+    --primary: 45 100% 55%;
+    --primary-foreground: 220 40% 8%;
+
+    --secondary: 210 80% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 25% 16%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 210 80% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 45 40% 22%;
+    --input: 220 25% 18%;
+    --ring: 45 100% 55%;
+
+    --radius: 0.25rem;
+
+    --sidebar-background: 220 35% 10%;
+    --sidebar-foreground: 45 100% 90%;
+    --sidebar-primary: 45 100% 55%;
+    --sidebar-primary-foreground: 220 40% 8%;
+    --sidebar-accent: 210 60% 20%;
+    --sidebar-accent-foreground: 45 100% 90%;
+    --sidebar-border: 45 30% 18%;
+    --sidebar-ring: 45 100% 55%;
+
+    --vault-yellow: 45 100% 55%;
+    --vault-yellow-dim: 45 60% 35%;
+    --vault-blue: 210 80% 45%;
+    --vault-blue-dim: 210 40% 25%;
+    --vault-blue-deep: 220 40% 10%;
+    --vault-bg-deep: 220 40% 5%;
+    --vault-glow: 45 100% 70%;
+
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  /* Pip-Boy Green Theme */
+  [data-theme="pip-boy"] {
+    --foreground: 120 80% 85%;
+    --card-foreground: 120 80% 85%;
+    --popover-foreground: 120 80% 85%;
+    --primary: 120 100% 40%;
+    --primary-foreground: 120 40% 5%;
+    --secondary: 120 60% 30%;
+    --muted-foreground: 120 20% 50%;
+    --border: 120 40% 20%;
+    --input: 120 25% 14%;
+    --ring: 120 100% 40%;
+    --sidebar-primary: 120 100% 40%;
+    --sidebar-primary-foreground: 120 40% 5%;
+    --sidebar-ring: 120 100% 40%;
+    --vault-yellow: 120 100% 40%;
+    --vault-yellow-dim: 120 60% 25%;
+    --vault-glow: 120 100% 60%;
+  }
+
+  /* Nuka-Cola Red Theme */
+  [data-theme="nuka-cola"] {
+    --foreground: 0 60% 90%;
+    --card-foreground: 0 60% 90%;
+    --popover-foreground: 0 60% 90%;
+    --primary: 0 85% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 60% 35%;
+    --muted-foreground: 0 15% 55%;
+    --border: 0 40% 22%;
+    --input: 0 25% 16%;
+    --ring: 0 85% 50%;
+    --sidebar-primary: 0 85% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-ring: 0 85% 50%;
+    --vault-yellow: 0 85% 50%;
+    --vault-yellow-dim: 0 60% 30%;
+    --vault-glow: 0 85% 65%;
+  }
+
+  /* Brotherhood of Steel Theme */
+  [data-theme="brotherhood"] {
+    --foreground: 220 10% 80%;
+    --card-foreground: 220 10% 80%;
+    --popover-foreground: 220 10% 80%;
+    --primary: 220 10% 55%;
+    --primary-foreground: 220 10% 5%;
+    --secondary: 220 15% 35%;
+    --muted-foreground: 220 10% 50%;
+    --border: 220 10% 25%;
+    --input: 220 15% 16%;
+    --ring: 220 10% 55%;
+    --sidebar-primary: 220 10% 55%;
+    --sidebar-primary-foreground: 220 10% 5%;
+    --sidebar-ring: 220 10% 55%;
+    --vault-yellow: 220 10% 55%;
+    --vault-yellow-dim: 220 10% 35%;
+    --vault-glow: 220 10% 70%;
+  }
+
+  /* Institute Theme */
+  [data-theme="institute"] {
+    --foreground: 190 70% 88%;
+    --card-foreground: 190 70% 88%;
+    --popover-foreground: 190 70% 88%;
+    --primary: 190 90% 50%;
+    --primary-foreground: 200 40% 5%;
+    --secondary: 200 60% 35%;
+    --muted-foreground: 200 20% 50%;
+    --border: 200 40% 22%;
+    --input: 200 25% 16%;
+    --ring: 190 90% 50%;
+    --sidebar-primary: 190 90% 50%;
+    --sidebar-primary-foreground: 200 40% 5%;
+    --sidebar-ring: 190 90% 50%;
+    --vault-yellow: 190 90% 50%;
+    --vault-yellow-dim: 190 60% 30%;
+    --vault-glow: 190 90% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+/* Scanline effect */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.95; }
+  94% { opacity: 1; }
+  96% { opacity: 0.97; }
+  97% { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px hsl(var(--vault-yellow) / 0.2), 0 0 20px hsl(var(--vault-yellow) / 0.05); }
+  50% { box-shadow: 0 0 16px hsl(var(--vault-yellow) / 0.4), 0 0 40px hsl(var(--vault-yellow) / 0.1); }
+}
+
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 6px hsl(var(--vault-yellow) / 0.4); }
+  50% { text-shadow: 0 0 16px hsl(var(--vault-yellow) / 0.7), 0 0 30px hsl(var(--vault-yellow) / 0.2); }
+}
+
+@keyframes float-bg {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-2%, 3%) scale(1.02); }
+  66% { transform: translate(2%, -2%) scale(0.98); }
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes stripe-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 0; }
+}
+
+@layer utilities {
+  .vault-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .vault-text-glow {
+    animation: text-glow 3s ease-in-out infinite;
+  }
+
+  .vault-flicker {
+    animation: flicker 8s infinite;
+  }
+
+  .terminal-cursor::after {
+    content: '█';
+    animation: terminal-blink 1s step-end infinite;
+    color: hsl(var(--vault-yellow));
+  }
+
+  .vault-scanline {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vault-scanline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: hsl(var(--vault-yellow) / 0.08);
+    animation: scanline 6s linear infinite;
+    pointer-events: none;
+  }
+
+  .glass-vault {
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+
+  .vault-gradient-bg {
+    background: 
+      radial-gradient(ellipse at 20% 50%, hsl(var(--vault-blue) / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, hsl(var(--vault-yellow) / 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, hsl(var(--vault-blue) / 0.04) 0%, transparent 50%),
+      hsl(var(--vault-bg-deep));
+  }
+
+  .vault-stripe {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      hsl(var(--vault-yellow) / 0.03) 10px,
+      hsl(var(--vault-yellow) / 0.03) 20px
+    );
+  }
+
+  .vault-badge {
+    background: linear-gradient(135deg, hsl(var(--vault-yellow)), hsl(45 100% 45%));
+    color: hsl(var(--primary-foreground));
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
