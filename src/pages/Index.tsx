@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getProfilePhoto } from '@/components/VaultSettings';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +14,7 @@ import VaultChat from '@/components/VaultChat';
 import { Loader2, Zap } from 'lucide-react';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
   const { fbi, skur, totalFBI, totalSKUR, loading: cargosLoading, loadCargos } = useCargos();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,12 +31,11 @@ const Index = () => {
     if (user) loadCargos();
   }, [user, loadCargos]);
 
-  // Se não está logado, volta para o login (URL limpa sem hash)
   useEffect(() => {
     if (!authLoading && !user) {
-      window.location.replace(window.location.pathname.replace('#/', '').replace('#', ''));
+      navigate('/login', { replace: true });
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, navigate]);
 
   if (authLoading || !user) {
     return (

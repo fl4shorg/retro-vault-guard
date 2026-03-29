@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# VAULT-TEC — Dossiê Operacional NEEXT
 
-TODO: Document your project here
+Sistema operacional interno da Vault-Tec Industries para gerenciamento de pessoal NEEXT.

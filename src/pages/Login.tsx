@@ -1,28 +1,22 @@
 import { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/hooks/useTheme.tsx';
 import VaultBackground from '@/components/VaultBackground';
 import VaultHeader from '@/components/VaultHeader';
 import VaultLoginScreen from '@/components/VaultLoginScreen';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-const queryClient = new QueryClient();
-
-function LoginInner() {
-  const { user, loading, signUp, signIn, signInWithGoogle, resetPassword } = useAuth();
-
-  const goToApp = () => {
-    window.location.replace(window.location.pathname + '#/');
-  };
+export default function Login() {
+  const { user, loading, signUp, signIn, resetPassword } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && user) {
-      goToApp();
+      navigate('/', { replace: true });
     }
-  }, [user, loading]);
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -40,7 +34,6 @@ function LoginInner() {
 
   const handleSignIn = async (email: string, password: string) => {
     await signIn(email, password);
-    // goToApp() será chamado pelo useEffect quando user for atualizado via onAuthStateChange
   };
 
   return (
@@ -57,33 +50,9 @@ function LoginInner() {
         <VaultLoginScreen
           onSignUp={signUp}
           onSignIn={handleSignIn}
-          onGoogleSignIn={signInWithGoogle}
           onResetPassword={resetPassword}
         />
       </div>
     </>
-  );
-}
-
-export default function Login() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <Toaster />
-        <Sonner
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: 'hsl(220 30% 12% / 0.97)',
-              border: '1px solid hsl(45 40% 22% / 0.5)',
-              color: 'hsl(45 100% 90%)',
-              fontFamily: 'Share Tech Mono, monospace',
-              fontSize: '13px',
-            },
-          }}
-        />
-        <LoginInner />
-      </ThemeProvider>
-    </QueryClientProvider>
   );
 }

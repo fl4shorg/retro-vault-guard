@@ -39,17 +39,6 @@ export function useAuth() {
     if (error) throw error;
   };
 
-  const signInWithGoogle = async () => {
-    // Usa a URL atual da página limpa — funciona em qualquer subpath (ex: /vault-tec)
-    const redirectTo = window.location.href.split('#')[0].split('?')[0];
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo },
-    });
-    if (error) throw error;
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -61,5 +50,5 @@ export function useAuth() {
     if (error) throw error;
   };
 
-  return { user, loading, getUserName, signUp, signIn, signInWithGoogle, signOut, resetPassword };
+  return { user, loading, getUserName, signUp, signIn, signOut, resetPassword };
 }
