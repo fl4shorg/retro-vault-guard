@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Skull, Layers, Tag, FileText, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
+import { Shield, Skull, Layers, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
@@ -107,7 +107,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
         className="flex items-center justify-center w-10 h-10 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-95 transition-all"
         title="Ver manual"
       >
-        <FileText size={16} />
+        <BookOpen size={16} />
       </button>
       <AnimatePresence>
         {open && <DescriptionPopup cargo={cargo} onClose={() => setOpen(false)} />}
