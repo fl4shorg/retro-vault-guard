@@ -156,7 +156,7 @@ const VaultLoginScreen = ({ onSignUp, onSignIn, onGoogleSignIn, onResetPassword 
               <div className="space-y-4">
                 <div className="relative">
                   <User size={16} className={iconClass} />
-                  <input className={inputClass} type="text" placeholder="Nome completo" value={regName} onChange={e => setRegName(e.target.value)} />
+                  <input className={inputClass} type="text" placeholder="Nome" value={regName} onChange={e => setRegName(e.target.value)} />
                 </div>
                 <div className="relative">
                   <Mail size={16} className={iconClass} />
