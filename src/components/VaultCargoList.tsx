@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Skull, Layers, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
+import { Briefcase, Layers, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
@@ -118,7 +118,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
 
 const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps) => {
   const isFBI = section === 'fbi';
-  const SectionIcon = isFBI ? Shield : Skull;
+  const SectionIcon = Briefcase;
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
   const [searchTerm, setSearchTerm] = useState('');
 
