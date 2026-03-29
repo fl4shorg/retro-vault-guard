@@ -45,10 +45,10 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     const mobile = isMobileDevice();
-    const callbackUrl = window.location.origin + '/auth/callback';
+    const callbackUrl = window.location.origin;
 
     if (mobile) {
-      // Em celular popup é bloqueado — usa redirect direto para /auth/callback
+      // Em celular popup é bloqueado — usa redirect direto para o domínio raiz
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: callbackUrl },
