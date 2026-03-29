@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { Toaster } from '@/components/ui/toaster';
 import VaultBackground from '@/components/VaultBackground';
 import VaultHeader from '@/components/VaultHeader';
 import VaultLoginScreen from '@/components/VaultLoginScreen';
@@ -39,21 +37,21 @@ export default function Login() {
   return (
     <>
       <VaultBackground />
-      <div className="min-h-screen flex flex-col pt-[57px]">
-        <VaultHeader
-          userName={null}
-          isLoggedIn={false}
-          sidebarOpen={false}
-          onToggleSidebar={() => {}}
-          onLogout={() => {}}
-          positionFixed
-        />
+      <VaultHeader
+        userName={null}
+        isLoggedIn={false}
+        sidebarOpen={false}
+        onToggleSidebar={() => {}}
+        onLogout={() => {}}
+        positionFixed
+      />
+      <main style={{ paddingTop: '57px', minHeight: '100vh' }}>
         <VaultLoginScreen
           onSignUp={signUp}
           onSignIn={handleSignIn}
           onResetPassword={resetPassword}
         />
-      </div>
+      </main>
     </>
   );
 }
