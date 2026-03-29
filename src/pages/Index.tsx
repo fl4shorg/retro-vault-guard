@@ -9,6 +9,7 @@ import VaultSidebar from '@/components/VaultSidebar';
 import VaultLoginScreen from '@/components/VaultLoginScreen';
 import VaultCargoList from '@/components/VaultCargoList';
 import VaultProtocolList from '@/components/VaultProtocolList';
+import VaultRulesList from '@/components/VaultRulesList';
 import VaultChat from '@/components/VaultChat';
 import { Toaster } from 'sonner';
 import { Loader2, Zap } from 'lucide-react';
@@ -115,6 +116,8 @@ const Index = () => {
                 <VaultCargoList section="skur" cargos={skur} total={totalSKUR} loading={cargosLoading} />
               ) : activeSection === 'protocolos' ? (
                 <VaultProtocolList />
+              ) : activeSection === 'regras' ? (
+                <VaultRulesList />
               ) : activeSection === 'chat' ? (
                 <VaultChat userName={getUserName(user) ?? 'Habitante'} />
               ) : null}

@@ -1,4 +1,4 @@
-import { Shield, Skull, ShieldAlert, X, Radiation, ChevronRight, MessageSquare } from 'lucide-react';
+import { Shield, Skull, ShieldAlert, X, Radiation, ChevronRight, MessageSquare, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VaultSidebarProps {
@@ -12,6 +12,7 @@ const sections = [
   { id: 'fbi', label: 'CARGOS FBI', desc: 'Federal Bureau Intelligence', icon: Shield },
   { id: 'skur', label: 'CARGOS SKUR', desc: 'SKUR Division Operacional', icon: Skull },
   { id: 'protocolos', label: 'PROTOCOLOS', desc: 'Protocolos de Segurança DEFCON', icon: ShieldAlert },
+  { id: 'regras', label: 'REGRAS', desc: 'Regulamento Oficial Vault-Tec', icon: BookOpen },
   { id: 'chat', label: 'VAULT COMMS', desc: 'Canal de Comunicação Operacional', icon: MessageSquare },
 ];
 
