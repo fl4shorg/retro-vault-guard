@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, ShieldAlert, MessageSquare, Gavel, Radiation,
-  Zap, Radio, AlertTriangle, Terminal, Users, FileText,
+  Zap, Radio, AlertTriangle, Terminal, Users,
   ChevronRight, Activity, Cpu, Lock, Atom
 } from 'lucide-react';
 
@@ -254,60 +254,10 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, onNavigate }:
         )}
       </AnimatePresence>
 
-      {/* ── Diretiva Vault-Tec ── */}
-      <AnimatePresence>
-        {bootDone && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-            <div className="flex items-center gap-3 mb-3">
-              <FileText size={13} className="text-primary" />
-              <span className="font-mono text-[10px] text-primary/60 tracking-[0.3em]">DIRETIVA VAULT-TEC — CLASSIFICADO</span>
-              <div className="flex-1 h-px bg-primary/10" />
-            </div>
-            <div className="rounded-lg border border-primary/20 overflow-hidden" style={{ background: 'hsl(220 30% 10% / 0.9)' }}>
-              <div className="px-5 py-4 space-y-4">
-                <div className="flex gap-3">
-                  <div className="w-1 rounded-full bg-primary/50 shrink-0 self-stretch" />
-                  <div>
-                    <p className="font-display text-xs font-bold text-primary tracking-[0.2em] mb-1">MISSÃO PRINCIPAL</p>
-                    <p className="font-mono text-[11px] text-muted-foreground/70 leading-relaxed">
-                      O Dossiê Operacional NEEXT centraliza a estrutura hierárquica das forças
-                      <span className="text-primary/80 font-semibold"> FBI</span> e <span className="text-primary/80 font-semibold">SKUR</span>.
-                      Cada agente possui um cargo definido, atribuído conforme seu desempenho, antiguidade e lealdade à Vault-Tec Industries.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-1 rounded-full bg-amber-500/50 shrink-0 self-stretch" />
-                  <div>
-                    <p className="font-display text-xs font-bold text-amber-400 tracking-[0.2em] mb-1">ESTRUTURA OPERACIONAL</p>
-                    <p className="font-mono text-[11px] text-muted-foreground/70 leading-relaxed">
-                      A hierarquia é dividida entre a divisão <span className="text-primary/80 font-semibold">FBI</span> — responsável pela inteligência e operações externas —
-                      e a divisão <span className="text-primary/80 font-semibold">SKUR</span> — força de segurança interna e controle do Vault.
-                      Ambas reportam diretamente ao Supervisor Geral.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-1 rounded-full bg-green-500/50 shrink-0 self-stretch" />
-                  <div>
-                    <p className="font-display text-xs font-bold text-green-400 tracking-[0.2em] mb-1">CANAIS DE COMUNICAÇÃO</p>
-                    <p className="font-mono text-[11px] text-muted-foreground/70 leading-relaxed">
-                      Utilize o <span className="text-primary/80 font-semibold">Vault Comms</span> para comunicação interna em tempo real.
-                      Toda mensagem é registrada nos servidores da Vault-Tec e pode ser auditada pelo comando superior a qualquer momento.
-                      Mantenha o protocolo de comunicação.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* ── Aviso de Segurança ── */}
       <AnimatePresence>
         {bootDone && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
             <div className="rounded-lg border border-destructive/30 overflow-hidden" style={{ background: 'hsl(0 30% 9% / 0.8)' }}>
               <div className="flex">
                 <div className="w-2 shrink-0" style={{
@@ -338,7 +288,7 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, onNavigate }:
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.65 }}
+          transition={{ delay: 0.55 }}
           className="text-center font-mono text-[9px] text-muted-foreground/25 tracking-[0.4em] pt-2"
         >
           VAULT-TEC INDUSTRIES © 2077 — TODOS OS DIREITOS RESERVADOS — ACESSO MONITORADO
