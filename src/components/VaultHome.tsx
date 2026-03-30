@@ -16,7 +16,7 @@ const BOOT_LINES = [
   'Inicializando módulos de segurança...',
   'Verificando credenciais de acesso...',
   'Carregando dossiê operacional NEEXT...',
-  'Sincronizando banco de dados FBI & SKUR...',
+  'Sincronizando banco de dados...',
   'STATUS: TODOS OS SISTEMAS OPERACIONAIS.',
 ];
 
