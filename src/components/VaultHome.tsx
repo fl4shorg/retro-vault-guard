@@ -230,7 +230,7 @@ export default function VaultHome({ userName, totalFBI, totalSKUR }: VaultHomePr
       >
         {[
           { id: 'fbi', label: 'F.B.I', sub: 'DIVISÃO OPERACIONAL', count: totalFBI, color: '#60a5fa', borderColor: 'hsl(215 80% 50% / 0.2)' },
-          { id: 'skur', label: 'S.K.U.R', sub: 'FORÇA DE SEGURANÇA', count: totalSKUR, color: '#f5c518', borderColor: 'hsl(45 100% 50% / 0.2)' },
+          { id: 'skur', label: 'S.K.U.R', sub: 'DIVISÃO OPERACIONAL', count: totalSKUR, color: '#f5c518', borderColor: 'hsl(45 100% 50% / 0.2)' },
         ].map(({ id, label, sub, count, color, borderColor }) => (
           <div
             key={id}
