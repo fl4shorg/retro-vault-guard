@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Briefcase, ShieldAlert, MessageSquare, Gavel, Radiation,
-  Zap, Radio, AlertTriangle, Terminal, Users,
-  ChevronRight, Activity, Cpu, Lock, Atom
+  Radiation, Radio, AlertTriangle, Terminal, Users,
+  Activity, Cpu, Lock, Atom
 } from 'lucide-react';
 
 interface VaultHomeProps {
   userName: string;
   totalFBI: number;
   totalSKUR: number;
-  onNavigate: (section: string) => void;
 }
 
 const BOOT_LINES = [
@@ -29,14 +27,9 @@ const FALLOUT_QUOTES = [
   { quote: 'Um Vault é apenas tão forte quanto seus habitantes.', source: '— Manual Vault-Tec, p. 42' },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.12, duration: 0.5 } }),
-};
-
 const quoteIdx = Math.floor(Math.random() * FALLOUT_QUOTES.length);
 
-export default function VaultHome({ userName, totalFBI, totalSKUR, onNavigate }: VaultHomeProps) {
+export default function VaultHome({ userName, totalFBI, totalSKUR }: VaultHomeProps) {
   const [bootStep, setBootStep] = useState(0);
   const [bootDone, setBootDone] = useState(false);
   const [tick, setTick] = useState(true);
@@ -57,14 +50,6 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, onNavigate }:
   }, []);
 
   const { quote, source } = FALLOUT_QUOTES[quoteIdx];
-
-  const quickLinks = [
-    { id: 'fbi', label: 'CARGOS FBI', desc: 'Ver hierarquia operacional FBI', icon: Briefcase, count: totalFBI, color: 'from-blue-900/30 to-blue-950/10', border: 'border-blue-500/20', accent: 'text-blue-400' },
-    { id: 'skur', label: 'CARGOS SKUR', desc: 'Ver hierarquia operacional SKUR', icon: Briefcase, count: totalSKUR, color: 'from-amber-900/20 to-amber-950/10', border: 'border-amber-500/20', accent: 'text-amber-400' },
-    { id: 'chat', label: 'VAULT COMMS', desc: 'Canal de comunicação operacional', icon: MessageSquare, count: null, color: 'from-green-900/20 to-green-950/10', border: 'border-green-500/20', accent: 'text-green-400' },
-    { id: 'protocolos', label: 'PROTOCOLOS', desc: 'Diretivas e ordens de missão', icon: ShieldAlert, count: null, color: 'from-red-900/20 to-red-950/10', border: 'border-red-500/20', accent: 'text-red-400' },
-    { id: 'regras', label: 'REGRAS', desc: 'Regulamento oficial Vault-Tec', icon: Gavel, count: null, color: 'from-purple-900/20 to-purple-950/10', border: 'border-purple-500/20', accent: 'text-purple-400' },
-  ];
 
   const statusItems = [
     { label: 'NÍVEL DE RADIAÇÃO', value: '0.02 RAD/H', icon: Radiation, ok: true },
@@ -171,54 +156,6 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, onNavigate }:
               </div>
             </div>
             <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Quick Access Cards ── */}
-      <AnimatePresence>
-        {bootDone && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Zap size={13} className="text-primary" />
-              <span className="font-mono text-[10px] text-primary/60 tracking-[0.3em]">ACESSO RÁPIDO</span>
-              <div className="flex-1 h-px bg-primary/10" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {quickLinks.map(({ id, label, desc, icon: Icon, count, color, border, accent }, i) => (
-                <motion.button
-                  key={id}
-                  custom={i}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="show"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onNavigate(id)}
-                  className={`w-full text-left rounded-lg border ${border} bg-gradient-to-br ${color} p-4 transition-all hover:brightness-125 relative overflow-hidden group`}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'linear-gradient(135deg, transparent, hsl(45 100% 55% / 0.03))' }} />
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-black/30 border ${border}`}>
-                      <Icon size={16} className={accent} />
-                    </div>
-                    {count !== null && (
-                      <span className={`font-mono text-lg font-bold ${accent}`}>{count}</span>
-                    )}
-                    <ChevronRight size={14} className={`${accent} opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all ${count !== null ? 'hidden' : ''}`} />
-                  </div>
-                  <p className={`font-display text-sm font-bold tracking-wider ${accent} mb-0.5`}>{label}</p>
-                  <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">{desc}</p>
-                  {count !== null && (
-                    <p className="font-mono text-[10px] text-muted-foreground/40 mt-2">{count} registros ativos</p>
-                  )}
-                </motion.button>
-              ))}
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

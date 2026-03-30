@@ -108,7 +108,6 @@ const Index = () => {
               userName={getUserName(user)}
               totalFBI={totalFBI}
               totalSKUR={totalSKUR}
-              onNavigate={setActiveSection}
             />
           ) : activeSection === 'fbi' ? (
             <VaultCargoList section="fbi" cargos={fbi} total={totalFBI} loading={cargosLoading} />
