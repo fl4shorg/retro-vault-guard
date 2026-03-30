@@ -1,4 +1,4 @@
-import { Briefcase, ShieldAlert, X, Radiation, ChevronRight, MessageSquare, Gavel, AtSign } from 'lucide-react';
+import { Briefcase, ShieldAlert, X, Radiation, ChevronRight, MessageSquare, Gavel, AtSign, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VaultSidebarProps {
@@ -9,6 +9,7 @@ interface VaultSidebarProps {
 }
 
 const sections = [
+  { id: 'inicio', label: 'INÍCIO', desc: 'Bem-vindo ao Dossiê Operacional', icon: Home },
   { id: 'fbi', label: 'CARGOS FBI', desc: 'Cargos Operacionais do FBI', icon: Briefcase },
   { id: 'skur', label: 'CARGOS SKUR', desc: 'Cargos Operacionais do SKUR', icon: Briefcase },
   { id: 'protocolos', label: 'PROTOCOLOS', desc: 'Protocolos de Segurança DEFCON', icon: ShieldAlert },

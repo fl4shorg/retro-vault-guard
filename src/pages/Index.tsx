@@ -11,6 +11,7 @@ import VaultCargoList from '@/components/VaultCargoList';
 import VaultProtocolList from '@/components/VaultProtocolList';
 import VaultRulesList from '@/components/VaultRulesList';
 import VaultChat from '@/components/VaultChat';
+import VaultHome from '@/components/VaultHome';
 import { Loader2, Zap } from 'lucide-react';
 
 const Index = () => {
@@ -18,7 +19,7 @@ const Index = () => {
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
   const { fbi, skur, totalFBI, totalSKUR, loading: cargosLoading, loadCargos } = useCargos();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('fbi');
+  const [activeSection, setActiveSection] = useState('inicio');
   const [profilePhoto, setProfilePhotoState] = useState<string | null>(getProfilePhoto());
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const Index = () => {
         />
 
         <main className={`flex-1 w-full ${activeSection === 'nickname' ? 'px-0 py-0' : 'max-w-[1200px] mx-auto px-4 sm:px-6 py-6'}`}>
-          {activeSection !== 'chat' && activeSection !== 'nickname' && (
+          {activeSection !== 'chat' && activeSection !== 'nickname' && activeSection !== 'inicio' && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -102,7 +103,14 @@ const Index = () => {
             </motion.div>
           )}
 
-          {activeSection === 'fbi' ? (
+          {activeSection === 'inicio' ? (
+            <VaultHome
+              userName={getUserName(user)}
+              totalFBI={totalFBI}
+              totalSKUR={totalSKUR}
+              onNavigate={setActiveSection}
+            />
+          ) : activeSection === 'fbi' ? (
             <VaultCargoList section="fbi" cargos={fbi} total={totalFBI} loading={cargosLoading} />
           ) : activeSection === 'skur' ? (
             <VaultCargoList section="skur" cargos={skur} total={totalSKUR} loading={cargosLoading} />
