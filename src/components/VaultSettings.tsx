@@ -3,6 +3,7 @@ import { LogOut, Camera, Trash2, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useTheme, themes, type ThemeId } from '@/hooks/useTheme';
 import type { User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 export const getProfilePhoto = (): string | null => null;
 
@@ -32,19 +33,34 @@ async function compressAndUpload(file: File, userId: string): Promise<string | n
         const sy = (img.height - min) / 2;
         ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
         canvas.toBlob(async (blob) => {
-          if (!blob) { resolve(null); return; }
+          if (!blob) {
+            toast.error('Erro ao processar imagem');
+            resolve(null); return;
+          }
           const path = `${userId}/avatar.jpg`;
-          const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+          const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, blob, {
             upsert: true,
             contentType: 'image/jpeg',
           });
-          if (error) { resolve(null); return; }
+          if (uploadError) {
+            toast.error(`Erro no upload: ${uploadError.message}`);
+            resolve(null); return;
+          }
           const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+          const { error: metaError } = await supabase.auth.updateUser({
+            data: { avatar_url: data.publicUrl + '?t=' + Date.now() }
+          });
+          if (metaError) {
+            toast.error(`Erro ao salvar perfil: ${metaError.message}`);
+            resolve(null); return;
+          }
           resolve(data.publicUrl + '?t=' + Date.now());
         }, 'image/jpeg', 0.82);
       };
+      img.onerror = () => { toast.error('Erro ao ler imagem'); resolve(null); };
       img.src = ev.target?.result as string;
     };
+    reader.onerror = () => { toast.error('Erro ao ler arquivo'); resolve(null); };
     reader.readAsDataURL(file);
   });
 }
@@ -87,8 +103,8 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
     try {
       const url = await compressAndUpload(file, user.id);
       if (url) {
-        await supabase.auth.updateUser({ data: { avatar_url: url } });
         setAvatarUrl(url);
+        toast.success('Foto de perfil atualizada!');
       }
     } finally {
       setUploading(false);
@@ -101,6 +117,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
     await supabase.storage.from(BUCKET).remove([`${user.id}/avatar.jpg`]);
     await supabase.auth.updateUser({ data: { avatar_url: null } });
     setAvatarUrl(null);
+    toast.success('Foto removida');
   };
 
   const initial = (userName || 'H').charAt(0).toUpperCase();
