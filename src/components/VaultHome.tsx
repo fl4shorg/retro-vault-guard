@@ -228,7 +228,7 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.12 }}
-        className="grid grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
         {[
           { id: 'fbi',       label: 'F.B.I',       sub: 'DIVISÃO OPERACIONAL', count: totalFBI,       barLabel: 'CARGOS REGISTRADOS', color: '#60a5fa', borderColor: 'hsl(215 80% 50% / 0.2)' },
@@ -242,15 +242,15 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
             style={{ borderColor, background: 'linear-gradient(160deg, hsl(220 38% 9%), hsl(220 42% 7%))' }}
           >
             <div className="h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-            <div className="px-4 py-4 flex flex-col gap-3">
+            <div className="px-5 py-5 flex flex-col gap-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-[7px] sm:text-[8px] tracking-[0.3em] mb-0.5" style={{ color, opacity: 0.5 }}>{sub}</p>
-                  <p className="font-display text-base sm:text-xl font-bold tracking-[0.15em]" style={{ color }}>{label}</p>
+                  <p className="font-mono text-[8px] tracking-[0.4em] mb-0.5" style={{ color, opacity: 0.5 }}>{sub}</p>
+                  <p className="font-display text-xl font-bold tracking-[0.2em]" style={{ color }}>{label}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-mono text-[7px] text-muted-foreground/30 tracking-[0.2em] mb-0.5">TOTAL</p>
-                  <p className="font-mono text-3xl sm:text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}66)` }}>
+                  <p className="font-mono text-[8px] text-muted-foreground/30 tracking-[0.3em] mb-0.5">TOTAL</p>
+                  <p className="font-mono text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}66)` }}>
                     {String(count).padStart(2, '0')}
                   </p>
                 </div>
