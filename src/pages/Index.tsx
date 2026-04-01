@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getProfilePhoto } from '@/components/VaultSettings';
 import { useAuth } from '@/hooks/useAuth';
 import { useCargos } from '@/hooks/useCargos';
 import VaultBackground from '@/components/VaultBackground';
@@ -20,13 +19,6 @@ const Index = () => {
   const { fbi, skur, totalFBI, totalSKUR, loading: cargosLoading, loadCargos } = useCargos();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
-  const [profilePhoto, setProfilePhotoState] = useState<string | null>(getProfilePhoto());
-
-  useEffect(() => {
-    const handler = () => setProfilePhotoState(getProfilePhoto());
-    window.addEventListener('profile-photo-change', handler);
-    return () => window.removeEventListener('profile-photo-change', handler);
-  }, []);
 
   useEffect(() => {
     if (user) loadCargos();
@@ -52,12 +44,16 @@ const Index = () => {
     );
   }
 
+  const avatarUrl = user.user_metadata?.avatar_url ?? null;
+  const userName = getUserName(user);
+
   return (
     <>
       <VaultBackground />
       <div className="min-h-screen flex flex-col vault-flicker">
         <VaultHeader
-          userName={getUserName(user)}
+          user={user}
+          userName={userName}
           isLoggedIn={!!user}
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -80,19 +76,20 @@ const Index = () => {
               style={{ background: 'hsl(220 30% 11% / 0.8)' }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded overflow-hidden flex items-center justify-center vault-badge vault-glow">
-                  {profilePhoto ? (
-                    <img src={profilePhoto} alt="Perfil" className="w-full h-full object-cover" />
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/40 flex items-center justify-center vault-glow shrink-0"
+                  style={{ background: 'hsl(var(--primary) / 0.1)' }}>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Perfil" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-lg font-bold">
-                      {getUserName(user)?.charAt(0).toUpperCase() || 'H'}
+                    <span className="text-primary font-bold text-lg font-mono">
+                      {userName?.charAt(0).toUpperCase() || 'H'}
                     </span>
                   )}
                 </div>
                 <div>
                   <p className="font-mono text-[10px] text-muted-foreground tracking-[0.3em]">// BEM-VINDO AO VAULT</p>
                   <h2 className="font-display text-lg font-bold text-foreground tracking-wider vault-text-glow">
-                    Olá, <span className="text-primary">{getUserName(user)}</span>
+                    Olá, <span className="text-primary">{userName}</span>
                   </h2>
                   <p className="font-mono text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                     <Zap size={10} className="text-primary" />
@@ -105,7 +102,7 @@ const Index = () => {
 
           {activeSection === 'inicio' ? (
             <VaultHome
-              userName={getUserName(user)}
+              userName={userName}
               totalFBI={totalFBI}
               totalSKUR={totalSKUR}
             />
@@ -118,7 +115,7 @@ const Index = () => {
           ) : activeSection === 'regras' ? (
             <VaultRulesList />
           ) : activeSection === 'chat' ? (
-            <VaultChat userName={getUserName(user) ?? 'Habitante'} />
+            <VaultChat userName={userName ?? 'Habitante'} />
           ) : activeSection === 'nickname' ? (
             <motion.div
               initial={{ opacity: 0 }}
