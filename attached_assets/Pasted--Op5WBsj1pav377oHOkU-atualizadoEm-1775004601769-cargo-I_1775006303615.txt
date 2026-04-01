@@ -1,0 +1,302 @@
+{
+  "-Op5WBsj1pav377oHOkU": {
+    "atualizadoEm": 1775004601769,
+    "cargo": "Imperador ◌",
+    "categoria": "Landstag",
+    "categoriaPosicao": 2,
+    "descricao": "",
+    "nome": "",
+    "posicao": 1,
+    "tag": "ⁱᵐᵖʳ"
+  },
+  "-Op5WFwekiqh6xS5nwvi": {
+    "atualizadoEm": 1775004618405,
+    "cargo": "Imperador tk ◌",
+    "categoria": "Landstag",
+    "categoriaPosicao": 2,
+    "descricao": "",
+    "nome": "",
+    "posicao": 2,
+    "tag": "nenhum"
+  },
+  "-Op5WKILQFGE5r6pYr5y": {
+    "atualizadoEm": 1775004636224,
+    "cargo": "Diretor ◌",
+    "categoria": "Landstag",
+    "categoriaPosicao": 2,
+    "descricao": "",
+    "nome": "",
+    "posicao": 3,
+    "tag": "nenhum"
+  },
+  "-Op5WaOToBp2tiJgn2yp": {
+    "atualizadoEm": 1775004706246,
+    "cargo": "Vice Diretor ◌",
+    "categoria": "Landstag",
+    "categoriaPosicao": 2,
+    "descricao": "",
+    "nome": "",
+    "posicao": 4,
+    "tag": "nenhum"
+  },
+  "-Op5WwggFi2FkseAM3Im": {
+    "atualizadoEm": 1775004797587,
+    "cargo": "Primeiro Ministro  ◌",
+    "categoria": "Landstag",
+    "categoriaPosicao": 2,
+    "descricao": "",
+    "nome": "",
+    "posicao": 5,
+    "tag": "nenhum"
+  },
+  "-Op5X1lkojoCxtsRGK9n": {
+    "atualizadoEm": 1775004822489,
+    "cargo": "Assistente ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 1,
+    "tag": "nenhum"
+  },
+  "-Op5X4uhMAc7x4EJuJhK": {
+    "atualizadoEm": 1775004835349,
+    "cargo": "Chanceler ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 2,
+    "tag": "nenhum"
+  },
+  "-Op5X7EjrWIS9yaw5w8G": {
+    "atualizadoEm": 1775004844888,
+    "cargo": "Procurador Geral ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 3,
+    "tag": "nenhum"
+  },
+  "-Op5X9OZzTMoXHmTs5jI": {
+    "atualizadoEm": 1775004853709,
+    "cargo": "Conselheiro ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 4,
+    "tag": "nenhum"
+  },
+  "-Op5XCArE68kCKhOdzqt": {
+    "atualizadoEm": 1775004865122,
+    "cargo": "Diretor da Abin ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 5,
+    "tag": "nenhum"
+  },
+  "-Op5XG8FFevNvS7cSicl": {
+    "atualizadoEm": 1775004881338,
+    "cargo": "Ceo Regente ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 6,
+    "tag": "nenhum"
+  },
+  "-Op5XIri-JSoRIq5bfZX": {
+    "atualizadoEm": 1775004892504,
+    "cargo": "Arquiteto ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 7,
+    "tag": "nenhum"
+  },
+  "-Op5XLpBZTHhIi5WmHhM": {
+    "atualizadoEm": 1775004904630,
+    "cargo": "Ministro Da Economia ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 8,
+    "tag": "nenhum"
+  },
+  "-Op5Xi60cdN7vFq0R0Ok": {
+    "atualizadoEm": 1775004999980,
+    "cargo": "Tesoureiro ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 9,
+    "tag": "nenhum"
+  },
+  "-Op5XlLz4ypEYpmc8uCU": {
+    "atualizadoEm": 1775005013288,
+    "cargo": "Juiz Inspetor ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 10,
+    "tag": "nenhum"
+  },
+  "-Op5XoEvcmGAXm7b96W0": {
+    "atualizadoEm": 1775005025123,
+    "cargo": "Delegado ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 11,
+    "tag": "nenhum"
+  },
+  "-Op5Xu0KLp_p8IQ6UAeM": {
+    "atualizadoEm": 1775005048767,
+    "cargo": "Ministro Da Defesa ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 12,
+    "tag": "nenhum"
+  },
+  "-Op5XwYlOTcbrtTa5dMC": {
+    "atualizadoEm": 1775005059163,
+    "cargo": "Presidente do brinks ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 13,
+    "tag": "nenhum"
+  },
+  "-Op5Xzow7lQekdKJuY8C": {
+    "atualizadoEm": 1775005072559,
+    "cargo": "Ministro da Justiça ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 14,
+    "tag": "nenhum"
+  },
+  "-Op5Y1QFE9YzXBkvhj1Y": {
+    "atualizadoEm": 1775005083202,
+    "cargo": "Ministro das relações ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 15,
+    "tag": "nenhum"
+  },
+  "-Op5Y42uzHOQru50gkh6": {
+    "atualizadoEm": 1775005093988,
+    "cargo": "Ministro de inteligência ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 16,
+    "tag": "nenhum"
+  },
+  "-Op5Y6dc7HiKGT7LTnmQ": {
+    "atualizadoEm": 1775005104593,
+    "cargo": "Ministro do Interior ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 17,
+    "tag": "nenhum"
+  },
+  "-Op5Y8w7aYiwshbWjkQ7": {
+    "atualizadoEm": 1775005113968,
+    "cargo": "Perfilador Geral ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 18,
+    "tag": "nenhum"
+  },
+  "-Op5YBDFhXG68LycUus1": {
+    "atualizadoEm": 1775005123321,
+    "cargo": "Tabelião ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 19,
+    "tag": "nenhum"
+  },
+  "-Op5YDcFPpFcqvxEtCb0": {
+    "atualizadoEm": 1775005133177,
+    "cargo": "Reporter ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 20,
+    "tag": "nenhum"
+  },
+  "-Op5YGus3XCBATOTEPz5": {
+    "atualizadoEm": 1775005146659,
+    "cargo": "Padre ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 21,
+    "tag": "nenhum"
+  },
+  "-Op5YJliNjQqnFzqqKVA": {
+    "atualizadoEm": 1775005158361,
+    "cargo": "Psicóloga ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 22,
+    "tag": "nenhum"
+  },
+  "-Op5YMqiRfkSCY_Uh78G": {
+    "atualizadoEm": 1775005170968,
+    "cargo": "Psicóloga Tk ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 23,
+    "tag": "nenhum"
+  },
+  "-Op5YOyEeRR8RKr1Ia5Q": {
+    "atualizadoEm": 1775005179641,
+    "cargo": "Guardião ♖ ꗃ",
+    "categoria": "Kremnlin",
+    "categoriaPosicao": 3,
+    "descricao": "",
+    "nome": "",
+    "posicao": 24,
+    "tag": "nenhum"
+  },
+  "-Op5_BGjjH2r5fLQT0JQ": {
+    "atualizadoEm": 1775005647855,
+    "cargo": "gdgds",
+    "categoria": "fdgd",
+    "categoriaPosicao": 1,
+    "descricao": "gsgs",
+    "nome": "hsgs",
+    "posicao": 1,
+    "tag": "gsgs"
+  }
+}

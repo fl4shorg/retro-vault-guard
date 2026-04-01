@@ -5,6 +5,7 @@ export interface CargoItem {
   id: string;
   cargo: string;
   categoria: string;
+  categoriaPosicao: number;
   posicao: number;
   descricao: string;
   tag: string;
@@ -26,6 +27,7 @@ function parseApiData(data: Record<string, any> | null): CargoItem[] {
     id,
     cargo: item.cargo || 'Sem título',
     categoria: item.categoria || 'Geral',
+    categoriaPosicao: item.categoriaPosicao ?? 999,
     posicao: item.posicao || 0,
     descricao: item.descricao || '',
     tag: item.tag || '',

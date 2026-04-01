@@ -142,7 +142,11 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
       return [cat, filtered] as [string, CargoItem[]];
     })
     .filter(([, items]) => items.length > 0)
-    .sort(([a], [b]) => a.localeCompare(b));
+    .sort(([catA, itemsA], [catB, itemsB]) => {
+      const posA = itemsA[0]?.categoriaPosicao ?? 999;
+      const posB = itemsB[0]?.categoriaPosicao ?? 999;
+      return posA - posB;
+    });
 
   return (
     <div>
