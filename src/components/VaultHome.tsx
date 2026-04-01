@@ -5,6 +5,8 @@ interface VaultHomeProps {
   userName: string;
   totalFBI: number;
   totalSKUR: number;
+  totalRegras: number;
+  totalProtocols: number;
 }
 
 const FALLOUT_QUOTES = [
@@ -129,7 +131,7 @@ function StatBar({ label, value, max, color }: { label: string; value: number; m
   );
 }
 
-export default function VaultHome({ userName, totalFBI, totalSKUR }: VaultHomeProps) {
+export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, totalProtocols }: VaultHomeProps) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -142,7 +144,7 @@ export default function VaultHome({ userName, totalFBI, totalSKUR }: VaultHomePr
   const dateStr = `${pad(time.getDate())} ${MONTHS[time.getMonth()]} ${time.getFullYear()}`;
   const dayStr = DAYS[time.getDay()];
   const { quote, source } = FALLOUT_QUOTES[quoteIdx];
-  const maxCargos = Math.max(totalFBI, totalSKUR, 1);
+  const maxCount = Math.max(totalFBI, totalSKUR, totalRegras, totalProtocols, 1);
 
   return (
     <div className="space-y-5 pb-10">
@@ -221,43 +223,39 @@ export default function VaultHome({ userName, totalFBI, totalSKUR }: VaultHomePr
         <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       </motion.div>
 
-      {/* ════ CARGOS — FBI & SKUR ════ */}
+      {/* ════ ESTATÍSTICAS ════ */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.12 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+        className="grid grid-cols-2 gap-4"
       >
         {[
-          { id: 'fbi', label: 'F.B.I', sub: 'DIVISÃO OPERACIONAL', count: totalFBI, color: '#60a5fa', borderColor: 'hsl(215 80% 50% / 0.2)' },
-          { id: 'skur', label: 'S.K.U.R', sub: 'DIVISÃO OPERACIONAL', count: totalSKUR, color: '#f5c518', borderColor: 'hsl(45 100% 50% / 0.2)' },
-        ].map(({ id, label, sub, count, color, borderColor }) => (
+          { id: 'fbi',       label: 'F.B.I',       sub: 'DIVISÃO OPERACIONAL', count: totalFBI,       barLabel: 'CARGOS REGISTRADOS', color: '#60a5fa', borderColor: 'hsl(215 80% 50% / 0.2)' },
+          { id: 'skur',      label: 'S.K.U.R',      sub: 'DIVISÃO OPERACIONAL', count: totalSKUR,      barLabel: 'CARGOS REGISTRADOS', color: '#f5c518', borderColor: 'hsl(45 100% 50% / 0.2)'  },
+          { id: 'regras',    label: 'ARTIGOS',       sub: 'REGULAMENTO VAULT',   count: totalRegras,    barLabel: 'ARTIGOS ATIVOS',     color: '#a78bfa', borderColor: 'hsl(265 80% 50% / 0.2)' },
+          { id: 'protocols', label: 'PROTOCOLOS',    sub: 'SEGURANÇA DEFCON',    count: totalProtocols, barLabel: 'NÍVEIS ATIVOS',      color: '#f87171', borderColor: 'hsl(0 70% 50% / 0.2)'   },
+        ].map(({ id, label, sub, count, barLabel, color, borderColor }) => (
           <div
             key={id}
             className="rounded-xl overflow-hidden border"
-            style={{
-              borderColor,
-              background: 'linear-gradient(160deg, hsl(220 38% 9%), hsl(220 42% 7%))',
-            }}
+            style={{ borderColor, background: 'linear-gradient(160deg, hsl(220 38% 9%), hsl(220 42% 7%))' }}
           >
             <div className="h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-            <div className="px-5 py-5 flex flex-col gap-4">
-              {/* Header */}
+            <div className="px-4 py-4 flex flex-col gap-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-[8px] tracking-[0.4em] mb-0.5" style={{ color, opacity: 0.5 }}>{sub}</p>
-                  <p className="font-display text-xl font-bold tracking-[0.2em]" style={{ color }}>{label}</p>
+                  <p className="font-mono text-[7px] sm:text-[8px] tracking-[0.3em] mb-0.5" style={{ color, opacity: 0.5 }}>{sub}</p>
+                  <p className="font-display text-base sm:text-xl font-bold tracking-[0.15em]" style={{ color }}>{label}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-mono text-[8px] text-muted-foreground/30 tracking-[0.3em] mb-0.5">TOTAL</p>
-                  <p className="font-mono text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}66)` }}>
+                  <p className="font-mono text-[7px] text-muted-foreground/30 tracking-[0.2em] mb-0.5">TOTAL</p>
+                  <p className="font-mono text-3xl sm:text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}66)` }}>
                     {String(count).padStart(2, '0')}
                   </p>
                 </div>
               </div>
-
-              {/* Bar */}
-              <StatBar label="CARGOS REGISTRADOS" value={count} max={maxCargos} color={color} />
+              <StatBar label={barLabel} value={count} max={maxCount} color={color} />
             </div>
           </div>
         ))}

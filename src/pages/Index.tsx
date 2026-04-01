@@ -16,7 +16,8 @@ import { Loader2, Zap } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
-  const { fbi, skur, totalFBI, totalSKUR, loading: cargosLoading, loadCargos } = useCargos();
+  const { fbi, skur, totalFBI, totalSKUR, totalRegras, loading: cargosLoading, loadCargos } = useCargos();
+  const totalProtocols = 4;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
 
@@ -105,6 +106,8 @@ const Index = () => {
               userName={userName}
               totalFBI={totalFBI}
               totalSKUR={totalSKUR}
+              totalRegras={totalRegras}
+              totalProtocols={totalProtocols}
             />
           ) : activeSection === 'fbi' ? (
             <VaultCargoList section="fbi" cargos={fbi} total={totalFBI} loading={cargosLoading} />

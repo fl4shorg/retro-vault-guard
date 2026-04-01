@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 import { API_CARGOS_FBI, API_CARGOS_SKUR } from '@/lib/supabase';
 
+const API_REGRAS = 'https://www.api.neext.online/api/regras';
+
 export interface CargoItem {
   id: string;
   cargo: string;
@@ -18,6 +20,7 @@ interface CargosData {
   skur: CargoItem[];
   totalFBI: number;
   totalSKUR: number;
+  totalRegras: number;
   loading: boolean;
 }
 
@@ -38,24 +41,28 @@ function parseApiData(data: Record<string, any> | null): CargoItem[] {
 
 export function useCargos() {
   const [data, setData] = useState<CargosData>({
-    fbi: [], skur: [], totalFBI: 0, totalSKUR: 0, loading: false,
+    fbi: [], skur: [], totalFBI: 0, totalSKUR: 0, totalRegras: 0, loading: false,
   });
 
   const loadCargos = useCallback(async () => {
     setData(prev => ({ ...prev, loading: true }));
     try {
-      const [resFBI, resSKUR] = await Promise.all([
+      const [resFBI, resSKUR, resRegras] = await Promise.all([
         fetch(API_CARGOS_FBI).catch(() => null),
         fetch(API_CARGOS_SKUR).catch(() => null),
+        fetch(API_REGRAS).catch(() => null),
       ]);
 
       const dadosFBI = resFBI?.ok ? await resFBI.json() : null;
       const dadosSKUR = resSKUR?.ok ? await resSKUR.json() : null;
+      const dadosRegras = resRegras?.ok ? await resRegras.json() : null;
 
       const fbi = parseApiData(dadosFBI);
       const skur = parseApiData(dadosSKUR);
+      const totalRegras = dadosRegras && typeof dadosRegras === 'object'
+        ? Object.keys(dadosRegras).length : 0;
 
-      setData({ fbi, skur, totalFBI: fbi.length, totalSKUR: skur.length, loading: false });
+      setData({ fbi, skur, totalFBI: fbi.length, totalSKUR: skur.length, totalRegras, loading: false });
     } catch {
       setData(prev => ({ ...prev, loading: false }));
     }
