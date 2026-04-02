@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Shield, ChevronDown, ChevronUp } from 'lucide-react';
+import { Briefcase, Layers, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
+
 
 interface VaultCargoListProps {
   section: string;
@@ -13,6 +14,7 @@ interface VaultCargoListProps {
 
 const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof Tag; label: string }) => {
   const [copied, setCopied] = useState(false);
+
   const handleCopy = async () => {
     if (!value) return;
     try {
@@ -24,20 +26,23 @@ const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof 
       toast.error('Erro ao copiar');
     }
   };
+
   if (!value) return null;
+
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center justify-center w-7 h-7 rounded border border-primary/30 text-primary/70 hover:bg-primary/10 hover:border-primary/60 hover:text-primary active:scale-95 transition-all"
+      className="flex items-center justify-center w-10 h-10 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-95 transition-all"
       title={`Copiar ${label}`}
     >
-      {copied ? <Check size={11} /> : <Icon size={11} />}
+      {copied ? <Check size={16} /> : <Icon size={16} />}
     </button>
   );
 };
 
 const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () => void }) => {
   const [copied, setCopied] = useState(false);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(cargo.descricao);
@@ -48,6 +53,7 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
       toast.error('Erro ao copiar');
     }
   };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -93,14 +99,15 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
 const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   const [open, setOpen] = useState(false);
   if (!cargo.descricao) return null;
+
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded border border-primary/30 text-primary/70 hover:bg-primary/10 hover:border-primary/60 hover:text-primary active:scale-95 transition-all"
+        className="flex items-center justify-center w-10 h-10 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-95 transition-all"
         title="Ver manual"
       >
-        <BookOpen size={11} />
+        <BookOpen size={16} />
       </button>
       <AnimatePresence>
         {open && <DescriptionPopup cargo={cargo} onClose={() => setOpen(false)} />}
@@ -109,154 +116,9 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   );
 };
 
-/* ── Horizontal connector between nodes ──────────────────────────────── */
-const HorizontalConnector = () => (
-  <div className="flex items-center shrink-0" style={{ width: 40 }}>
-    <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-primary/30" />
-    {/* Arrow tip */}
-    <svg width="8" height="10" viewBox="0 0 8 10" fill="none" className="shrink-0 -ml-px">
-      <path d="M1 1l6 4-6 4" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.6" />
-    </svg>
-  </div>
-);
-
-/* ── Single cargo node ────────────────────────────────────────────────── */
-const CargoNode = ({ cargo, index }: { cargo: CargoItem; index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.88 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay: index * 0.06 }}
-    className="group relative flex flex-col shrink-0"
-    style={{ width: 160 }}
-  >
-    {/* Glow border card */}
-    <div
-      className="relative rounded-xl border border-border/40 hover:border-primary/50 transition-all duration-200 hover:shadow-[0_0_16px_hsl(var(--primary)/0.18)] overflow-hidden h-full flex flex-col"
-      style={{ background: 'hsl(220 30% 9% / 0.95)' }}
-    >
-      {/* Top accent line */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent group-hover:via-primary transition-all duration-300" />
-
-      {/* Scanline overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.025] rounded-xl"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 2px,hsl(var(--primary)) 2px,hsl(var(--primary)) 3px)' }}
-      />
-
-      <div className="flex flex-col gap-2 p-3 flex-1">
-        {/* Position badge */}
-        <div className="flex items-center justify-between">
-          <div
-            className="w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-[11px] border shrink-0"
-            style={{
-              background: 'hsl(var(--primary)/0.1)',
-              borderColor: 'hsl(var(--primary)/0.35)',
-              color: 'hsl(var(--primary))',
-              textShadow: '0 0 8px hsl(var(--primary)/0.6)',
-              boxShadow: '0 0 6px hsl(var(--primary)/0.12)',
-            }}
-          >
-            {cargo.posicao || index + 1}
-          </div>
-          {/* Action buttons */}
-          <div className="flex items-center gap-1">
-            <DescriptionButton cargo={cargo} />
-            <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
-          </div>
-        </div>
-
-        {/* Cargo name */}
-        <p className="font-body font-semibold text-foreground text-[13px] leading-snug">
-          {cargo.cargo}
-        </p>
-
-        {/* Tag + creator */}
-        <div className="mt-auto flex flex-col gap-1">
-          {cargo.tag && (
-            <span className="font-mono text-[10px] text-primary/55 bg-primary/5 border border-primary/10 rounded px-1.5 py-0.5 w-fit max-w-full truncate">
-              {cargo.tag}
-            </span>
-          )}
-          {cargo.criadoPor && (
-            <span className="font-mono text-[10px] text-muted-foreground/45 flex items-center gap-1">
-              <User size={9} className="shrink-0" />
-              <span className="truncate">{cargo.criadoPor}</span>
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
-
-/* ── Category row (horizontal tech tree) ─────────────────────────────── */
-const TechTreeRow = ({ cat, items, index }: { cat: string; items: CargoItem[]; index: number }) => {
-  const [collapsed, setCollapsed] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.08 }}
-      className="flex flex-col gap-3"
-    >
-      {/* Category label */}
-      <button
-        onClick={() => setCollapsed(v => !v)}
-        className="group flex items-center gap-2.5 w-fit"
-      >
-        <div
-          className="flex items-center gap-2.5 rounded-lg border border-primary/40 px-3.5 py-2 transition-all hover:border-primary/70 hover:shadow-[0_0_12px_hsl(var(--primary)/0.2)] relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.15), hsl(45 100% 42%/0.08))' }}
-        >
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
-            style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 2px,hsl(var(--primary)) 2px,hsl(var(--primary)) 3px)' }}
-          />
-          <Shield size={13} className="text-primary shrink-0" />
-          <span className="font-display font-bold text-primary text-xs tracking-[0.18em] uppercase whitespace-nowrap">
-            {cat}
-          </span>
-          <span className="font-mono text-[10px] text-primary/40 ml-1">
-            [{items.length}]
-          </span>
-          <div className="text-primary/40 group-hover:text-primary/70 transition-colors ml-1">
-            {collapsed ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-          </div>
-        </div>
-      </button>
-
-      {/* Horizontal chain */}
-      <AnimatePresence>
-        {!collapsed && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-x-auto pb-2"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(var(--primary)/0.2) transparent' }}
-          >
-            <div className="flex items-stretch gap-0 min-w-max pl-2">
-              {items.map((cargo, i) => (
-                <div key={cargo.id} className="flex items-center">
-                  <CargoNode cargo={cargo} index={i} />
-                  {i < items.length - 1 && <HorizontalConnector />}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Category separator */}
-      <div className="h-px bg-gradient-to-r from-primary/20 via-border/30 to-transparent mt-1" />
-    </motion.div>
-  );
-};
-
-/* ── Main component ───────────────────────────────────────────────────── */
 const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps) => {
   const isFBI = section === 'fbi';
+  const SectionIcon = Briefcase;
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -266,6 +128,7 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
     if (!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(c);
   });
+
   Object.values(grouped).forEach(arr => arr.sort((a, b) => a.posicao - b.posicao));
 
   const filteredGroups = Object.entries(grouped)
@@ -279,7 +142,7 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
       return [cat, filtered] as [string, CargoItem[]];
     })
     .filter(([, items]) => items.length > 0)
-    .sort(([, itemsA], [, itemsB]) => {
+    .sort(([catA, itemsA], [catB, itemsB]) => {
       const posA = itemsA[0]?.categoriaPosicao ?? 999;
       const posB = itemsB[0]?.categoriaPosicao ?? 999;
       return posA - posB;
@@ -291,7 +154,7 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded flex items-center justify-center bg-primary/10 border border-primary/20">
-            <Briefcase size={20} className="text-primary" />
+            <SectionIcon size={20} className="text-primary" />
           </div>
           <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground tracking-wider">
             {title}
@@ -303,10 +166,8 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
       </div>
 
       {/* Search */}
-      <div className="relative mb-8">
-        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-        </svg>
+      <div className="relative mb-6">
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input
           type="text"
           placeholder="Buscar cargos..."
@@ -331,9 +192,71 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
           <p className="font-mono text-sm">Nenhum resultado para "{searchTerm}"</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
-          {filteredGroups.map(([cat, items], index) => (
-            <TechTreeRow key={cat} cat={cat} items={items} index={index} />
+        <div className="space-y-8">
+          {filteredGroups.map(([cat, items]) => (
+            <motion.div
+              key={cat}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-xl overflow-hidden border border-border/40"
+              style={{ background: 'hsl(220 30% 11% / 0.6)' }}
+            >
+              {/* Category header */}
+              <div
+                className="px-5 py-4 flex items-center justify-center gap-3 flex-col"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(45 100% 42%))',
+                }}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers size={20} className="text-primary-foreground" />
+                  <h3 className="font-display text-lg font-bold text-primary-foreground tracking-wider">
+                    {cat}
+                  </h3>
+                </div>
+                <p className="font-body text-sm text-primary-foreground/70">
+                  Total de Cargos: {items.length}
+                </p>
+              </div>
+
+              {/* Cargo items */}
+              <div className="divide-y divide-border/20">
+                {items.map((cargo, i) => (
+                  <div
+                    key={cargo.id}
+                    className="flex items-center gap-4 px-4 py-4 hover:bg-primary/[0.03] transition-colors"
+                  >
+                    {/* Position number */}
+                    <span className="font-mono text-base text-muted-foreground/60 w-6 text-center shrink-0">
+                      {cargo.posicao || i + 1}
+                    </span>
+
+                    {/* Accent bar */}
+                    <div className="w-1 self-stretch rounded-full bg-primary/60 shrink-0" />
+
+                    {/* Cargo name + creator */}
+                    <div className="flex-1 min-w-0">
+                      <span className="font-body text-base font-semibold text-foreground block">
+                        {cargo.cargo}
+                      </span>
+                      {cargo.criadoPor && (
+                        <span className="font-mono text-[11px] text-muted-foreground/60 flex items-center gap-1 mt-0.5">
+                          <User size={10} /> {cargo.criadoPor}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {cargo.descricao && (
+                        <DescriptionButton cargo={cargo} />
+                      )}
+                      <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           ))}
         </div>
       )}
