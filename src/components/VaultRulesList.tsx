@@ -254,12 +254,13 @@ const RuleCard = memo(function RuleCard({ rule, index }: { rule: Rule; index: nu
           </div>
         </div>
 
-        {/* Expandable paragraphs — CSS transition simples, sem height:auto animation */}
+        {/* Expandable paragraphs — grid-template-rows anima sem precisar estimar altura */}
         {rule.paragrafos.length > 0 && (
           <div
-            className="overflow-hidden transition-all duration-200 ease-in-out"
-            style={{ maxHeight: expanded ? `${rule.paragrafos.length * 120 + 80}px` : '0px' }}
+            className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+            style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
           >
+          <div className="overflow-hidden">
             <div
               className="border-t border-border/30 px-4 sm:px-5 py-4 space-y-4"
               style={{ background: 'hsl(220 35% 10% / 0.6)' }}
@@ -288,6 +289,7 @@ const RuleCard = memo(function RuleCard({ rule, index }: { rule: Rule; index: nu
                 </div>
               ))}
             </div>
+          </div>
           </div>
         )}
       </div>
