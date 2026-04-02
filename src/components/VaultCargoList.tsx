@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Atom } from 'lucide-react';
+import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Atom, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
@@ -115,6 +115,98 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   );
 };
 
+const CategorySection = ({ cat, cargoItems }: { cat: string; cargoItems: CargoItem[] }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAll = async () => {
+    const text = cargoItems
+      .map((c, i) => `${String(c.posicao || i + 1).padStart(2, '0')}. ${c.cargo}${c.tag ? ` | ${c.tag}` : ''}`)
+      .join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success('Categoria copiada!');
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error('Erro ao copiar');
+    }
+  };
+
+  return (
+    <div>
+      {/* Category root node */}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
+          <Atom size={13} className="text-primary" />
+        </div>
+        <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
+          <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
+            {cat}
+          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap">
+              {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
+            </span>
+            <button
+              onClick={handleCopyAll}
+              className="flex items-center justify-center w-6 h-6 rounded border border-primary/40 text-primary/70 hover:bg-primary/10 hover:text-primary hover:border-primary/60 active:scale-95 transition-all"
+              title="Copiar todos os cargos desta categoria"
+            >
+              {copied ? <Check size={11} /> : <ClipboardList size={11} />}
+            </button>
+            <button
+              onClick={() => setCollapsed(v => !v)}
+              className="flex items-center justify-center w-6 h-6 rounded border border-primary/40 text-primary/70 hover:bg-primary/10 hover:text-primary hover:border-primary/60 active:scale-95 transition-all"
+              title={collapsed ? 'Expandir categoria' : 'Recolher categoria'}
+            >
+              {collapsed ? <ChevronRight size={11} /> : <ChevronDown size={11} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Cargo items */}
+      {!collapsed && (
+        <div className="ml-3 border-l-2 border-primary/30 pl-3 space-y-1.5">
+          {cargoItems.map((cargo, i) => (
+            <div key={cargo.id} className="relative">
+              <div
+                className="absolute top-1/2 -left-3 w-3 h-px bg-primary/30"
+                style={{ transform: 'translateY(-50%)' }}
+              />
+              <div
+                className="absolute top-1/2 -left-[15px] w-2 h-2 rounded-full bg-primary/40 border border-primary/70"
+                style={{ transform: 'translateY(-50%)', boxShadow: '0 0 4px hsl(var(--primary)/0.4)' }}
+              />
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border/40 bg-card/60 hover:border-primary/30 hover:bg-primary/[0.03] transition-colors">
+                <span className="font-mono text-[10px] text-primary/50 shrink-0 w-5 text-right">
+                  {String(cargo.posicao || i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-body text-sm font-semibold text-foreground truncate">
+                    {cargo.cargo}
+                  </p>
+                  {cargo.criadoPor && (
+                    <p className="font-mono text-[10px] text-muted-foreground/50 flex items-center gap-1 mt-0.5">
+                      <User size={9} className="shrink-0" />
+                      <span className="truncate">{cargo.criadoPor}</span>
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  {cargo.descricao && <DescriptionButton cargo={cargo} />}
+                  <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps) => {
   const isFBI = section === 'fbi';
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
@@ -193,74 +285,13 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredGroups.map(([cat, items]) => {
-            const cargoItems = items as CargoItem[];
-            return (
-              <div key={cat as string}>
-
-                {/* Category root node — sem animation para evitar bug de espaço */}
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
-                    <Atom size={13} className="text-primary" />
-                  </div>
-                  <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
-                    <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
-                      {cat as string}
-                    </span>
-                    <span className="font-mono text-[10px] text-primary/70 shrink-0 whitespace-nowrap">
-                      {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Cargo items — tree connector via border-left */}
-                <div className="ml-3 border-l-2 border-primary/30 pl-3 space-y-1.5">
-                  {cargoItems.map((cargo, i) => (
-                    <div key={cargo.id} className="relative">
-                      {/* Horizontal branch */}
-                      <div
-                        className="absolute top-1/2 -left-3 w-3 h-px bg-primary/30"
-                        style={{ transform: 'translateY(-50%)' }}
-                      />
-                      {/* Node dot */}
-                      <div
-                        className="absolute top-1/2 -left-[15px] w-2 h-2 rounded-full bg-primary/40 border border-primary/70"
-                        style={{
-                          transform: 'translateY(-50%)',
-                          boxShadow: '0 0 4px hsl(var(--primary)/0.4)',
-                        }}
-                      />
-
-                      {/* Cargo card */}
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border/40 bg-card/60 hover:border-primary/30 hover:bg-primary/[0.03] transition-colors">
-                        <span className="font-mono text-[10px] text-primary/50 shrink-0 w-5 text-right">
-                          {String(cargo.posicao || i + 1).padStart(2, '0')}
-                        </span>
-
-                        <div className="flex-1 min-w-0">
-                          <p className="font-body text-sm font-semibold text-foreground truncate">
-                            {cargo.cargo}
-                          </p>
-                          {cargo.criadoPor && (
-                            <p className="font-mono text-[10px] text-muted-foreground/50 flex items-center gap-1 mt-0.5">
-                              <User size={9} className="shrink-0" />
-                              <span className="truncate">{cargo.criadoPor}</span>
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          {cargo.descricao && <DescriptionButton cargo={cargo} />}
-                          <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            );
-          })}
+          {filteredGroups.map(([cat, items]) => (
+            <CategorySection
+              key={cat as string}
+              cat={cat as string}
+              cargoItems={items as CargoItem[]}
+            />
+          ))}
         </div>
       )}
     </div>
