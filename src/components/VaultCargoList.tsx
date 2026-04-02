@@ -13,7 +13,6 @@ interface VaultCargoListProps {
 
 const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof Tag; label: string }) => {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     if (!value) return;
     try {
@@ -25,23 +24,20 @@ const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof 
       toast.error('Erro ao copiar');
     }
   };
-
   if (!value) return null;
-
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all"
+      className="flex items-center justify-center w-7 h-7 rounded border border-primary/30 text-primary/70 hover:bg-primary/10 hover:border-primary/60 hover:text-primary active:scale-95 transition-all"
       title={`Copiar ${label}`}
     >
-      {copied ? <Check size={13} /> : <Icon size={13} />}
+      {copied ? <Check size={11} /> : <Icon size={11} />}
     </button>
   );
 };
 
 const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () => void }) => {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(cargo.descricao);
@@ -52,7 +48,6 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
       toast.error('Erro ao copiar');
     }
   };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -98,15 +93,14 @@ const DescriptionPopup = ({ cargo, onClose }: { cargo: CargoItem; onClose: () =>
 const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   const [open, setOpen] = useState(false);
   if (!cargo.descricao) return null;
-
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all"
+        className="flex items-center justify-center w-7 h-7 rounded border border-primary/30 text-primary/70 hover:bg-primary/10 hover:border-primary/60 hover:text-primary active:scale-95 transition-all"
         title="Ver manual"
       >
-        <BookOpen size={13} />
+        <BookOpen size={11} />
       </button>
       <AnimatePresence>
         {open && <DescriptionPopup cargo={cargo} onClose={() => setOpen(false)} />}
@@ -115,139 +109,152 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   );
 };
 
-const TechTreeCategory = ({
-  cat,
-  items,
-  index,
-}: {
-  cat: string;
-  items: CargoItem[];
-  index: number;
-}) => {
+/* ── Horizontal connector between nodes ──────────────────────────────── */
+const HorizontalConnector = () => (
+  <div className="flex items-center shrink-0" style={{ width: 40 }}>
+    <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-primary/30" />
+    {/* Arrow tip */}
+    <svg width="8" height="10" viewBox="0 0 8 10" fill="none" className="shrink-0 -ml-px">
+      <path d="M1 1l6 4-6 4" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.6" />
+    </svg>
+  </div>
+);
+
+/* ── Single cargo node ────────────────────────────────────────────────── */
+const CargoNode = ({ cargo, index }: { cargo: CargoItem; index: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.88 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay: index * 0.06 }}
+    className="group relative flex flex-col shrink-0"
+    style={{ width: 160 }}
+  >
+    {/* Glow border card */}
+    <div
+      className="relative rounded-xl border border-border/40 hover:border-primary/50 transition-all duration-200 hover:shadow-[0_0_16px_hsl(var(--primary)/0.18)] overflow-hidden h-full flex flex-col"
+      style={{ background: 'hsl(220 30% 9% / 0.95)' }}
+    >
+      {/* Top accent line */}
+      <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent group-hover:via-primary transition-all duration-300" />
+
+      {/* Scanline overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025] rounded-xl"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 2px,hsl(var(--primary)) 2px,hsl(var(--primary)) 3px)' }}
+      />
+
+      <div className="flex flex-col gap-2 p-3 flex-1">
+        {/* Position badge */}
+        <div className="flex items-center justify-between">
+          <div
+            className="w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-[11px] border shrink-0"
+            style={{
+              background: 'hsl(var(--primary)/0.1)',
+              borderColor: 'hsl(var(--primary)/0.35)',
+              color: 'hsl(var(--primary))',
+              textShadow: '0 0 8px hsl(var(--primary)/0.6)',
+              boxShadow: '0 0 6px hsl(var(--primary)/0.12)',
+            }}
+          >
+            {cargo.posicao || index + 1}
+          </div>
+          {/* Action buttons */}
+          <div className="flex items-center gap-1">
+            <DescriptionButton cargo={cargo} />
+            <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
+          </div>
+        </div>
+
+        {/* Cargo name */}
+        <p className="font-body font-semibold text-foreground text-[13px] leading-snug">
+          {cargo.cargo}
+        </p>
+
+        {/* Tag + creator */}
+        <div className="mt-auto flex flex-col gap-1">
+          {cargo.tag && (
+            <span className="font-mono text-[10px] text-primary/55 bg-primary/5 border border-primary/10 rounded px-1.5 py-0.5 w-fit max-w-full truncate">
+              {cargo.tag}
+            </span>
+          )}
+          {cargo.criadoPor && (
+            <span className="font-mono text-[10px] text-muted-foreground/45 flex items-center gap-1">
+              <User size={9} className="shrink-0" />
+              <span className="truncate">{cargo.criadoPor}</span>
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  </motion.div>
+);
+
+/* ── Category row (horizontal tech tree) ─────────────────────────────── */
+const TechTreeRow = ({ cat, items, index }: { cat: string; items: CargoItem[]; index: number }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
     <motion.div
-      key={cat}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07 }}
-      className="flex flex-col items-center"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.08 }}
+      className="flex flex-col gap-3"
     >
-      {/* Category root node */}
-      <div className="relative w-full max-w-sm">
-        <button
-          onClick={() => setCollapsed(v => !v)}
-          className="w-full group relative overflow-hidden rounded-xl border border-primary/50 px-5 py-3 flex items-center justify-between gap-3 transition-all hover:border-primary/80 hover:shadow-[0_0_18px_hsl(var(--primary)/0.25)] active:scale-[0.99]"
-          style={{
-            background: 'linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(45 100% 42% / 0.12))',
-          }}
+      {/* Category label */}
+      <button
+        onClick={() => setCollapsed(v => !v)}
+        className="group flex items-center gap-2.5 w-fit"
+      >
+        <div
+          className="flex items-center gap-2.5 rounded-lg border border-primary/40 px-3.5 py-2 transition-all hover:border-primary/70 hover:shadow-[0_0_12px_hsl(var(--primary)/0.2)] relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.15), hsl(45 100% 42%/0.08))' }}
         >
-          <div className="absolute inset-0 pointer-events-none opacity-5"
-            style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, hsl(var(--primary)) 3px, hsl(var(--primary)) 4px)' }}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 2px,hsl(var(--primary)) 2px,hsl(var(--primary)) 3px)' }}
           />
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-primary/40 bg-primary/10 shrink-0">
-              <Shield size={15} className="text-primary" />
-            </div>
-            <div className="text-left">
-              <p className="font-display font-bold text-primary text-sm tracking-widest uppercase leading-none">
-                {cat}
-              </p>
-              <p className="font-mono text-[10px] text-primary/50 mt-0.5">
-                {items.length} cargo{items.length !== 1 ? 's' : ''}
-              </p>
-            </div>
+          <Shield size={13} className="text-primary shrink-0" />
+          <span className="font-display font-bold text-primary text-xs tracking-[0.18em] uppercase whitespace-nowrap">
+            {cat}
+          </span>
+          <span className="font-mono text-[10px] text-primary/40 ml-1">
+            [{items.length}]
+          </span>
+          <div className="text-primary/40 group-hover:text-primary/70 transition-colors ml-1">
+            {collapsed ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
           </div>
-          <div className="text-primary/50 group-hover:text-primary transition-colors shrink-0">
-            {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-          </div>
-        </button>
-      </div>
+        </div>
+      </button>
 
-      {/* Tree connector from category to first node */}
+      {/* Horizontal chain */}
       <AnimatePresence>
         {!collapsed && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-col items-center w-full max-w-sm overflow-visible"
+            className="overflow-x-auto pb-2"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(var(--primary)/0.2) transparent' }}
           >
-            {items.map((cargo, i) => (
-              <div key={cargo.id} className="flex flex-col items-center w-full">
-                {/* Vertical connector line */}
-                <div className="relative flex flex-col items-center" style={{ height: 28 }}>
-                  <div className="w-px flex-1 bg-gradient-to-b from-primary/60 to-primary/30" />
-                  {/* Diamond connector dot */}
-                  <div
-                    className="w-2.5 h-2.5 rotate-45 border border-primary/70 bg-background shrink-0"
-                    style={{ boxShadow: '0 0 6px hsl(var(--primary)/0.4)' }}
-                  />
+            <div className="flex items-stretch gap-0 min-w-max pl-2">
+              {items.map((cargo, i) => (
+                <div key={cargo.id} className="flex items-center">
+                  <CargoNode cargo={cargo} index={i} />
+                  {i < items.length - 1 && <HorizontalConnector />}
                 </div>
-
-                {/* Cargo node */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="w-full group relative rounded-lg border border-border/40 hover:border-primary/40 transition-all hover:shadow-[0_0_12px_hsl(var(--primary)/0.12)] overflow-hidden"
-                  style={{ background: 'hsl(220 30% 9% / 0.9)' }}
-                >
-                  {/* Left accent bar that pulses on hover */}
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary/40 group-hover:bg-primary/80 transition-colors rounded-l-lg" />
-
-                  <div className="flex items-center gap-3 pl-4 pr-3 py-3">
-                    {/* Position badge */}
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-mono font-bold text-sm border"
-                      style={{
-                        background: 'hsl(var(--primary)/0.08)',
-                        borderColor: 'hsl(var(--primary)/0.3)',
-                        color: 'hsl(var(--primary))',
-                        boxShadow: '0 0 8px hsl(var(--primary)/0.15)',
-                        textShadow: '0 0 8px hsl(var(--primary)/0.5)',
-                      }}
-                    >
-                      {cargo.posicao || i + 1}
-                    </div>
-
-                    {/* Cargo info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-body font-semibold text-foreground text-sm leading-snug truncate">
-                        {cargo.cargo}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        {cargo.tag && (
-                          <span className="font-mono text-[10px] text-primary/60 bg-primary/5 border border-primary/15 rounded px-1.5 py-0.5">
-                            {cargo.tag}
-                          </span>
-                        )}
-                        {cargo.criadoPor && (
-                          <span className="font-mono text-[10px] text-muted-foreground/50 flex items-center gap-1">
-                            <User size={9} />
-                            {cargo.criadoPor}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <DescriptionButton cargo={cargo} />
-                      <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            ))}
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Category separator */}
+      <div className="h-px bg-gradient-to-r from-primary/20 via-border/30 to-transparent mt-1" />
     </motion.div>
   );
 };
 
+/* ── Main component ───────────────────────────────────────────────────── */
 const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps) => {
   const isFBI = section === 'fbi';
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
@@ -259,7 +266,6 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
     if (!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(c);
   });
-
   Object.values(grouped).forEach(arr => arr.sort((a, b) => a.posicao - b.posicao));
 
   const filteredGroups = Object.entries(grouped)
@@ -298,7 +304,9 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
 
       {/* Search */}
       <div className="relative mb-8">
-        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+        </svg>
         <input
           type="text"
           placeholder="Buscar cargos..."
@@ -323,14 +331,9 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
           <p className="font-mono text-sm">Nenhum resultado para "{searchTerm}"</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+        <div className="flex flex-col gap-6">
           {filteredGroups.map(([cat, items], index) => (
-            <TechTreeCategory
-              key={cat}
-              cat={cat}
-              items={items}
-              index={index}
-            />
+            <TechTreeRow key={cat} cat={cat} items={items} index={index} />
           ))}
         </div>
       )}
