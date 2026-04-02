@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Atom, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react';
+import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Atom } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
@@ -119,26 +119,6 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
   const isFBI = section === 'fbi';
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
   const [searchTerm, setSearchTerm] = useState('');
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  const [copiedCat, setCopiedCat] = useState<string | null>(null);
-
-  const toggleCategory = (cat: string) => {
-    setCollapsed(prev => ({ ...prev, [cat]: !prev[cat] }));
-  };
-
-  const copyCategory = async (cat: string, items: CargoItem[]) => {
-    const text = items
-      .map((c, i) => `${String(c.posicao || i + 1).padStart(2, '0')} | ${c.cargo}${c.tag ? ` | ${c.tag}` : ''}`)
-      .join('\n');
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedCat(cat);
-      toast.success('Categoria copiada!');
-      setTimeout(() => setCopiedCat(null), 1500);
-    } catch {
-      toast.error('Erro ao copiar');
-    }
-  };
 
   const grouped: Record<string, CargoItem[]> = {};
   cargos.forEach(c => {
@@ -218,49 +198,22 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
             return (
               <div key={cat as string}>
 
-                {/* Category root node */}
+                {/* Category root node — sem animation para evitar bug de espaço */}
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
                     <Atom size={13} className="text-primary" />
                   </div>
-
                   <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
                     <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
                       {cat as string}
                     </span>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap">
-                        {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
-                      </span>
-                      {/* Toggle */}
-                      <button
-                        onClick={() => toggleCategory(cat as string)}
-                        className="text-primary/60 hover:text-primary transition-colors"
-                        title={collapsed[cat as string] ? 'Expandir' : 'Ocultar'}
-                      >
-                        {collapsed[cat as string]
-                          ? <ChevronRight size={13} />
-                          : <ChevronDown size={13} />
-                        }
-                      </button>
-                    </div>
+                    <span className="font-mono text-[10px] text-primary/70 shrink-0 whitespace-nowrap">
+                      {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
+                    </span>
                   </div>
-
-                  {/* Botão copiar tudo da categoria */}
-                  <button
-                    onClick={() => copyCategory(cat as string, cargoItems)}
-                    className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
-                    title="Copiar todos os cargos desta categoria"
-                  >
-                    {copiedCat === (cat as string)
-                      ? <Check size={12} />
-                      : <ClipboardList size={12} />
-                    }
-                  </button>
                 </div>
 
                 {/* Cargo items — tree connector via border-left */}
-                {!collapsed[cat as string] && (
                 <div className="ml-3 border-l-2 border-primary/30 pl-3 space-y-1.5">
                   {cargoItems.map((cargo, i) => (
                     <div key={cargo.id} className="relative">
@@ -304,7 +257,6 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
                     </div>
                   ))}
                 </div>
-                )}
 
               </div>
             );
