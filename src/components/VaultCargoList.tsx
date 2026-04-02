@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Crosshair } from 'lucide-react';
+import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
@@ -201,7 +201,7 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
                 {/* Category root node — sem animation para evitar bug de espaço */}
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
-                    <Crosshair size={13} className="text-primary" />
+                    <Wrench size={13} className="text-primary" />
                   </div>
                   <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
                     <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
