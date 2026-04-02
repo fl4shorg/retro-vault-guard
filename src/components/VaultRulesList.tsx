@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gavel, ChevronDown, ChevronUp, Download, X,
@@ -74,22 +74,19 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
         style={{ background: 'hsl(220 35% 9% / 0.99)' }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Top bar */}
         <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent shrink-0" />
 
-        {/* Drag handle (mobile) */}
         <div className="flex justify-center pt-2 pb-1 sm:hidden shrink-0">
           <div className="w-10 h-1 rounded-full bg-border/60" />
         </div>
 
-        {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border/40 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
               <ImageIcon size={15} className="text-primary" />
             </div>
             <div className="min-w-0">
-              <p className="font-display text-xs font-bold text-primary tracking-[0.2em] vault-text-glow">
+              <p className="font-display text-xs font-bold text-primary tracking-[0.2em]">
                 ARTIGCARDS
               </p>
               <p className="font-mono text-[9px] text-muted-foreground tracking-widest truncate max-w-[200px] sm:max-w-[320px]">
@@ -105,7 +102,6 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
           </button>
         </div>
 
-        {/* Cards grid — scrollable */}
         <div className="overflow-y-auto p-4 sm:p-6">
           <p className="font-mono text-[10px] text-primary/60 tracking-[0.3em] mb-4 flex items-center gap-2">
             <span className="h-px flex-1 bg-primary/20" />
@@ -115,12 +111,9 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {rule.artigdcards.map((url, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.07 }}
-                className="rounded-lg overflow-hidden border border-border/40 hover:border-primary/40 transition-all"
+                className="rounded-lg overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
                 style={{ background: 'hsl(220 30% 12% / 0.8)' }}
               >
                 <div className="relative group">
@@ -129,39 +122,35 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
                     alt={`ArtigCard ${i + 1}`}
                     className="w-full object-contain max-h-52"
                     loading="lazy"
+                    decoding="async"
                   />
-                  {/* Hover overlay — desktop */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex flex-col items-center justify-center gap-2">
                     <p className="font-mono text-[10px] text-primary/80 tracking-widest">
                       CARD {String(i + 1).padStart(2, '0')}
                     </p>
                     <button
                       onClick={() => handleDownload(url, i)}
-                      data-testid={`btn-download-card-${i}`}
                       className="flex items-center gap-1.5 px-4 py-2 rounded vault-badge border border-primary/50 text-[11px] font-mono font-bold tracking-widest text-background hover:opacity-90 active:scale-95 transition-all"
                     >
                       <Download size={12} />
                       BAIXAR
                     </button>
                   </div>
-                  {/* Badge */}
                   <div className="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 border border-primary/30 text-primary">
                     #{String(i + 1).padStart(2, '0')}
                   </div>
                 </div>
 
-                {/* Download button always visible on mobile */}
                 <div className="sm:hidden p-2 border-t border-border/30">
                   <button
                     onClick={() => handleDownload(url, i)}
-                    data-testid={`btn-download-card-mobile-${i}`}
                     className="w-full flex items-center justify-center gap-2 py-2 rounded vault-badge border border-primary/40 text-[11px] font-mono font-bold tracking-widest text-background active:scale-95 transition-all"
                   >
                     <Download size={12} />
                     BAIXAR CARD {String(i + 1).padStart(2, '0')}
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -174,12 +163,12 @@ function CardsModal({ rule, onClose }: { rule: Rule; onClose: () => void }) {
 
 /* ─── Rule Card ───────────────────────────────────────────────────────── */
 
-function RuleCard({ rule, index }: { rule: Rule; index: number }) {
+const RuleCard = memo(function RuleCard({ rule, index }: { rule: Rule; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const [showCards, setShowCards] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(buildRuleText(rule));
       setCopied(true);
@@ -188,24 +177,18 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
     } catch {
       toast.error('Erro ao copiar');
     }
-  };
+  }, [rule]);
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.06 }}
+      {/* Sem motion.div aqui — plain div para não travar o scroll */}
+      <div
         className="rounded-xl overflow-hidden border border-border/40 hover:border-primary/30 transition-colors"
         style={{ background: 'hsl(220 30% 12% / 0.7)' }}
       >
-        {/* Top accent line */}
         <div className="h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
 
-        {/* Rule header */}
         <div className="px-4 sm:px-5 py-4">
-
-          {/* Top row: icon + title + action buttons */}
           <div className="flex items-start gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center shrink-0 mt-0.5">
               <Gavel size={15} className="text-primary" />
@@ -215,42 +198,38 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
               <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] mb-0.5">
                 // ARTIGO {String(index + 1).padStart(2, '0')}
               </p>
-              <h3 className="font-display text-sm font-bold text-foreground tracking-wider leading-tight vault-text-glow break-words">
+              {/* Sem vault-text-glow — animação contínua em todos os cards trava o scroll */}
+              <h3 className="font-display text-sm font-bold text-foreground tracking-wider leading-tight break-words">
                 {rule.nome}
               </h3>
             </div>
 
-            {/* Action buttons */}
             <div className="flex gap-1.5 shrink-0">
-              {/* Copy */}
               <button
                 onClick={handleCopy}
-                data-testid={`btn-copy-rule-${rule.id}`}
                 title="Copiar regra"
                 className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
               >
                 {copied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
               </button>
-              {/* Expand */}
-              <button
-                onClick={() => setExpanded(v => !v)}
-                data-testid={`btn-expand-rule-${rule.id}`}
-                title={expanded ? 'Recolher' : 'Expandir parágrafos'}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
-              >
-                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
+              {(rule.paragrafos.length > 0) && (
+                <button
+                  onClick={() => setExpanded(v => !v)}
+                  title={expanded ? 'Recolher' : 'Expandir parágrafos'}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                >
+                  {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Descrição */}
           {rule.descricao && (
             <p className="font-body text-sm text-muted-foreground leading-relaxed mt-3 ml-[42px]">
               {rule.descricao}
             </p>
           )}
 
-          {/* Footer badges row */}
           <div className="flex flex-wrap items-center gap-2 mt-4 ml-[42px]">
             {rule.paragrafos.length > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-border/40 bg-muted/20">
@@ -264,7 +243,6 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
             {rule.artigdcards.length > 0 && (
               <button
                 onClick={() => setShowCards(true)}
-                data-testid={`btn-cards-rule-${rule.id}`}
                 className="flex items-center gap-1.5 px-3 py-1 rounded border border-primary/30 hover:bg-primary/15 hover:border-primary/50 text-primary transition-all active:scale-95"
               >
                 <ImageIcon size={11} />
@@ -276,62 +254,50 @@ function RuleCard({ rule, index }: { rule: Rule; index: number }) {
           </div>
         </div>
 
-        {/* Expandable paragraphs */}
-        <AnimatePresence>
-          {expanded && rule.paragrafos.length > 0 && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              className="overflow-hidden"
+        {/* Expandable paragraphs — CSS transition simples, sem height:auto animation */}
+        {rule.paragrafos.length > 0 && (
+          <div
+            className="overflow-hidden transition-all duration-200 ease-in-out"
+            style={{ maxHeight: expanded ? `${rule.paragrafos.length * 120 + 80}px` : '0px' }}
+          >
+            <div
+              className="border-t border-border/30 px-4 sm:px-5 py-4 space-y-4"
+              style={{ background: 'hsl(220 35% 10% / 0.6)' }}
             >
-              <div
-                className="border-t border-border/30 px-4 sm:px-5 py-4 space-y-4"
-                style={{ background: 'hsl(220 35% 10% / 0.6)' }}
-              >
-                <p className="font-mono text-[10px] text-primary/50 tracking-[0.3em] flex items-center gap-2">
-                  <span className="h-px flex-1 bg-primary/15" />
-                  PARÁGRAFOS
-                  <span className="h-px flex-1 bg-primary/15" />
-                </p>
+              <p className="font-mono text-[10px] text-primary/50 tracking-[0.3em] flex items-center gap-2">
+                <span className="h-px flex-1 bg-primary/15" />
+                PARÁGRAFOS
+                <span className="h-px flex-1 bg-primary/15" />
+              </p>
 
-                {rule.paragrafos.map((para, pi) => (
-                  <motion.div
-                    key={pi}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: pi * 0.04 }}
-                    className="flex gap-3"
-                  >
-                    <div className="shrink-0 mt-0.5">
-                      <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 border border-primary/25">
-                        <Hash size={10} className="text-primary" />
-                      </div>
+              {rule.paragrafos.map((para, pi) => (
+                <div key={pi} className="flex gap-3">
+                  <div className="shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 border border-primary/25">
+                      <Hash size={10} className="text-primary" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-mono text-[9px] text-primary/50 tracking-widest mb-1">
-                        PARÁGRAFO {pi + 1}
-                      </p>
-                      <p className="font-body text-sm text-foreground/85 leading-relaxed break-words">
-                        {para}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono text-[9px] text-primary/50 tracking-widest mb-1">
+                      PARÁGRAFO {pi + 1}
+                    </p>
+                    <p className="font-body text-sm text-foreground/85 leading-relaxed break-words">
+                      {para}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
-      {/* Cards modal */}
       <AnimatePresence>
         {showCards && <CardsModal rule={rule} onClose={() => setShowCards(false)} />}
       </AnimatePresence>
     </>
   );
-}
+});
 
 /* ─── Main Component ──────────────────────────────────────────────────── */
 
@@ -370,7 +336,6 @@ export default function VaultRulesList() {
 
   return (
     <div>
-      {/* Section header */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded flex items-center justify-center bg-primary/10 border border-primary/20">
@@ -388,7 +353,6 @@ export default function VaultRulesList() {
         )}
       </div>
 
-      {/* Search bar */}
       {!loading && !error && rules.length > 0 && (
         <div className="relative mb-4">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none" />
@@ -397,7 +361,6 @@ export default function VaultRulesList() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="PESQUISAR REGRAS..."
-            data-testid="input-search-rules"
             className="w-full bg-transparent border border-border/50 rounded-lg pl-10 pr-4 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 placeholder:tracking-widest focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
           />
           {search && (
@@ -411,10 +374,7 @@ export default function VaultRulesList() {
         </div>
       )}
 
-      {/* Warning banner */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <div
         className="rounded-lg border border-primary/20 p-3 sm:p-4 mb-6 flex items-center gap-3"
         style={{ background: 'hsl(45 100% 55% / 0.04)' }}
       >
@@ -422,9 +382,8 @@ export default function VaultRulesList() {
         <p className="font-mono text-[10px] sm:text-[11px] text-primary/60 tracking-wide">
           REGULAMENTO OFICIAL VAULT-TEC — LEIA COM ATENÇÃO ANTES DE OPERAR
         </p>
-      </motion.div>
+      </div>
 
-      {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <div className="text-center">
