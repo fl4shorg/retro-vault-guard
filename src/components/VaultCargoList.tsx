@@ -137,27 +137,38 @@ const CategorySection = ({ cat, cargoItems }: { cat: string; cargoItems: CargoIt
     <div>
       {/* Category root node */}
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
-          <Atom size={13} className="text-primary" />
+        <div
+          className="w-7 h-7 rounded flex items-center justify-center shrink-0"
+          style={{ background: 'rgba(234,179,8,0.22)', border: '1px solid rgba(234,179,8,0.65)' }}
+        >
+          <Atom size={13} style={{ color: 'rgb(234,179,8)' }} />
         </div>
-        <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
-          <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
+        <div
+          className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0"
+          style={{ background: 'rgba(234,179,8,0.14)', border: '1px solid rgba(234,179,8,0.55)' }}
+        >
+          <span
+            className="font-display text-xs font-bold tracking-[0.12em] uppercase truncate"
+            style={{ color: 'rgb(234,179,8)' }}
+          >
             {cat}
           </span>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap">
+            <span className="font-mono text-[10px] whitespace-nowrap" style={{ color: 'rgba(234,179,8,0.7)' }}>
               {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
             </span>
             <button
               onClick={handleCopyAll}
-              className="flex items-center justify-center w-6 h-6 rounded border border-primary/40 text-primary/70 hover:bg-primary/10 hover:text-primary hover:border-primary/60 active:scale-95 transition-all"
+              className="flex items-center justify-center w-6 h-6 rounded active:scale-95 transition-all"
+              style={{ border: '1px solid rgba(234,179,8,0.45)', color: 'rgba(234,179,8,0.75)' }}
               title="Copiar todos os cargos desta categoria"
             >
               {copied ? <Check size={11} /> : <ClipboardList size={11} />}
             </button>
             <button
               onClick={() => setCollapsed(v => !v)}
-              className="flex items-center justify-center w-6 h-6 rounded border border-primary/40 text-primary/70 hover:bg-primary/10 hover:text-primary hover:border-primary/60 active:scale-95 transition-all"
+              className="flex items-center justify-center w-6 h-6 rounded active:scale-95 transition-all"
+              style={{ border: '1px solid rgba(234,179,8,0.45)', color: 'rgba(234,179,8,0.75)' }}
               title={collapsed ? 'Expandir categoria' : 'Recolher categoria'}
             >
               {collapsed ? <ChevronRight size={11} /> : <ChevronDown size={11} />}
