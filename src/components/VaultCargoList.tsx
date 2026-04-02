@@ -4,7 +4,6 @@ import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Shield 
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
 
-
 interface VaultCargoListProps {
   section: string;
   cargos: CargoItem[];
@@ -32,7 +31,7 @@ const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof 
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all"
+      className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all shrink-0"
       title={`Copiar ${label}`}
     >
       {copied ? <Check size={13} /> : <Icon size={13} />}
@@ -104,7 +103,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all"
+        className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all shrink-0"
         title="Ver manual"
       >
         <BookOpen size={13} />
@@ -116,160 +115,8 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
   );
 };
 
-const TreeNode = ({ cargo, isLast, index }: { cargo: CargoItem; isLast: boolean; index: number }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.04 }}
-      className="flex items-stretch relative"
-    >
-      {/* Vertical line segment + horizontal branch */}
-      <div className="flex flex-col items-center relative shrink-0" style={{ width: 36 }}>
-        {/* Top vertical segment */}
-        <div
-          className="w-px flex-1"
-          style={{
-            background: 'linear-gradient(to bottom, hsl(var(--primary)/0.5), hsl(var(--primary)/0.5))',
-            minHeight: 20,
-          }}
-        />
-        {/* Node dot */}
-        <div
-          className="w-2 h-2 rounded-full border border-primary shrink-0 z-10"
-          style={{
-            background: 'hsl(var(--primary)/0.3)',
-            boxShadow: '0 0 6px hsl(var(--primary)/0.6)',
-          }}
-        />
-        {/* Bottom vertical segment — hidden for last item */}
-        {!isLast ? (
-          <div
-            className="w-px flex-1"
-            style={{
-              background: 'hsl(var(--primary)/0.5)',
-              minHeight: 20,
-            }}
-          />
-        ) : (
-          <div className="flex-1" />
-        )}
-      </div>
-
-      {/* Horizontal branch line */}
-      <div
-        className="shrink-0 self-center"
-        style={{
-          width: 20,
-          height: 1,
-          background: 'hsl(var(--primary)/0.5)',
-          boxShadow: '0 0 4px hsl(var(--primary)/0.4)',
-        }}
-      />
-
-      {/* Cargo card */}
-      <div className="flex-1 my-1.5 min-w-0">
-        <div
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all group hover:border-primary/50 hover:bg-primary/[0.04]"
-          style={{
-            background: 'hsl(220 30% 9% / 0.8)',
-            borderColor: 'hsl(var(--border)/0.5)',
-          }}
-        >
-          {/* Position badge */}
-          <span
-            className="font-mono text-[10px] text-primary/70 shrink-0 w-5 text-center"
-            style={{ textShadow: '0 0 8px hsl(var(--primary)/0.4)' }}
-          >
-            {String(cargo.posicao || index + 1).padStart(2, '0')}
-          </span>
-
-          {/* Name + creator */}
-          <div className="flex-1 min-w-0">
-            <span className="font-body text-sm font-semibold text-foreground/90 block truncate group-hover:text-foreground transition-colors">
-              {cargo.cargo}
-            </span>
-            {cargo.criadoPor && (
-              <span className="font-mono text-[10px] text-muted-foreground/50 flex items-center gap-1 mt-0.5">
-                <User size={9} /> {cargo.criadoPor}
-              </span>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {cargo.descricao && <DescriptionButton cargo={cargo} />}
-            <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const CategoryTree = ({ cat, items, catIndex }: { cat: string; items: CargoItem[]; catIndex: number }) => {
-  return (
-    <motion.div
-      key={cat}
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: catIndex * 0.08 }}
-      className="relative"
-    >
-      {/* Category root node */}
-      <div className="flex items-center gap-3 mb-1">
-        {/* Root node icon */}
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-primary/40"
-          style={{
-            background: 'linear-gradient(135deg, hsl(var(--primary)/0.2), hsl(var(--primary)/0.05))',
-            boxShadow: '0 0 12px hsl(var(--primary)/0.2)',
-          }}
-        >
-          <Shield size={14} className="text-primary" />
-        </div>
-
-        {/* Category label */}
-        <div
-          className="flex-1 flex items-center justify-between px-4 py-2.5 rounded-lg border border-primary/30"
-          style={{
-            background: 'linear-gradient(135deg, hsl(var(--primary)/0.15), hsl(var(--primary)/0.05))',
-            boxShadow: '0 0 16px hsl(var(--primary)/0.1)',
-          }}
-        >
-          <span
-            className="font-display text-sm font-bold text-primary tracking-[0.2em] uppercase"
-            style={{ textShadow: '0 0 10px hsl(var(--primary)/0.5)' }}
-          >
-            {cat}
-          </span>
-          <span
-            className="font-mono text-[10px] text-primary/60 border border-primary/20 rounded px-2 py-0.5"
-            style={{ background: 'hsl(var(--primary)/0.08)' }}
-          >
-            {items.length} {items.length === 1 ? 'CARGO' : 'CARGOS'}
-          </span>
-        </div>
-      </div>
-
-      {/* Tree branches */}
-      <div className="pl-4">
-        {items.map((cargo, i) => (
-          <TreeNode
-            key={cargo.id}
-            cargo={cargo}
-            isLast={i === items.length - 1}
-            index={i}
-          />
-        ))}
-      </div>
-    </motion.div>
-  );
-};
-
 const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps) => {
   const isFBI = section === 'fbi';
-  const SectionIcon = Briefcase;
   const title = isFBI ? 'Cargos FBI' : 'Cargos SKUR';
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -294,8 +141,8 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
     })
     .filter(([, items]) => items.length > 0)
     .sort(([, itemsA], [, itemsB]) => {
-      const posA = itemsA[0]?.categoriaPosicao ?? 999;
-      const posB = itemsB[0]?.categoriaPosicao ?? 999;
+      const posA = (itemsA as CargoItem[])[0]?.categoriaPosicao ?? 999;
+      const posB = (itemsB as CargoItem[])[0]?.categoriaPosicao ?? 999;
       return posA - posB;
     });
 
@@ -305,7 +152,7 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded flex items-center justify-center bg-primary/10 border border-primary/20">
-            <SectionIcon size={20} className="text-primary" />
+            <Briefcase size={20} className="text-primary" />
           </div>
           <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground tracking-wider">
             {title}
@@ -318,7 +165,9 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
 
       {/* Search */}
       <div className="relative mb-6">
-        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
         <input
           type="text"
           placeholder="Buscar cargos..."
@@ -343,15 +192,105 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
           <p className="font-mono text-sm">Nenhum resultado para "{searchTerm}"</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {filteredGroups.map(([cat, items], catIndex) => (
-            <CategoryTree
-              key={cat}
-              cat={cat as string}
-              items={items as CargoItem[]}
-              catIndex={catIndex}
-            />
-          ))}
+        <div className="space-y-8">
+          {filteredGroups.map(([cat, items], catIndex) => {
+            const cargoItems = items as CargoItem[];
+            return (
+              <motion.div
+                key={cat as string}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: catIndex * 0.06 }}
+              >
+                {/* Category root node */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-primary/40"
+                    style={{
+                      background: 'hsl(var(--primary)/0.12)',
+                      boxShadow: '0 0 10px hsl(var(--primary)/0.15)',
+                    }}
+                  >
+                    <Shield size={14} className="text-primary" />
+                  </div>
+                  <div
+                    className="flex-1 flex items-center justify-between px-3 py-2 rounded-lg border border-primary/30 min-w-0"
+                    style={{
+                      background: 'hsl(var(--primary)/0.08)',
+                      boxShadow: '0 0 12px hsl(var(--primary)/0.08)',
+                    }}
+                  >
+                    <span
+                      className="font-display text-xs sm:text-sm font-bold text-primary tracking-[0.15em] uppercase truncate"
+                      style={{ textShadow: '0 0 8px hsl(var(--primary)/0.4)' }}
+                    >
+                      {cat as string}
+                    </span>
+                    <span className="font-mono text-[10px] text-primary/60 shrink-0 ml-2">
+                      {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tree children — left border acts as the vertical trunk */}
+                <div
+                  className="ml-4 border-l-2 pl-4 space-y-2"
+                  style={{ borderColor: 'hsl(var(--primary)/0.3)' }}
+                >
+                  {cargoItems.map((cargo, i) => (
+                    <div key={cargo.id} className="relative">
+                      {/* Horizontal branch line */}
+                      <div
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-4 h-px"
+                        style={{ background: 'hsl(var(--primary)/0.3)' }}
+                      />
+                      {/* Node dot on the trunk */}
+                      <div
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[18px] w-2 h-2 rounded-full border border-primary"
+                        style={{
+                          background: 'hsl(var(--primary)/0.25)',
+                          boxShadow: '0 0 5px hsl(var(--primary)/0.5)',
+                        }}
+                      />
+
+                      {/* Cargo card */}
+                      <div
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors hover:border-primary/40 hover:bg-primary/[0.04]"
+                        style={{
+                          background: 'hsl(220 30% 9% / 0.7)',
+                          borderColor: 'hsl(var(--border)/0.4)',
+                        }}
+                      >
+                        {/* Position */}
+                        <span className="font-mono text-[10px] text-primary/50 shrink-0 w-5 text-right">
+                          {String(cargo.posicao || i + 1).padStart(2, '0')}
+                        </span>
+
+                        {/* Name + creator */}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-body text-sm font-semibold text-foreground/90 truncate">
+                            {cargo.cargo}
+                          </p>
+                          {cargo.criadoPor && (
+                            <p className="font-mono text-[10px] text-muted-foreground/50 flex items-center gap-1 mt-0.5">
+                              <User size={9} className="shrink-0" />
+                              <span className="truncate">{cargo.criadoPor}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {cargo.descricao && <DescriptionButton cargo={cargo} />}
+                          <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
