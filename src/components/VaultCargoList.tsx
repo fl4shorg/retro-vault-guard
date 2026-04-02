@@ -224,22 +224,27 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
                     <Atom size={13} className="text-primary" />
                   </div>
 
-                  {/* Toggle — clica em toda a barra para colapsar */}
-                  <button
-                    onClick={() => toggleCategory(cat as string)}
-                    className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0 text-left hover:bg-primary/15 transition-colors"
-                  >
-                    {collapsed[cat as string]
-                      ? <ChevronRight size={13} className="text-primary/70 shrink-0" />
-                      : <ChevronDown size={13} className="text-primary/70 shrink-0" />
-                    }
-                    <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate flex-1">
+                  <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
+                    <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
                       {cat as string}
                     </span>
-                    <span className="font-mono text-[10px] text-primary/60 shrink-0 whitespace-nowrap">
-                      {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
-                    </span>
-                  </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap">
+                        {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
+                      </span>
+                      {/* Toggle */}
+                      <button
+                        onClick={() => toggleCategory(cat as string)}
+                        className="text-primary/60 hover:text-primary transition-colors"
+                        title={collapsed[cat as string] ? 'Expandir' : 'Ocultar'}
+                      >
+                        {collapsed[cat as string]
+                          ? <ChevronRight size={13} />
+                          : <ChevronDown size={13} />
+                        }
+                      </button>
+                    </div>
+                  </div>
 
                   {/* Botão copiar tudo da categoria */}
                   <button
