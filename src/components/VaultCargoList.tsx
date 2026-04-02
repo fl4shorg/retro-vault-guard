@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Briefcase, Tag, BookOpen, Loader2, Inbox, Check, User, X, Copy, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CargoItem } from '@/hooks/useCargos';
@@ -31,7 +31,7 @@ const CopyButton = ({ value, icon: Icon, label }: { value: string; icon: typeof 
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all shrink-0"
+      className="flex items-center justify-center w-8 h-8 rounded border border-primary/40 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0"
       title={`Copiar ${label}`}
     >
       {copied ? <Check size={13} /> : <Icon size={13} />}
@@ -103,7 +103,7 @@ const DescriptionButton = ({ cargo }: { cargo: CargoItem }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center w-8 h-8 rounded border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 active:scale-95 transition-all shrink-0"
+        className="flex items-center justify-center w-8 h-8 rounded border border-primary/40 text-primary hover:bg-primary/10 active:scale-95 transition-all shrink-0"
         title="Ver manual"
       >
         <BookOpen size={13} />
@@ -192,83 +192,53 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
           <p className="font-mono text-sm">Nenhum resultado para "{searchTerm}"</p>
         </div>
       ) : (
-        <div className="space-y-8">
-          {filteredGroups.map(([cat, items], catIndex) => {
+        <div className="space-y-6">
+          {filteredGroups.map(([cat, items]) => {
             const cargoItems = items as CargoItem[];
             return (
-              <motion.div
-                key={cat as string}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: catIndex * 0.06 }}
-              >
-                {/* Category root node */}
-                <div className="flex items-center gap-2 mb-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-primary/40"
-                    style={{
-                      background: 'hsl(var(--primary)/0.12)',
-                      boxShadow: '0 0 10px hsl(var(--primary)/0.15)',
-                    }}
-                  >
-                    <Shield size={14} className="text-primary" />
+              <div key={cat as string}>
+
+                {/* Category root node — sem animation para evitar bug de espaço */}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 border border-primary/60 bg-primary/20">
+                    <Shield size={13} className="text-primary" />
                   </div>
-                  <div
-                    className="flex-1 flex items-center justify-between px-3 py-2 rounded-lg border border-primary/30 min-w-0"
-                    style={{
-                      background: 'hsl(var(--primary)/0.08)',
-                      boxShadow: '0 0 12px hsl(var(--primary)/0.08)',
-                    }}
-                  >
-                    <span
-                      className="font-display text-xs sm:text-sm font-bold text-primary tracking-[0.15em] uppercase truncate"
-                      style={{ textShadow: '0 0 8px hsl(var(--primary)/0.4)' }}
-                    >
+                  <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-primary/50 bg-primary/10 min-w-0">
+                    <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
                       {cat as string}
                     </span>
-                    <span className="font-mono text-[10px] text-primary/60 shrink-0 ml-2">
+                    <span className="font-mono text-[10px] text-primary/70 shrink-0 whitespace-nowrap">
                       {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
                     </span>
                   </div>
                 </div>
 
-                {/* Tree children — left border acts as the vertical trunk */}
-                <div
-                  className="ml-4 border-l-2 pl-4 space-y-2"
-                  style={{ borderColor: 'hsl(var(--primary)/0.3)' }}
-                >
+                {/* Cargo items — tree connector via border-left */}
+                <div className="ml-3 border-l-2 border-primary/30 pl-3 space-y-1.5">
                   {cargoItems.map((cargo, i) => (
                     <div key={cargo.id} className="relative">
-                      {/* Horizontal branch line */}
+                      {/* Horizontal branch */}
                       <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-4 h-px"
-                        style={{ background: 'hsl(var(--primary)/0.3)' }}
+                        className="absolute top-1/2 -left-3 w-3 h-px bg-primary/30"
+                        style={{ transform: 'translateY(-50%)' }}
                       />
-                      {/* Node dot on the trunk */}
+                      {/* Node dot */}
                       <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[18px] w-2 h-2 rounded-full border border-primary"
+                        className="absolute top-1/2 -left-[15px] w-2 h-2 rounded-full bg-primary/40 border border-primary/70"
                         style={{
-                          background: 'hsl(var(--primary)/0.25)',
-                          boxShadow: '0 0 5px hsl(var(--primary)/0.5)',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 4px hsl(var(--primary)/0.4)',
                         }}
                       />
 
                       {/* Cargo card */}
-                      <div
-                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors hover:border-primary/40 hover:bg-primary/[0.04]"
-                        style={{
-                          background: 'hsl(220 30% 9% / 0.7)',
-                          borderColor: 'hsl(var(--border)/0.4)',
-                        }}
-                      >
-                        {/* Position */}
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border/40 bg-card/60 hover:border-primary/30 hover:bg-primary/[0.03] transition-colors">
                         <span className="font-mono text-[10px] text-primary/50 shrink-0 w-5 text-right">
                           {String(cargo.posicao || i + 1).padStart(2, '0')}
                         </span>
 
-                        {/* Name + creator */}
                         <div className="flex-1 min-w-0">
-                          <p className="font-body text-sm font-semibold text-foreground/90 truncate">
+                          <p className="font-body text-sm font-semibold text-foreground truncate">
                             {cargo.cargo}
                           </p>
                           {cargo.criadoPor && (
@@ -279,7 +249,6 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
                           )}
                         </div>
 
-                        {/* Action buttons */}
                         <div className="flex items-center gap-1 shrink-0">
                           {cargo.descricao && <DescriptionButton cargo={cargo} />}
                           <CopyButton value={cargo.tag} icon={Tag} label="Tag" />
@@ -288,7 +257,8 @@ const VaultCargoList = ({ section, cargos, total, loading }: VaultCargoListProps
                     </div>
                   ))}
                 </div>
-              </motion.div>
+
+              </div>
             );
           })}
         </div>
