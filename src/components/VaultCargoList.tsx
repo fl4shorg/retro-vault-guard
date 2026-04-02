@@ -137,16 +137,12 @@ const CategorySection = ({ cat, cargoItems }: { cat: string; cargoItems: CargoIt
     <div>
       {/* Category root node */}
       <div className="flex items-center gap-2 mb-2">
-        <div
-          className="w-7 h-7 rounded flex items-center justify-center shrink-0"
-          style={{ background: 'hsl(var(--primary) / 0.28)', border: '1px solid hsl(var(--primary) / 0.7)' }}
-        >
-          <Atom size={13} className="text-primary" />
+        {/* Ícone — fundo sólido garantido */}
+        <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 bg-primary border border-primary text-primary-foreground">
+          <Atom size={13} />
         </div>
-        <div
-          className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0"
-          style={{ background: 'hsl(var(--primary) / 0.18)', border: '1px solid hsl(var(--primary) / 0.6)' }}
-        >
+        {/* Barra da categoria — mesma base dos cards que funcionam */}
+        <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0 bg-card border-y border-r border-primary/50 border-l-4 border-l-primary">
           <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
             {cat}
           </span>
@@ -156,16 +152,14 @@ const CategorySection = ({ cat, cargoItems }: { cat: string; cargoItems: CargoIt
             </span>
             <button
               onClick={handleCopyAll}
-              className="flex items-center justify-center w-6 h-6 rounded text-primary active:scale-95 transition-all"
-              style={{ border: '1px solid hsl(var(--primary) / 0.5)' }}
+              className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/50 active:scale-95 transition-all"
               title="Copiar todos os cargos desta categoria"
             >
               {copied ? <Check size={11} /> : <ClipboardList size={11} />}
             </button>
             <button
               onClick={() => setCollapsed(v => !v)}
-              className="flex items-center justify-center w-6 h-6 rounded text-primary active:scale-95 transition-all"
-              style={{ border: '1px solid hsl(var(--primary) / 0.5)' }}
+              className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/50 active:scale-95 transition-all"
               title={collapsed ? 'Expandir categoria' : 'Recolher categoria'}
             >
               {collapsed ? <ChevronRight size={11} /> : <ChevronDown size={11} />}
