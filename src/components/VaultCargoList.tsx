@@ -137,35 +137,27 @@ const CategorySection = ({ cat, cargoItems }: { cat: string; cargoItems: CargoIt
     <div>
       {/* Category root node */}
       <div className="flex items-center gap-2 mb-2">
-        <div
-          className="w-7 h-7 rounded flex items-center justify-center shrink-0"
-          style={{ background: 'hsl(var(--primary) / 0.28)', border: '1px solid hsl(var(--primary) / 0.7)' }}
-        >
-          <Atom size={13} className="text-primary" />
+        <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 bg-primary/40 border-2 border-primary">
+          <Atom size={13} className="text-primary-foreground" />
         </div>
-        <div
-          className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0"
-          style={{ background: 'hsl(var(--primary) / 0.18)', border: '1px solid hsl(var(--primary) / 0.6)' }}
-        >
+        <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0 bg-primary/30 border-2 border-primary/80">
           <span className="font-display text-xs font-bold text-primary tracking-[0.12em] uppercase truncate">
             {cat}
           </span>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap">
+            <span className="font-mono text-[10px] text-primary/80 whitespace-nowrap">
               {cargoItems.length} {cargoItems.length === 1 ? 'cargo' : 'cargos'}
             </span>
             <button
               onClick={handleCopyAll}
-              className="flex items-center justify-center w-6 h-6 rounded text-primary active:scale-95 transition-all"
-              style={{ border: '1px solid hsl(var(--primary) / 0.5)' }}
+              className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/60 hover:bg-primary/20 active:scale-95 transition-all"
               title="Copiar todos os cargos desta categoria"
             >
               {copied ? <Check size={11} /> : <ClipboardList size={11} />}
             </button>
             <button
               onClick={() => setCollapsed(v => !v)}
-              className="flex items-center justify-center w-6 h-6 rounded text-primary active:scale-95 transition-all"
-              style={{ border: '1px solid hsl(var(--primary) / 0.5)' }}
+              className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/60 hover:bg-primary/20 active:scale-95 transition-all"
               title={collapsed ? 'Expandir categoria' : 'Recolher categoria'}
             >
               {collapsed ? <ChevronRight size={11} /> : <ChevronDown size={11} />}
