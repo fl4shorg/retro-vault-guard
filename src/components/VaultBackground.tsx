@@ -60,27 +60,29 @@ const VaultBackground = () => {
       {/* Hazard stripes top */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-40" />
 
-      {/* Floating orbs */}
-      <div
-        className="absolute w-[700px] h-[700px] rounded-full"
-        style={{
-          background: 'radial-gradient(circle, hsl(var(--vault-blue)), transparent 70%)',
-          opacity: isCustom ? 0.025 : 0.04,
-          top: '10%',
-          left: '-5%',
-          animation: 'float-bg 25s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="absolute w-[500px] h-[500px] rounded-full"
-        style={{
-          background: 'radial-gradient(circle, hsl(var(--vault-yellow)), transparent 70%)',
-          opacity: isCustom ? 0.02 : 0.03,
-          bottom: '5%',
-          right: '-5%',
-          animation: 'float-bg 20s ease-in-out infinite reverse',
-        }}
-      />
+      {/* Floating orbs — hidden when custom wallpaper is active */}
+      {!isCustom && (
+        <>
+          <div
+            className="absolute w-[700px] h-[700px] rounded-full opacity-[0.04]"
+            style={{
+              background: 'radial-gradient(circle, hsl(var(--vault-blue)), transparent 70%)',
+              top: '10%',
+              left: '-5%',
+              animation: 'float-bg 25s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="absolute w-[500px] h-[500px] rounded-full opacity-[0.03]"
+            style={{
+              background: 'radial-gradient(circle, hsl(var(--vault-yellow)), transparent 70%)',
+              bottom: '5%',
+              right: '-5%',
+              animation: 'float-bg 20s ease-in-out infinite reverse',
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };
