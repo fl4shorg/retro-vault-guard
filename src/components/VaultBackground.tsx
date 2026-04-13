@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useWallpaperContext } from '@/contexts/WallpaperContext';
 import { WALLPAPER_PRESETS } from '@/hooks/useWallpaper';
 
@@ -10,34 +11,43 @@ const VaultBackground = () => {
     : null;
   const isDefault = preset?.id === 'default';
 
+  /* Apply custom wallpaper directly on <body> so it's truly fixed to the
+     viewport and never moves during scroll, regardless of any stacking
+     contexts or transforms inside the React tree.                         */
+  useEffect(() => {
+    const body = document.body;
+    if (isCustom) {
+      const dataUrl = (wallpaper as { type: 'custom'; dataUrl: string }).dataUrl;
+      body.style.setProperty('background-image', `url(${CSS.escape ? dataUrl : dataUrl})`);
+      body.style.setProperty('background-size', 'cover');
+      body.style.setProperty('background-position', 'center center');
+      body.style.setProperty('background-repeat', 'no-repeat');
+      body.style.setProperty('background-attachment', 'fixed');
+    } else {
+      body.style.removeProperty('background-image');
+      body.style.removeProperty('background-size');
+      body.style.removeProperty('background-position');
+      body.style.removeProperty('background-repeat');
+      body.style.removeProperty('background-attachment');
+    }
+    return () => {
+      body.style.removeProperty('background-image');
+      body.style.removeProperty('background-size');
+      body.style.removeProperty('background-position');
+      body.style.removeProperty('background-repeat');
+      body.style.removeProperty('background-attachment');
+    };
+  }, [isCustom, wallpaper]);
+
   return (
     <div className="fixed inset-0 -z-10">
 
-      {/* Custom image wallpaper — img tag keeps it truly fixed during scroll */}
+      {/* Dark overlay when custom wallpaper is active */}
       {isCustom && (
-        <>
-          <img
-            src={(wallpaper as { type: 'custom'; dataUrl: string }).dataUrl}
-            aria-hidden="true"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              display: 'block',
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
-          />
-          {/* Dark overlay for readability */}
-          <div
-            className="absolute inset-0"
-            style={{ background: 'hsl(220 35% 5% / 0.72)' }}
-          />
-        </>
+        <div
+          className="absolute inset-0"
+          style={{ background: 'hsl(220 35% 5% / 0.72)' }}
+        />
       )}
 
       {/* Preset wallpaper base */}
