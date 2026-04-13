@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Gavel, ChevronDown, ChevronUp, Download, X,
-  FileText, ImageIcon, Loader2, AlertTriangle, Hash,
-  Search, Copy, Check
+  Gavel, ChevronDown, ChevronRight, Download, X,
+  FileText, ImageIcon, Loader2, AlertTriangle,
+  Search, Copy, Check, Hash, Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -179,119 +179,130 @@ const RuleCard = memo(function RuleCard({ rule, index }: { rule: Rule; index: nu
     }
   }, [rule]);
 
+  const hasParagrafos = rule.paragrafos.length > 0;
+
   return (
     <>
-      {/* Sem motion.div aqui — plain div para não travar o scroll */}
-      <div
-        className="rounded-xl overflow-hidden border border-border/40 hover:border-primary/30 transition-colors"
-        style={{ background: 'hsl(220 30% 12% / 0.7)' }}
-      >
-        <div className="h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
+      <div>
+        {/* Article header row — same pattern as CategorySection in cargo */}
+        <div className="flex items-center gap-2 mb-2">
+          {/* Article number badge */}
+          <div className="w-7 h-7 rounded flex items-center justify-center shrink-0 bg-primary border border-primary text-primary-foreground">
+            <span className="font-mono text-[10px] font-bold leading-none">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+          </div>
 
-        <div className="px-4 sm:px-5 py-4">
-          <div className="flex items-start gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center shrink-0 mt-0.5">
-              <Gavel size={15} className="text-primary" />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] mb-0.5">
-                // ARTIGO {String(index + 1).padStart(2, '0')}
-              </p>
-              {/* Sem vault-text-glow — animação contínua em todos os cards trava o scroll */}
-              <h3 className="font-display text-sm font-bold text-foreground tracking-wider leading-tight break-words">
+          {/* Header bar */}
+          <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0 bg-card border-y border-r border-primary/50 border-l-4 border-l-primary">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-mono text-[9px] text-primary/60 tracking-[0.25em] shrink-0 hidden sm:block">
+                ART.
+              </span>
+              <span className="font-display text-xs font-bold text-primary tracking-[0.1em] uppercase truncate">
                 {rule.nome}
-              </h3>
+              </span>
             </div>
 
-            <div className="flex gap-1.5 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
+              {hasParagrafos && (
+                <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap hidden sm:block">
+                  {rule.paragrafos.length} {rule.paragrafos.length === 1 ? 'parágrafo' : 'parágrafos'}
+                </span>
+              )}
               <button
                 onClick={handleCopy}
-                title="Copiar regra"
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                title="Copiar artigo"
+                className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/50 hover:bg-primary/10 active:scale-95 transition-all"
               >
-                {copied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
+                {copied ? <Check size={11} /> : <Copy size={11} />}
               </button>
-              {(rule.paragrafos.length > 0) && (
+              {hasParagrafos && (
                 <button
                   onClick={() => setExpanded(v => !v)}
                   title={expanded ? 'Recolher' : 'Expandir parágrafos'}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-border/40 hover:border-primary/40 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                  className="flex items-center justify-center w-6 h-6 rounded text-primary border border-primary/50 hover:bg-primary/10 active:scale-95 transition-all"
                 >
-                  {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
                 </button>
               )}
             </div>
           </div>
-
-          {rule.descricao && (
-            <p className="font-body text-sm text-muted-foreground leading-relaxed mt-3 ml-[42px]">
-              {rule.descricao}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-2 mt-4 ml-[42px]">
-            {rule.paragrafos.length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-border/40 bg-muted/20">
-                <FileText size={11} className="text-primary/60" />
-                <span className="font-mono text-[10px] text-muted-foreground tracking-widest">
-                  {rule.paragrafos.length} PARÁGRAFO{rule.paragrafos.length !== 1 ? 'S' : ''}
-                </span>
-              </div>
-            )}
-
-            {rule.artigdcards.length > 0 && (
-              <button
-                onClick={() => setShowCards(true)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded border border-primary/30 hover:bg-primary/15 hover:border-primary/50 text-primary transition-all active:scale-95"
-              >
-                <ImageIcon size={11} />
-                <span className="font-mono text-[10px] font-bold tracking-widest">
-                  {rule.artigdcards.length} ARTIGCARD{rule.artigdcards.length !== 1 ? 'S' : ''}
-                </span>
-              </button>
-            )}
-          </div>
         </div>
 
-        {/* Expandable paragraphs — grid-template-rows anima sem precisar estimar altura */}
-        {rule.paragrafos.length > 0 && (
-          <div
-            className="grid transition-[grid-template-rows] duration-200 ease-in-out"
-            style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
-          >
-          <div className="overflow-hidden">
-            <div
-              className="border-t border-border/30 px-4 sm:px-5 py-4 space-y-4"
-              style={{ background: 'hsl(220 35% 10% / 0.6)' }}
-            >
-              <p className="font-mono text-[10px] text-primary/50 tracking-[0.3em] flex items-center gap-2">
-                <span className="h-px flex-1 bg-primary/15" />
-                PARÁGRAFOS
-                <span className="h-px flex-1 bg-primary/15" />
-              </p>
+        {/* Body + paragraphs — tree connector like cargo items */}
+        <div className="ml-3 border-l-2 border-primary/30 pl-3 space-y-1.5">
 
-              {rule.paragrafos.map((para, pi) => (
-                <div key={pi} className="flex gap-3">
-                  <div className="shrink-0 mt-0.5">
-                    <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10 border border-primary/25">
-                      <Hash size={10} className="text-primary" />
+          {/* Description row */}
+          {rule.descricao && (
+            <div className="relative">
+              <div className="absolute top-1/2 -left-3 w-3 h-px bg-primary/30" style={{ transform: 'translateY(-50%)' }} />
+              <div className="absolute top-1/2 -left-[15px] w-2 h-2 rounded-full bg-primary/40 border border-primary/70" style={{ transform: 'translateY(-50%)', boxShadow: '0 0 4px hsl(var(--primary)/0.4)' }} />
+              <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-border/40 bg-card/60">
+                <FileText size={12} className="text-primary/50 shrink-0 mt-0.5" />
+                <p className="font-body text-sm text-foreground/80 leading-relaxed break-words">
+                  {rule.descricao}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ArtigCards button row */}
+          {rule.artigdcards.length > 0 && (
+            <div className="relative">
+              <div className="absolute top-1/2 -left-3 w-3 h-px bg-primary/30" style={{ transform: 'translateY(-50%)' }} />
+              <div className="absolute top-1/2 -left-[15px] w-2 h-2 rounded-full bg-primary/40 border border-primary/70" style={{ transform: 'translateY(-50%)', boxShadow: '0 0 4px hsl(var(--primary)/0.4)' }} />
+              <button
+                onClick={() => setShowCards(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 text-primary transition-all active:scale-[0.98] w-full sm:w-auto"
+              >
+                <ImageIcon size={12} />
+                <span className="font-mono text-[10px] font-bold tracking-widest">
+                  VER {rule.artigdcards.length} ARTIGCARD{rule.artigdcards.length !== 1 ? 'S' : ''}
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* Paragraphs — expandable, also tree-style */}
+          {hasParagrafos && expanded && (
+            <>
+              <div className="relative">
+                <div className="absolute top-3 -left-3 w-3 h-px bg-primary/30" />
+                <div className="absolute top-3 -left-[15px] w-2 h-2 rounded-full bg-primary/20 border border-primary/40" style={{ boxShadow: '0 0 4px hsl(var(--primary)/0.2)' }} />
+                <div className="px-3 pt-2 pb-1">
+                  <p className="font-mono text-[9px] text-primary/40 tracking-[0.3em] flex items-center gap-2">
+                    <span className="h-px flex-1 bg-primary/15" />
+                    PARÁGRAFOS
+                    <span className="h-px flex-1 bg-primary/15" />
+                  </p>
+                </div>
+              </div>
+
+              <div className="ml-3 border-l-2 border-primary/20 pl-3 space-y-1.5">
+                {rule.paragrafos.map((para, pi) => (
+                  <div key={pi} className="relative">
+                    <div className="absolute top-1/2 -left-3 w-3 h-px bg-primary/20" style={{ transform: 'translateY(-50%)' }} />
+                    <div className="absolute top-1/2 -left-[13px] w-1.5 h-1.5 rounded-full bg-primary/30 border border-primary/50" style={{ transform: 'translateY(-50%)' }} />
+                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border border-border/30 bg-card/40 hover:border-primary/20 transition-colors">
+                      <div className="w-5 h-5 rounded flex items-center justify-center bg-primary/10 border border-primary/25 shrink-0 mt-0.5">
+                        <Hash size={9} className="text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-mono text-[9px] text-primary/40 tracking-widest mb-1">
+                          § {pi + 1}
+                        </p>
+                        <p className="font-body text-sm text-foreground/80 leading-relaxed break-words">
+                          {para}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-[9px] text-primary/50 tracking-widest mb-1">
-                      PARÁGRAFO {pi + 1}
-                    </p>
-                    <p className="font-body text-sm text-foreground/85 leading-relaxed break-words">
-                      {para}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          </div>
-        )}
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -338,6 +349,7 @@ export default function VaultRulesList() {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded flex items-center justify-center bg-primary/10 border border-primary/20">
@@ -355,6 +367,7 @@ export default function VaultRulesList() {
         )}
       </div>
 
+      {/* Search */}
       {!loading && !error && rules.length > 0 && (
         <div className="relative mb-4">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none" />
@@ -363,7 +376,7 @@ export default function VaultRulesList() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="PESQUISAR REGRAS..."
-            className="w-full bg-transparent border border-border/50 rounded-lg pl-10 pr-4 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 placeholder:tracking-widest focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
+            className="w-full bg-card/80 border border-border/60 rounded-lg pl-10 pr-4 py-3 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 placeholder:tracking-widest focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
           />
           {search && (
             <button
@@ -376,16 +389,18 @@ export default function VaultRulesList() {
         </div>
       )}
 
+      {/* Notice banner */}
       <div
-        className="rounded-lg border border-primary/20 p-3 sm:p-4 mb-6 flex items-center gap-3"
+        className="rounded-lg border border-primary/20 px-4 py-3 mb-6 flex items-center gap-3"
         style={{ background: 'hsl(45 100% 55% / 0.04)' }}
       >
-        <AlertTriangle size={15} className="text-primary/70 shrink-0" />
+        <Shield size={14} className="text-primary/70 shrink-0" />
         <p className="font-mono text-[10px] sm:text-[11px] text-primary/60 tracking-wide">
           REGULAMENTO OFICIAL VAULT-TEC — LEIA COM ATENÇÃO ANTES DE OPERAR
         </p>
       </div>
 
+      {/* States */}
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <div className="text-center">
@@ -428,7 +443,7 @@ export default function VaultRulesList() {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {filtered.map((rule, i) => (
             <RuleCard key={rule.id} rule={rule} index={i} />
           ))}
