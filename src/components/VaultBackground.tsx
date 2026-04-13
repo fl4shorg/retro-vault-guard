@@ -41,6 +41,15 @@ function WallpaperPortal({ dataUrl }: { dataUrl: string }) {
           userSelect: 'none',
         }}
       />
+      {/* Overlay inside the same stable container so it never gaps */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'hsl(220 35% 5% / 0.72)',
+          pointerEvents: 'none',
+        }}
+      />
     </div>,
     document.body
   );
@@ -63,14 +72,6 @@ const VaultBackground = () => {
       {isCustom && <WallpaperPortal dataUrl={dataUrl} />}
 
       <div className="fixed inset-0 -z-10">
-        {/* Dark overlay for readability over custom image */}
-        {isCustom && (
-          <div
-            className="absolute inset-0"
-            style={{ background: 'hsl(220 35% 5% / 0.72)' }}
-          />
-        )}
-
         {/* Preset wallpaper */}
         {!isCustom && !isDefault && preset && (
           <div className="absolute inset-0" style={preset.style} />
