@@ -194,22 +194,22 @@ const RuleCard = memo(function RuleCard({ rule, index }: { rule: Rule; index: nu
           </div>
 
           {/* Header bar */}
-          <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg min-w-0 bg-card border-y border-r border-primary/50 border-l-4 border-l-primary">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="font-mono text-[9px] text-primary/60 tracking-[0.25em] shrink-0 hidden sm:block">
+          <div className="flex-1 flex items-start justify-between gap-2 px-3 py-2 rounded-lg min-w-0 bg-card border-y border-r border-primary/50 border-l-4 border-l-primary">
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="font-mono text-[9px] text-primary/50 tracking-[0.25em] hidden sm:block">
                 ART.
               </span>
-              <span className="font-display text-xs font-bold text-primary tracking-[0.1em] uppercase truncate">
+              <span className="font-display text-xs font-bold text-primary tracking-[0.1em] uppercase break-words leading-snug">
                 {rule.nome}
               </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0">
               {hasParagrafos && (
-                <span className="font-mono text-[10px] text-primary/70 whitespace-nowrap hidden sm:block">
+                <span className="font-mono text-[9px] text-primary/50 tracking-widest mt-0.5">
                   {rule.paragrafos.length} {rule.paragrafos.length === 1 ? 'parágrafo' : 'parágrafos'}
                 </span>
               )}
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
               <button
                 onClick={handleCopy}
                 title="Copiar artigo"
