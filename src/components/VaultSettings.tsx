@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, Camera, Trash2, Check, Upload, Link, X, RotateCcw, Loader2 } from 'lucide-react';
+import { LogOut, Camera, Trash2, Check, Upload, RotateCcw, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useTheme, themes, type ThemeId } from '@/hooks/useTheme';
 import { WALLPAPER_PRESETS, compressImage, type WallpaperPresetId } from '@/hooks/useWallpaper';
@@ -62,8 +62,6 @@ async function compressAndUploadAvatar(file: File, userId: string): Promise<stri
 
 function WallpaperPicker({ user }: { user: User | null }) {
   const { wallpaper, setPreset, setCustom, reset } = useWallpaperContext();
-  const [urlMode, setUrlMode] = useState(false);
-  const [urlInput, setUrlInput] = useState('');
   const [uploading, setUploading] = useState(false);
   const wallpaperInputRef = useRef<HTMLInputElement>(null);
 
@@ -95,16 +93,6 @@ function WallpaperPicker({ user }: { user: User | null }) {
       setUploading(false);
       e.target.value = '';
     }
-  };
-
-  const handleUrlApply = async () => {
-    const trimmed = urlInput.trim();
-    if (!trimmed) return;
-    setCustom(trimmed);
-    if (user) await supabase.auth.updateUser({ data: { wallpaper_url: trimmed } });
-    setUrlMode(false);
-    setUrlInput('');
-    toast.success('Wallpaper aplicado!');
   };
 
   const handlePresetSelect = async (id: WallpaperPresetId) => {
@@ -175,53 +163,26 @@ function WallpaperPicker({ user }: { user: User | null }) {
         ))}
       </div>
 
-      {/* Upload / URL */}
-      {urlMode ? (
-        <div className="flex gap-1.5">
-          <input
-            autoFocus
-            type="text"
-            value={urlInput}
-            onChange={e => setUrlInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleUrlApply(); if (e.key === 'Escape') setUrlMode(false); }}
-            placeholder="https://..."
-            className="flex-1 min-w-0 bg-card/60 border border-border/50 rounded px-2 py-1 font-mono text-[10px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-all"
-          />
-          <button onClick={handleUrlApply} className="px-2 py-1 rounded border border-primary/40 font-mono text-[9px] text-primary hover:bg-primary/10 transition-all">
-            OK
-          </button>
-          <button onClick={() => { setUrlMode(false); setUrlInput(''); }} className="px-1.5 py-1 rounded border border-border/30 text-muted-foreground/50 hover:text-muted-foreground transition-all">
-            <X size={10} />
-          </button>
-        </div>
-      ) : (
-        <div className="flex gap-1.5">
+      {/* Upload */}
+      <div className="flex gap-1.5">
+        <button
+          onClick={() => wallpaperInputRef.current?.click()}
+          disabled={uploading}
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border border-border/30 hover:border-primary/40 font-mono text-[9px] text-muted-foreground/60 hover:text-primary transition-all disabled:opacity-40"
+        >
+          {uploading ? <Loader2 size={10} className="animate-spin" /> : <Upload size={10} />}
+          {uploading ? 'SALVANDO...' : 'UPLOAD'}
+        </button>
+        {isCustom && (
           <button
-            onClick={() => wallpaperInputRef.current?.click()}
-            disabled={uploading}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border border-border/30 hover:border-primary/40 font-mono text-[9px] text-muted-foreground/60 hover:text-primary transition-all disabled:opacity-40"
+            onClick={handleReset}
+            className="px-2 py-1.5 rounded border border-border/30 hover:border-destructive/40 text-muted-foreground/40 hover:text-destructive/70 transition-all"
+            title="Remover wallpaper"
           >
-            {uploading ? <Loader2 size={10} className="animate-spin" /> : <Upload size={10} />}
-            {uploading ? 'SALVANDO...' : 'UPLOAD'}
+            <Trash2 size={10} />
           </button>
-          <button
-            onClick={() => setUrlMode(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border border-border/30 hover:border-primary/40 font-mono text-[9px] text-muted-foreground/60 hover:text-primary transition-all"
-          >
-            <Link size={10} />
-            URL
-          </button>
-          {isCustom && (
-            <button
-              onClick={handleReset}
-              className="px-2 py-1.5 rounded border border-border/30 hover:border-destructive/40 text-muted-foreground/40 hover:text-destructive/70 transition-all"
-              title="Remover wallpaper"
-            >
-              <Trash2 size={10} />
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       <input ref={wallpaperInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
     </div>
