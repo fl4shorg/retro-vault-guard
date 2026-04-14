@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Sunset, Moon, CloudMoon, Briefcase, Gavel, ShieldAlert, Activity } from 'lucide-react';
+import { Sun, Sunset, Moon, CloudMoon, Activity } from 'lucide-react';
 
 interface VaultHomeProps {
   userName: string;
@@ -123,19 +123,19 @@ function ClockFace({ time }: { time: Date }) {
 /* ── Stat bar ── */
 function StatBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
   const pct = Math.min(value / Math.max(max, 1), 1);
-  const bars = 16;
+  const bars = 20;
   const filled = Math.round(pct * bars);
   return (
     <div>
       <div className="flex items-baseline justify-between mb-1">
-        <span className="font-mono text-[9px] tracking-[0.2em]" style={{ color, opacity: 0.7 }}>{label}</span>
-        <span className="font-mono text-[9px] text-muted-foreground/35 tabular-nums">{value}</span>
+        <span className="font-mono text-[10px] tracking-[0.25em]" style={{ color }}>{label}</span>
+        <span className="font-mono text-[10px] text-muted-foreground/40">{value} REG.</span>
       </div>
-      <div className="flex gap-[2px]">
+      <div className="flex gap-[3px]">
         {Array.from({ length: bars }, (_, i) => (
-          <div key={i} className="h-1.5 flex-1 rounded-sm transition-all" style={{
-            background: i < filled ? color : 'rgba(255,255,255,0.05)',
-            boxShadow: i < filled ? `0 0 4px ${color}44` : 'none',
+          <div key={i} className="h-2 flex-1 rounded-sm" style={{
+            background: i < filled ? color : 'rgba(255,255,255,0.06)',
+            boxShadow: i < filled ? `0 0 4px ${color}55` : 'none',
           }} />
         ))}
       </div>
@@ -161,10 +161,10 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
   const maxCount = Math.max(totalFBI, totalSKUR, totalRegras, totalProtocols, 1);
 
   const stats = [
-    { id: 'fbi',       label: 'F.B.I',      sub: 'DIVISÃO',     count: totalFBI,       barLabel: 'CARGOS',     color: '#60a5fa', border: 'hsl(215 80% 50% / 0.2)', Icon: Briefcase },
-    { id: 'skur',      label: 'S.K.U.R',     sub: 'DIVISÃO',     count: totalSKUR,      barLabel: 'CARGOS',     color: '#f5c518', border: 'hsl(45 100% 50% / 0.2)',  Icon: Briefcase },
-    { id: 'regras',    label: 'ARTIGOS',      sub: 'REGULAMENTO', count: totalRegras,    barLabel: 'ARTIGOS',    color: '#a78bfa', border: 'hsl(265 80% 50% / 0.2)', Icon: Gavel },
-    { id: 'protocols', label: 'PROTOCOLOS',   sub: 'DEFCON',      count: totalProtocols, barLabel: 'NÍVEIS',     color: '#f87171', border: 'hsl(0 70% 50% / 0.2)',   Icon: ShieldAlert },
+    { id: 'fbi',       label: 'F.B.I',      sub: 'DIVISÃO OPERACIONAL', count: totalFBI,       barLabel: 'CARGOS REGISTRADOS', color: '#60a5fa', border: 'hsl(215 80% 50% / 0.2)' },
+    { id: 'skur',      label: 'S.K.U.R',     sub: 'DIVISÃO OPERACIONAL', count: totalSKUR,      barLabel: 'CARGOS REGISTRADOS', color: '#f5c518', border: 'hsl(45 100% 50% / 0.2)'  },
+    { id: 'regras',    label: 'ARTIGOS',      sub: 'REGULAMENTO VAULT',   count: totalRegras,    barLabel: 'ARTIGOS ATIVOS',     color: '#a78bfa', border: 'hsl(265 80% 50% / 0.2)' },
+    { id: 'protocols', label: 'PROTOCOLOS',   sub: 'SEGURANÇA DEFCON',    count: totalProtocols, barLabel: 'NÍVEIS ATIVOS',      color: '#f87171', border: 'hsl(0 70% 50% / 0.2)'   },
   ];
 
   return (
@@ -268,27 +268,22 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
         transition={{ duration: 0.45, delay: 0.1 }}
         className="grid grid-cols-1 gap-4"
       >
-        {stats.map(({ id, label, sub, count, barLabel, color, border, Icon }) => (
+        {stats.map(({ id, label, sub, count, barLabel, color, border }) => (
           <div
             key={id}
             className="rounded-xl overflow-hidden border"
             style={{ borderColor: border, background: 'linear-gradient(160deg, hsl(220 38% 9%), hsl(220 42% 7%))' }}
           >
             <div className="h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-            <div className="px-3.5 sm:px-5 py-4 flex flex-col gap-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <Icon size={11} style={{ color, opacity: 0.6 }} />
-                    <p className="font-mono text-[8px] tracking-[0.3em]" style={{ color, opacity: 0.5 }}>{sub}</p>
-                  </div>
-                  <p className="font-display text-base sm:text-lg font-bold tracking-[0.15em] leading-none" style={{ color }}>
-                    {label}
-                  </p>
+            <div className="px-5 py-5 flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-mono text-[8px] tracking-[0.4em] mb-0.5" style={{ color, opacity: 0.5 }}>{sub}</p>
+                  <p className="font-display text-xl font-bold tracking-[0.2em]" style={{ color }}>{label}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-mono text-[7px] text-muted-foreground/25 tracking-[0.3em] mb-0.5">TOTAL</p>
-                  <p className="font-mono text-3xl sm:text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}55)` }}>
+                <div className="text-right">
+                  <p className="font-mono text-[8px] text-muted-foreground/30 tracking-[0.3em] mb-0.5">TOTAL</p>
+                  <p className="font-mono text-4xl font-bold tabular-nums leading-none" style={{ color, filter: `drop-shadow(0 0 8px ${color}66)` }}>
                     {String(count).padStart(2, '0')}
                   </p>
                 </div>
