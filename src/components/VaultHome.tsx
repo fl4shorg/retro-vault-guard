@@ -215,7 +215,7 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
                 </p>
                 <h1 className="font-display font-bold tracking-[0.1em] leading-tight">
                   <span className="text-muted-foreground/45 text-base sm:text-lg block">
-                    {greeting.text},
+                    BEM-VINDO, {greeting.text}
                   </span>
                   <span className="text-primary vault-text-glow text-2xl sm:text-3xl block break-words">
                     {userName.toUpperCase()}
@@ -261,12 +261,12 @@ export default function VaultHome({ userName, totalFBI, totalSKUR, totalRegras, 
         <div className="h-px bg-gradient-to-r from-transparent via-primary/15 to-transparent" />
       </motion.div>
 
-      {/* ════ ESTATÍSTICAS 2×2 ════ */}
+      {/* ════ ESTATÍSTICAS ════ */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.1 }}
-        className="grid grid-cols-2 gap-3"
+        className="grid grid-cols-1 gap-4"
       >
         {stats.map(({ id, label, sub, count, barLabel, color, border, Icon }) => (
           <div
