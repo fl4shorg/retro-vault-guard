@@ -12,6 +12,8 @@ import VaultProtocolList from '@/components/VaultProtocolList';
 import VaultRulesList from '@/components/VaultRulesList';
 import VaultChat from '@/components/VaultChat';
 import VaultHome from '@/components/VaultHome';
+import VaultRank from '@/components/VaultRank';
+import { useUserAccess } from '@/hooks/useUserAccess';
 import { Loader2, Zap } from 'lucide-react';
 
 const Index = () => {
@@ -19,6 +21,7 @@ const Index = () => {
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
   const { fbi, skur, totalFBI, totalSKUR, totalRegras, loading: cargosLoading, loadCargos } = useCargos();
   const { setCustom, reset } = useWallpaperContext();
+  const { ranking, loading: rankLoading, error: rankError, fetchRanking, registerAccess } = useUserAccess();
   const totalProtocols = 4;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
@@ -27,7 +30,7 @@ const Index = () => {
     if (user) loadCargos();
   }, [user, loadCargos]);
 
-  // Sync wallpaper from Supabase user metadata on login
+  // Sync wallpaper + register access on login
   useEffect(() => {
     if (!user) return;
     const wallpaperUrl = user.user_metadata?.wallpaper_url;
@@ -36,6 +39,8 @@ const Index = () => {
     } else {
       reset();
     }
+    const name = getUserName(user) ?? 'Habitante';
+    registerAccess(user.id, name);
   }, [user?.id]);
 
   useEffect(() => {
@@ -82,7 +87,7 @@ const Index = () => {
         />
 
         <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-6">
-          {activeSection !== 'chat' && activeSection !== 'inicio' && (
+          {activeSection !== 'chat' && activeSection !== 'inicio' && activeSection !== 'rank' && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -132,6 +137,14 @@ const Index = () => {
             <VaultRulesList />
           ) : activeSection === 'chat' ? (
             <VaultChat userName={userName ?? 'Habitante'} />
+          ) : activeSection === 'rank' ? (
+            <VaultRank
+              ranking={ranking}
+              loading={rankLoading}
+              error={rankError}
+              currentUserId={user.id}
+              onRefresh={fetchRanking}
+            />
           ) : null}
         </main>
       </div>
