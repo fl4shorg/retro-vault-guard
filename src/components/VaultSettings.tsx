@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, Camera, Trash2, Check, ImageIcon, Upload, Link, X, RotateCcw } from 'lucide-react';
+import { LogOut, Camera, Trash2, Check, Upload, Link, X, RotateCcw, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useTheme, themes, type ThemeId } from '@/hooks/useTheme';
 import { WALLPAPER_PRESETS, compressImage, type WallpaperPresetId } from '@/hooks/useWallpaper';
@@ -9,7 +9,8 @@ import { toast } from 'sonner';
 
 export const getProfilePhoto = (): string | null => null;
 
-const BUCKET = 'avatars';
+const BUCKET_AVATARS = 'avatars';
+const BUCKET_WALLPAPERS = 'wallpapers';
 
 const themeColors: Record<ThemeId, string> = {
   'vault-tec': 'bg-[hsl(45,100%,55%)]',
@@ -19,7 +20,7 @@ const themeColors: Record<ThemeId, string> = {
   'institute': 'bg-[hsl(190,90%,50%)]',
 };
 
-async function compressAndUpload(file: File, userId: string): Promise<string | null> {
+async function compressAndUploadAvatar(file: File, userId: string): Promise<string | null> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -35,27 +36,17 @@ async function compressAndUpload(file: File, userId: string): Promise<string | n
         const sy = (img.height - min) / 2;
         ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
         canvas.toBlob(async (blob) => {
-          if (!blob) {
-            toast.error('Erro ao processar imagem');
-            resolve(null); return;
-          }
+          if (!blob) { toast.error('Erro ao processar imagem'); resolve(null); return; }
           const path = `${userId}/avatar.jpg`;
-          const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, blob, {
-            upsert: true,
-            contentType: 'image/jpeg',
+          const { error: uploadError } = await supabase.storage.from(BUCKET_AVATARS).upload(path, blob, {
+            upsert: true, contentType: 'image/jpeg',
           });
-          if (uploadError) {
-            toast.error(`Erro no upload: ${uploadError.message}`);
-            resolve(null); return;
-          }
-          const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+          if (uploadError) { toast.error(`Erro no upload: ${uploadError.message}`); resolve(null); return; }
+          const { data } = supabase.storage.from(BUCKET_AVATARS).getPublicUrl(path);
           const { error: metaError } = await supabase.auth.updateUser({
             data: { avatar_url: data.publicUrl + '?t=' + Date.now() }
           });
-          if (metaError) {
-            toast.error(`Erro ao salvar perfil: ${metaError.message}`);
-            resolve(null); return;
-          }
+          if (metaError) { toast.error(`Erro ao salvar perfil: ${metaError.message}`); resolve(null); return; }
           resolve(data.publicUrl + '?t=' + Date.now());
         }, 'image/jpeg', 0.82);
       };
@@ -67,9 +58,9 @@ async function compressAndUpload(file: File, userId: string): Promise<string | n
   });
 }
 
-/* ─── Wallpaper Picker sub-panel ────────────────────────────────────── */
+/* ─── Wallpaper Picker ───────────────────────────────────────────────── */
 
-function WallpaperPicker() {
+function WallpaperPicker({ user }: { user: User | null }) {
   const { wallpaper, setPreset, setCustom, reset } = useWallpaperContext();
   const [urlMode, setUrlMode] = useState(false);
   const [urlInput, setUrlInput] = useState('');
@@ -85,8 +76,19 @@ function WallpaperPicker() {
     setUploading(true);
     try {
       const dataUrl = await compressImage(file, 1920, 0.75);
-      setCustom(dataUrl);
-      toast.success('Wallpaper aplicado!');
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const path = `${user?.id ?? 'anon'}/wallpaper.jpg`;
+      const { error } = await supabase.storage.from(BUCKET_WALLPAPERS).upload(path, blob, {
+        upsert: true,
+        contentType: 'image/jpeg',
+      });
+      if (error) { toast.error('Erro no upload: ' + error.message); return; }
+      const { data } = supabase.storage.from(BUCKET_WALLPAPERS).getPublicUrl(path);
+      const url = data.publicUrl + '?t=' + Date.now();
+      if (user) await supabase.auth.updateUser({ data: { wallpaper_url: url } });
+      setCustom(url);
+      toast.success('Wallpaper salvo no Vault!');
     } catch {
       toast.error('Erro ao processar imagem');
     } finally {
@@ -95,13 +97,30 @@ function WallpaperPicker() {
     }
   };
 
-  const handleUrlApply = () => {
+  const handleUrlApply = async () => {
     const trimmed = urlInput.trim();
     if (!trimmed) return;
     setCustom(trimmed);
+    if (user) await supabase.auth.updateUser({ data: { wallpaper_url: trimmed } });
     setUrlMode(false);
     setUrlInput('');
     toast.success('Wallpaper aplicado!');
+  };
+
+  const handlePresetSelect = async (id: WallpaperPresetId) => {
+    setPreset(id);
+    if (user) {
+      await supabase.storage.from(BUCKET_WALLPAPERS).remove([`${user.id}/wallpaper.jpg`]);
+      await supabase.auth.updateUser({ data: { wallpaper_url: null } });
+    }
+  };
+
+  const handleReset = async () => {
+    reset();
+    if (user) {
+      await supabase.storage.from(BUCKET_WALLPAPERS).remove([`${user.id}/wallpaper.jpg`]);
+      await supabase.auth.updateUser({ data: { wallpaper_url: null } });
+    }
   };
 
   return (
@@ -110,9 +129,8 @@ function WallpaperPicker() {
         <p className="font-mono text-[8px] text-muted-foreground/35 tracking-[0.35em]">// WALLPAPER</p>
         {isCustom && (
           <button
-            onClick={reset}
+            onClick={handleReset}
             className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground/40 hover:text-primary transition-colors"
-            title="Remover wallpaper"
           >
             <RotateCcw size={9} />
             RESETAR
@@ -125,7 +143,7 @@ function WallpaperPicker() {
         {WALLPAPER_PRESETS.map(preset => (
           <button
             key={preset.id}
-            onClick={() => setPreset(preset.id as WallpaperPresetId)}
+            onClick={() => handlePresetSelect(preset.id as WallpaperPresetId)}
             title={preset.name}
             className={`relative h-8 rounded overflow-hidden border transition-all ${
               activePresetId === preset.id
@@ -143,7 +161,7 @@ function WallpaperPicker() {
         ))}
       </div>
 
-      {/* Preset labels row */}
+      {/* Labels */}
       <div className="grid grid-cols-4 gap-1.5 mb-3">
         {WALLPAPER_PRESETS.map(preset => (
           <p
@@ -157,7 +175,7 @@ function WallpaperPicker() {
         ))}
       </div>
 
-      {/* Custom image / URL */}
+      {/* Upload / URL */}
       {urlMode ? (
         <div className="flex gap-1.5">
           <input
@@ -169,16 +187,10 @@ function WallpaperPicker() {
             placeholder="https://..."
             className="flex-1 min-w-0 bg-card/60 border border-border/50 rounded px-2 py-1 font-mono text-[10px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-all"
           />
-          <button
-            onClick={handleUrlApply}
-            className="px-2 py-1 rounded border border-primary/40 font-mono text-[9px] text-primary hover:bg-primary/10 transition-all"
-          >
+          <button onClick={handleUrlApply} className="px-2 py-1 rounded border border-primary/40 font-mono text-[9px] text-primary hover:bg-primary/10 transition-all">
             OK
           </button>
-          <button
-            onClick={() => { setUrlMode(false); setUrlInput(''); }}
-            className="px-1.5 py-1 rounded border border-border/30 text-muted-foreground/50 hover:text-muted-foreground transition-all"
-          >
+          <button onClick={() => { setUrlMode(false); setUrlInput(''); }} className="px-1.5 py-1 rounded border border-border/30 text-muted-foreground/50 hover:text-muted-foreground transition-all">
             <X size={10} />
           </button>
         </div>
@@ -189,8 +201,8 @@ function WallpaperPicker() {
             disabled={uploading}
             className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border border-border/30 hover:border-primary/40 font-mono text-[9px] text-muted-foreground/60 hover:text-primary transition-all disabled:opacity-40"
           >
-            <Upload size={10} />
-            {uploading ? 'ENVIANDO...' : 'UPLOAD'}
+            {uploading ? <Loader2 size={10} className="animate-spin" /> : <Upload size={10} />}
+            {uploading ? 'SALVANDO...' : 'UPLOAD'}
           </button>
           <button
             onClick={() => setUrlMode(true)}
@@ -201,9 +213,9 @@ function WallpaperPicker() {
           </button>
           {isCustom && (
             <button
-              onClick={reset}
+              onClick={handleReset}
               className="px-2 py-1.5 rounded border border-border/30 hover:border-destructive/40 text-muted-foreground/40 hover:text-destructive/70 transition-all"
-              title="Remover wallpaper personalizado"
+              title="Remover wallpaper"
             >
               <Trash2 size={10} />
             </button>
@@ -211,13 +223,7 @@ function WallpaperPicker() {
         </div>
       )}
 
-      <input
-        ref={wallpaperInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileUpload}
-      />
+      <input ref={wallpaperInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
     </div>
   );
 }
@@ -247,9 +253,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -260,11 +264,8 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
     if (!file || !user) return;
     setUploading(true);
     try {
-      const url = await compressAndUpload(file, user.id);
-      if (url) {
-        setAvatarUrl(url);
-        toast.success('Foto de perfil atualizada!');
-      }
+      const url = await compressAndUploadAvatar(file, user.id);
+      if (url) { setAvatarUrl(url); toast.success('Foto de perfil atualizada!'); }
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -273,7 +274,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
 
   const removePhoto = async () => {
     if (!user) return;
-    await supabase.storage.from(BUCKET).remove([`${user.id}/avatar.jpg`]);
+    await supabase.storage.from(BUCKET_AVATARS).remove([`${user.id}/avatar.jpg`]);
     await supabase.auth.updateUser({ data: { avatar_url: null } });
     setAvatarUrl(null);
     toast.success('Foto removida');
@@ -283,8 +284,6 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
 
   return (
     <div className="relative" ref={menuRef}>
-
-      {/* ── Avatar circle button ── */}
       <button
         onClick={() => setOpen(v => !v)}
         className="w-10 h-10 rounded-full overflow-hidden border-2 transition-all flex items-center justify-center font-bold font-mono text-base"
@@ -295,14 +294,9 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
           boxShadow: open ? '0 0 12px hsl(var(--primary) / 0.4)' : 'none',
         }}
       >
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-        ) : (
-          <span>{initial}</span>
-        )}
+        {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <span>{initial}</span>}
       </button>
 
-      {/* ── Dropdown panel ── */}
       {open && (
         <div
           className="absolute right-0 top-[calc(100%+8px)] w-64 rounded-xl border border-border/50 overflow-hidden z-[200] shadow-2xl overflow-y-auto max-h-[calc(100vh-80px)]"
@@ -312,21 +306,12 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
 
           {/* User info */}
           <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3">
-            <div
-              className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/40 flex items-center justify-center shrink-0"
-              style={{ background: 'hsl(var(--primary) / 0.1)' }}
-            >
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-primary font-bold font-mono text-base">{initial}</span>
-              )}
+            <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/40 flex items-center justify-center shrink-0" style={{ background: 'hsl(var(--primary) / 0.1)' }}>
+              {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <span className="text-primary font-bold font-mono text-base">{initial}</span>}
             </div>
             <div className="min-w-0">
               <p className="font-mono text-[8px] text-muted-foreground/35 tracking-[0.4em]">AGENTE IDENTIFICADO</p>
-              <p className="font-display text-sm font-bold text-primary tracking-wide truncate">
-                {userName.toUpperCase()}
-              </p>
+              <p className="font-display text-sm font-bold text-primary tracking-wide truncate">{userName.toUpperCase()}</p>
             </div>
           </div>
 
@@ -343,10 +328,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
                 {uploading ? 'ENVIANDO...' : avatarUrl ? 'TROCAR FOTO' : 'ADICIONAR FOTO'}
               </button>
               {avatarUrl && !uploading && (
-                <button
-                  onClick={removePhoto}
-                  className="flex items-center gap-1 font-mono text-[10px] text-destructive/60 hover:text-destructive transition-colors ml-auto"
-                >
+                <button onClick={removePhoto} className="flex items-center gap-1 font-mono text-[10px] text-destructive/60 hover:text-destructive transition-colors ml-auto">
                   <Trash2 size={11} /> REMOVER
                 </button>
               )}
@@ -366,9 +348,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
                   }`}
                 >
                   <div className={`w-3 h-3 rounded-full ${themeColors[t.id]} shrink-0`} />
-                  <span className={`font-mono text-[10px] tracking-wider ${theme === t.id ? 'text-primary' : 'text-muted-foreground/60'}`}>
-                    {t.name}
-                  </span>
+                  <span className={`font-mono text-[10px] tracking-wider ${theme === t.id ? 'text-primary' : 'text-muted-foreground/60'}`}>{t.name}</span>
                   {theme === t.id && <Check size={10} className="text-primary ml-auto" />}
                 </button>
               ))}
@@ -376,7 +356,7 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
           </div>
 
           {/* Wallpaper */}
-          <WallpaperPicker />
+          <WallpaperPicker user={user} />
 
           {/* Logout */}
           <div className="px-4 py-2.5">

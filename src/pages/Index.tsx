@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useCargos } from '@/hooks/useCargos';
+import { useWallpaperContext } from '@/contexts/WallpaperContext';
 import VaultBackground from '@/components/VaultBackground';
 import VaultHeader from '@/components/VaultHeader';
 import VaultSidebar from '@/components/VaultSidebar';
@@ -17,6 +18,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
   const { fbi, skur, totalFBI, totalSKUR, totalRegras, loading: cargosLoading, loadCargos } = useCargos();
+  const { setCustom, reset } = useWallpaperContext();
   const totalProtocols = 4;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
@@ -24,6 +26,17 @@ const Index = () => {
   useEffect(() => {
     if (user) loadCargos();
   }, [user, loadCargos]);
+
+  // Sync wallpaper from Supabase user metadata on login
+  useEffect(() => {
+    if (!user) return;
+    const wallpaperUrl = user.user_metadata?.wallpaper_url;
+    if (wallpaperUrl) {
+      setCustom(wallpaperUrl);
+    } else {
+      reset();
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (!authLoading && !user) {
