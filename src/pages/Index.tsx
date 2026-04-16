@@ -99,12 +99,12 @@ const Index = () => {
               }}
             >
               {/* Terminal header bar */}
-              <div className="flex items-center justify-between px-3 py-1.5 border-b gap-2 overflow-hidden"
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 py-1.5 border-b gap-0.5 sm:gap-2"
                 style={{ borderColor: 'hsl(var(--primary) / 0.35)', background: 'hsl(var(--primary) / 0.07)' }}>
-                <span className="font-mono text-[9px] tracking-[0.25em] text-primary/70 uppercase truncate">
+                <span className="font-mono text-[9px] tracking-[0.12em] sm:tracking-[0.25em] text-primary/70 uppercase">
                   ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL
                 </span>
-                <span className="font-mono text-[9px] tracking-widest text-primary/50 shrink-0">v2.3.7-STABLE</span>
+                <span className="font-mono text-[9px] tracking-widest text-primary/50">v2.3.7-STABLE</span>
               </div>
 
               <div className="flex items-stretch">
@@ -131,7 +131,7 @@ const Index = () => {
                 <div className="flex-1 min-w-0 px-3 py-3 flex flex-col justify-between gap-2">
                   {/* Header line */}
                   <div className="min-w-0">
-                    <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] uppercase mb-0.5 truncate">
+                    <p className="font-mono text-[9px] text-primary/50 tracking-[0.1em] sm:tracking-[0.3em] uppercase mb-0.5 leading-snug">
                       ── IDENTIFICAÇÃO DO HABITANTE ──
                     </p>
                     <h2 className="font-display text-sm sm:text-base font-bold tracking-[0.1em] vault-text-glow flex items-baseline gap-1.5 min-w-0"
@@ -160,7 +160,7 @@ const Index = () => {
                   {/* Boot log line */}
                   <div className="flex items-center gap-1.5 pt-1 border-t min-w-0" style={{ borderColor: 'hsl(var(--primary) / 0.15)' }}>
                     <Zap size={9} className="text-primary/60 shrink-0" />
-                    <p className="font-mono text-[9px] text-muted-foreground tracking-[0.2em] truncate">
+                    <p className="font-mono text-[9px] text-muted-foreground tracking-[0.05em] sm:tracking-[0.2em] leading-snug">
                       BEM-VINDO AO VAULT • TODOS OS SISTEMAS OPERACIONAIS • CARREGANDO PROTOCOLOS...
                     </p>
                   </div>
