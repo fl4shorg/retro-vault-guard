@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = "https://mqtixljmalxlabhlvskv.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xdGl4bGptYWx4bGFiaGx2c2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MjYxMzQsImV4cCI6MjA5MDMwMjEzNH0.1n-WNPUL7LDa285jOKW7OG7aw-r0i1VZKEKKG7xUHjc";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error('Supabase env vars VITE_SUPABASE_URL e VITE_SUPABASE_KEY não configurados.');
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {

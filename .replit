@@ -49,3 +49,9 @@ externalPort = 3002
 [[ports]]
 localPort = 5003
 externalPort = 3000
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://mqtixljmalxlabhlvskv.supabase.co"
+VITE_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xdGl4bGptYWx4bGFiaGx2c2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MjYxMzQsImV4cCI6MjA5MDMwMjEzNH0.1n-WNPUL7LDa285jOKW7OG7aw-r0i1VZKEKKG7xUHjc"
