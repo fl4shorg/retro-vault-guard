@@ -35,24 +35,16 @@ export function useUserAccess() {
     try {
       const { data: existing } = await supabase
         .from('user_access')
-        .select('access_count, last_seen')
+        .select('access_count')
         .eq('user_id', userId)
         .single();
 
-      const now = new Date();
-
       if (existing) {
-        const lastSeen = new Date(existing.last_seen);
-        const hoursSinceLast = (now.getTime() - lastSeen.getTime()) / (1000 * 60 * 60);
-
-        // Só conta um acesso por dia — reload não incrementa
-        if (hoursSinceLast < 24) return;
-
         await supabase
           .from('user_access')
           .update({
             access_count: existing.access_count + 1,
-            last_seen: now.toISOString(),
+            last_seen: new Date().toISOString(),
             user_name: userName,
           })
           .eq('user_id', userId);
@@ -63,7 +55,7 @@ export function useUserAccess() {
             user_id: userId,
             user_name: userName,
             access_count: 1,
-            last_seen: now.toISOString(),
+            last_seen: new Date().toISOString(),
           });
       }
     } catch {
