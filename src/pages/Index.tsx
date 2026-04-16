@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +16,24 @@ import VaultRank from '@/components/VaultRank';
 import { useUserAccess } from '@/hooks/useUserAccess';
 import { Loader2, Zap } from 'lucide-react';
 
+const FALLOUT_QUOTES = [
+  '"A guerra. A guerra nunca muda." — Ron Perlman',
+  '"Nunca deveríamos ter saído do Vault." — Overseer Almodovar',
+  '"O futuro pertence àqueles que sobrevivem." — Vault-Tec',
+  '"Você pode fazer mais com palavras gentis e uma arma do que só com palavras gentis." — Vault City',
+  '"O átomo nos une a todos." — Igreja do Átomo',
+  '"Sobrevivência é minha especialidade." — Harold',
+  '"A morte é apenas o começo de outra aventura." — Fallout Lore',
+  '"Todo homem tem um preço. O meu só é um pouco mais alto." — Mr. House',
+  '"Escolha com sabedoria, habitante. O Vault depende de você." — Vault-Tec',
+  '"Melhor estar preparado para o pior. O pior sempre chega." — Overseer',
+  '"A esperança é a última coisa a morrer no Ermo." — Fallout Lore',
+  '"Nossas ações definem quem somos, não nossas origens." — Lone Wanderer',
+  '"Se você quer paz, prepare-se para a guerra." — Brotherhood of Steel',
+  '"O passado está morto. O futuro ainda pode ser salvo." — Fallout Lore',
+  '"A liberdade é cara. Mas a escravidão custa ainda mais." — NCR',
+];
+
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, getUserName, signOut } = useAuth();
@@ -25,6 +43,7 @@ const Index = () => {
   const totalProtocols = 4;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
+  const randomQuote = useMemo(() => FALLOUT_QUOTES[Math.floor(Math.random() * FALLOUT_QUOTES.length)], []);
 
   useEffect(() => {
     if (user) loadCargos();
@@ -157,11 +176,11 @@ const Index = () => {
                     ))}
                   </div>
 
-                  {/* Boot log line */}
-                  <div className="flex items-center gap-1.5 pt-1 border-t min-w-0" style={{ borderColor: 'hsl(var(--primary) / 0.15)' }}>
-                    <Zap size={9} className="text-primary/60 shrink-0" />
-                    <p className="font-mono text-[9px] text-muted-foreground tracking-[0.05em] sm:tracking-[0.2em] leading-snug">
-                      BEM-VINDO AO VAULT • TODOS OS SISTEMAS OPERACIONAIS • CARREGANDO PROTOCOLOS...
+                  {/* Boot log line — random Fallout quote */}
+                  <div className="flex items-start gap-1.5 pt-1 border-t min-w-0" style={{ borderColor: 'hsl(var(--primary) / 0.15)' }}>
+                    <Zap size={9} className="text-primary/60 shrink-0 mt-0.5" />
+                    <p className="font-mono text-[9px] text-primary/60 tracking-[0.05em] sm:tracking-[0.1em] leading-snug italic">
+                      {randomQuote}
                     </p>
                   </div>
                 </div>
