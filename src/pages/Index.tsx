@@ -99,69 +99,70 @@ const Index = () => {
               }}
             >
               {/* Terminal header bar */}
-              <div className="flex items-center justify-between px-3 py-1.5 border-b"
+              <div className="flex items-center justify-between px-3 py-1.5 border-b gap-2 overflow-hidden"
                 style={{ borderColor: 'hsl(var(--primary) / 0.35)', background: 'hsl(var(--primary) / 0.07)' }}>
-                <span className="font-mono text-[9px] tracking-[0.25em] text-primary/70 uppercase">
-                  ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL
+                <span className="font-mono text-[8px] tracking-[0.12em] text-primary/70 uppercase truncate">
+                  <span className="hidden sm:inline">ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL</span>
+                  <span className="sm:hidden">ROBCO TERMLINK</span>
                 </span>
-                <span className="font-mono text-[9px] tracking-widest text-primary/50">v2.3.7-STABLE</span>
+                <span className="font-mono text-[8px] tracking-wider text-primary/50 shrink-0">v2.3.7</span>
               </div>
 
               <div className="flex items-stretch">
                 {/* Left: Avatar block */}
-                <div className="flex flex-col items-center justify-center gap-2 px-5 py-4 border-r shrink-0"
-                  style={{ borderColor: 'hsl(var(--primary) / 0.25)', minWidth: 90 }}>
-                  <div className="w-14 h-14 rounded-sm overflow-hidden border-2 vault-glow shrink-0 flex items-center justify-center"
+                <div className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 border-r shrink-0"
+                  style={{ borderColor: 'hsl(var(--primary) / 0.25)', minWidth: 72 }}>
+                  <div className="w-12 h-12 rounded-sm overflow-hidden border-2 vault-glow shrink-0 flex items-center justify-center"
                     style={{ borderColor: 'hsl(var(--primary) / 0.55)', background: 'hsl(var(--primary) / 0.08)' }}>
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="Perfil" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-primary font-bold text-2xl font-mono">
+                      <span className="text-primary font-bold text-xl font-mono">
                         {userName?.charAt(0).toUpperCase() || 'H'}
                       </span>
                     )}
                   </div>
                   <div className="text-center">
-                    <p className="font-mono text-[8px] tracking-[0.2em] text-primary/60 uppercase">VAULT-TEC</p>
-                    <p className="font-mono text-[8px] tracking-[0.2em] text-primary/60 uppercase">CERTIFIED</p>
+                    <p className="font-mono text-[7px] tracking-[0.1em] text-primary/60 uppercase leading-tight">VAULT-TEC</p>
+                    <p className="font-mono text-[7px] tracking-[0.1em] text-primary/60 uppercase leading-tight">CERTIFIED</p>
                   </div>
                 </div>
 
                 {/* Right: Info block */}
-                <div className="flex-1 px-4 py-3 flex flex-col justify-between gap-2">
+                <div className="flex-1 min-w-0 px-3 py-3 flex flex-col justify-between gap-2">
                   {/* Header line */}
-                  <div>
-                    <p className="font-mono text-[9px] text-primary/50 tracking-[0.3em] uppercase mb-0.5">
+                  <div className="min-w-0">
+                    <p className="font-mono text-[8px] text-primary/50 tracking-[0.15em] uppercase mb-0.5 truncate">
                       ── IDENTIFICAÇÃO DO HABITANTE ──
                     </p>
-                    <h2 className="font-display text-base font-bold tracking-[0.15em] vault-text-glow flex items-baseline gap-2"
+                    <h2 className="font-display text-sm sm:text-base font-bold tracking-[0.1em] vault-text-glow flex items-baseline gap-1.5 min-w-0"
                       style={{ color: 'hsl(var(--foreground))' }}>
-                      <span className="text-primary/60 text-sm font-mono font-normal">&gt;</span>
-                      {userName}
-                      <span className="terminal-cursor text-primary text-xs font-mono font-normal" />
+                      <span className="text-primary/60 text-sm font-mono font-normal shrink-0">&gt;</span>
+                      <span className="truncate">{userName}</span>
+                      <span className="terminal-cursor text-primary text-xs font-mono font-normal shrink-0" />
                     </h2>
                   </div>
 
                   {/* Status grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 mt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-0.5">
                     {[
-                      { label: 'STATUS', value: 'OPERACIONAL', ok: true },
-                      { label: 'ACESSO', value: 'AUTORIZADO', ok: true },
-                      { label: 'SISTEMA', value: 'VAULT-TEC OS', ok: true },
-                    ].map(({ label, value, ok }) => (
-                      <div key={label} className="flex items-center gap-1.5">
-                        <span className="font-mono text-[9px]" style={{ color: ok ? 'hsl(var(--primary))' : 'hsl(0 80% 55%)' }}>●</span>
-                        <span className="font-mono text-[9px] text-muted-foreground tracking-widest">{label}:</span>
-                        <span className="font-mono text-[9px] font-semibold tracking-widest" style={{ color: 'hsl(var(--primary))' }}>{value}</span>
+                      { label: 'STATUS', value: 'OPERACIONAL' },
+                      { label: 'ACESSO', value: 'AUTORIZADO' },
+                      { label: 'SISTEMA', value: 'VAULT-TEC OS' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex items-center gap-1 min-w-0">
+                        <span className="font-mono text-[9px] text-primary shrink-0">●</span>
+                        <span className="font-mono text-[9px] text-muted-foreground shrink-0">{label}:</span>
+                        <span className="font-mono text-[9px] font-semibold text-primary truncate">{value}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Boot log line */}
-                  <div className="flex items-center gap-2 pt-1 border-t" style={{ borderColor: 'hsl(var(--primary) / 0.15)' }}>
+                  <div className="flex items-center gap-1.5 pt-1 border-t min-w-0" style={{ borderColor: 'hsl(var(--primary) / 0.15)' }}>
                     <Zap size={9} className="text-primary/60 shrink-0" />
-                    <p className="font-mono text-[9px] text-muted-foreground tracking-[0.2em] truncate">
-                      BEM-VINDO AO VAULT • TODOS OS SISTEMAS OPERACIONAIS • CARREGANDO PROTOCOLOS...
+                    <p className="font-mono text-[8px] text-muted-foreground tracking-[0.1em] truncate">
+                      <span className="hidden sm:inline">BEM-VINDO AO VAULT • TODOS OS SISTEMAS OPERACIONAIS • </span>CARREGANDO PROTOCOLOS...
                     </p>
                   </div>
                 </div>
