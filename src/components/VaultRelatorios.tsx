@@ -40,6 +40,7 @@ interface Recruta {
 interface ReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   recrutamentos: Recruta[];
   subiuDeCargo: string[];
@@ -99,7 +100,7 @@ function readFileAsBase64(file: File): Promise<string> {
 }
 
 const emptyReport = (): ReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   recrutamentos: [], subiuDeCargo: [],
   totalGrupo: '', totalNYPD: '',
   descricao: '',
@@ -126,8 +127,19 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
   const c50    = wOver(0.50, base);
   const c45    = wOver(0.45, base);
 
+  // Wallpaper support: bg-image + dark overlay so text stays readable.
+  // When no wallpaper, falls back to the theme gradient as usual.
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
 
       <div style={{ padding: '24px 22px' }}>
@@ -234,6 +246,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
       </div>
 
       <div style={{ height: 3, background: c18 }} />
+      </div>{/* /zIndex wrapper */}
     </div>
   );
 }
@@ -4873,8 +4886,9 @@ function RelatoriosHub({ onOpen }: { onOpen: (id: string) => void }) {
 // ─── CEO Regente generator ────────────────────────────────────────────────────
 
 function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
-  const captureRef  = useRef<HTMLDivElement>(null);
-  const fotoRef     = useRef<HTMLInputElement>(null);
+  const captureRef    = useRef<HTMLDivElement>(null);
+  const fotoRef       = useRef<HTMLInputElement>(null);
+  const wallpaperRef  = useRef<HTMLInputElement>(null);
   const [data, setData]           = useState<ReportData>(emptyReport());
   const [themeId, setThemeId]     = useState('vault-amber');
   const [themeOpen, setThemeOpen] = useState(false);
@@ -4889,6 +4903,16 @@ function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -5012,6 +5036,39 @@ function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
               </div>
             </div>
           </div>
+
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
 
           {/* Contagens */}
           <div className={sec} style={secStyle}>
