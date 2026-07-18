@@ -271,7 +271,7 @@ function ListSection({ icon: Icon, label, items, placeholder, onAdd, onRemove }:
 
 // ─── Scaled preview wrapper ───────────────────────────────────────────────────
 
-function ScaledPreview({ data, theme }: { data: ReportData; theme: Theme }) {
+function ScaledPreview({ data, theme, cardRef }: { data: ReportData; theme: Theme; cardRef?: React.RefObject<HTMLDivElement> }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
 
@@ -289,7 +289,9 @@ function ScaledPreview({ data, theme }: { data: ReportData; theme: Theme }) {
   return (
     <div ref={wrapRef} style={{ width: '100%' }}>
       <div style={{ zoom }}>
-        <ReportCard data={data} theme={theme} />
+        <div ref={cardRef}>
+          <ReportCard data={data} theme={theme} />
+        </div>
       </div>
     </div>
   );
@@ -345,10 +347,6 @@ export default function VaultRelatorios() {
   return (
     <div className="space-y-4 sm:space-y-6">
 
-      {/* Hidden card for html2canvas — same component = identical to preview */}
-      <div style={{ position: 'fixed', left: '-9999px', top: 0, zIndex: -1, pointerEvents: 'none' }} aria-hidden>
-        <div ref={captureRef}><ReportCard data={data} theme={theme} /></div>
-      </div>
 
       {/* Page header */}
       <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
@@ -510,7 +508,7 @@ export default function VaultRelatorios() {
         {/* ── Preview ── */}
         <div>
           <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
-          <ScaledPreview data={data} theme={theme} />
+          <ScaledPreview data={data} theme={theme} cardRef={captureRef} />
         </div>
       </div>
     </div>
