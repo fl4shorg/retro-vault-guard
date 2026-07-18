@@ -5,6 +5,7 @@ import {
   Loader2, Camera, UserCheck, TrendingUp, Users,
   Building2, Shield, Radiation, ChevronDown, Crown, Star, MessageSquare, Ban, Gavel, Landmark,
   CheckCircle2, XCircle, ShieldCheck, Sword, Vote, Stethoscope,
+  Scale, Calendar, PenLine,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -3587,6 +3588,355 @@ function HospitalGenerator({ onBack }: { onBack: () => void }) {
 
 // ─── Report Hub (landing) ─────────────────────────────────────────────────────
 
+// ─── Justiça NeexT Report ─────────────────────────────────────────────────────
+
+type TipoDocumento =
+  | 'mandadoPrisao'
+  | 'pedidoRegulatorio'
+  | 'notificacaoAviso'
+  | 'notificacaoRegras'
+  | 'burlamentoRegras'
+  | 'pedidoAlteracao';
+
+const TIPO_DOCUMENTO_MAP: Record<TipoDocumento, string> = {
+  mandadoPrisao:      'MANDADO DE PRISÃO',
+  pedidoRegulatorio:  'PEDIDO REGULATÓRIO',
+  notificacaoAviso:   'NOTIFICAÇÃO DE AVISO',
+  notificacaoRegras:  'NOTIFICAÇÃO DE REGRAS NOVAS',
+  burlamentoRegras:   'NOTIFICAÇÃO DE BURLAMENTO DE REGRAS',
+  pedidoAlteracao:    'PEDIDO DE ALTERAÇÃO',
+};
+
+const TIPO_DOCUMENTO_COLOR: Record<TipoDocumento, string> = {
+  mandadoPrisao:      '#7f1d1d',
+  pedidoRegulatorio:  '#1a237e',
+  notificacaoAviso:   '#7c5f00',
+  notificacaoRegras:  '#1a237e',
+  burlamentoRegras:   '#4a1d96',
+  pedidoAlteracao:    '#14532d',
+};
+
+interface JusticaReportData {
+  tipoDocumento: TipoDocumento;
+  nome: string;
+  descricao: string;
+  dataEmissao: string;
+  assinatura: string;
+}
+
+const emptyJusticaReport = (): JusticaReportData => ({
+  tipoDocumento: 'mandadoPrisao',
+  nome: '',
+  descricao: '',
+  dataEmissao: new Date().toISOString().split('T')[0],
+  assinatura: '',
+});
+
+// ─── Justiça Report Card (official document look) ─────────────────────────────
+
+function JusticaReportCard({ data }: { data: JusticaReportData }) {
+  const sans = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+  const mono = "'Courier New', Courier, monospace";
+  const navy   = '#1a237e';
+  const indigo = '#3949ab';
+  const gold   = '#ffab00';
+  const dark   = '#0d1238';
+  const midGray = '#444e6a';
+  const lightBg = '#f4f6fb';
+  const white  = '#ffffff';
+  const tipoColor = TIPO_DOCUMENTO_COLOR[data.tipoDocumento] ?? navy;
+
+  return (
+    <div style={{ width: 400, background: white, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const, boxShadow: '0 8px 32px rgba(26,35,126,0.18)' }}>
+
+      {/* ── Rainbow top stripe ── */}
+      <div style={{ height: 7, background: `linear-gradient(90deg, ${navy} 0%, ${indigo} 55%, ${gold} 100%)` }} />
+
+      {/* ── Navy header ── */}
+      <div style={{ background: navy, padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 13 }}>
+        <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(255,171,0,0.18)', border: `2px solid ${gold}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Scale size={22} color={gold} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: sans, fontSize: 17, fontWeight: 800, color: white, textTransform: 'uppercase' as const, letterSpacing: '0.12em', lineHeight: 1 }}>Justiça NeexT</div>
+          <div style={{ fontFamily: sans, fontSize: 8, color: gold, textTransform: 'uppercase' as const, letterSpacing: '0.22em', marginTop: 4 }}>Sistema Judicial Oficial</div>
+        </div>
+        <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
+          <div style={{ fontFamily: mono, fontSize: 8, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.15em', marginBottom: 3 }}>Emissão</div>
+          <div style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{formatDate(data.dataEmissao) || '—'}</div>
+        </div>
+      </div>
+
+      {/* ── Light body ── */}
+      <div style={{ background: lightBg, padding: '20px 22px' }}>
+
+        {/* Document type badge */}
+        <div style={{ background: tipoColor, borderRadius: 8, padding: '9px 16px', marginBottom: 16, textAlign: 'center' as const, boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+          <span style={{ fontFamily: sans, fontSize: 12, fontWeight: 800, color: gold, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>
+            {TIPO_DOCUMENTO_MAP[data.tipoDocumento]}
+          </span>
+        </div>
+
+        {/* Gradient divider */}
+        <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${indigo}, transparent)`, marginBottom: 16 }} />
+
+        {/* ── Fields ── */}
+        {/* Nome */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+            <User size={13} color={gold} />
+          </div>
+          <div>
+            <div style={{ fontFamily: sans, fontSize: 8, fontWeight: 700, color: indigo, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Nome</div>
+            <div style={{ fontFamily: sans, fontSize: 13, fontWeight: 700, color: dark }}>{data.nome || '[NÃO INFORMADO]'}</div>
+          </div>
+        </div>
+
+        {/* Descrição */}
+        {data.descricao.trim() && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 7, background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+              <FileText size={13} color={gold} />
+            </div>
+            <div>
+              <div style={{ fontFamily: sans, fontSize: 8, fontWeight: 700, color: indigo, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Descrição</div>
+              <div style={{ fontFamily: sans, fontSize: 11, color: midGray, lineHeight: 1.65, whiteSpace: 'pre-wrap' as const }}>{data.descricao}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Data */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 16 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+            <Calendar size={13} color={gold} />
+          </div>
+          <div>
+            <div style={{ fontFamily: sans, fontSize: 8, fontWeight: 700, color: indigo, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Data de Emissão</div>
+            <div style={{ fontFamily: sans, fontSize: 12, fontWeight: 600, color: dark }}>{formatDate(data.dataEmissao) || '[NÃO INFORMADA]'}</div>
+          </div>
+        </div>
+
+        {/* Signature divider */}
+        <div style={{ height: 2, borderTop: `2px solid ${dark}`, marginBottom: 12 }} />
+
+        {/* Assinatura */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: navy, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <PenLine size={13} color={gold} />
+          </div>
+          <div>
+            <div style={{ fontFamily: sans, fontSize: 8, fontWeight: 700, color: indigo, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Assinatura</div>
+            <div style={{ fontFamily: sans, fontSize: 13, fontWeight: 700, color: dark, fontStyle: 'italic' as const }}>{data.assinatura || '[NÃO INFORMADA]'}</div>
+          </div>
+        </div>
+
+        {/* ── Bottom row: stamp + watermark ── */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          {/* Circular stamp */}
+          <div style={{
+            width: 72, height: 72,
+            border: `2.5px solid ${gold}`,
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transform: 'rotate(-15deg)',
+            color: gold,
+            fontSize: 8,
+            fontWeight: 800,
+            fontFamily: sans,
+            textAlign: 'center' as const,
+            lineHeight: 1.35,
+            opacity: 0.75,
+            flexShrink: 0,
+          }}>
+            SELO<br/>OFICIAL<br/>JUSTIÇA<br/>NEEXT
+          </div>
+          {/* Watermark */}
+          <div style={{ fontFamily: mono, fontSize: 8, color: 'rgba(0,0,0,0.22)', textAlign: 'right' as const, lineHeight: 1.6, maxWidth: 200 }}>
+            Documento gerado eletronicamente<br/>Sistema Justiça NeexT
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom stripe ── */}
+      <div style={{ height: 5, background: `linear-gradient(90deg, ${navy} 0%, ${indigo} 55%, ${gold} 100%)` }} />
+    </div>
+  );
+}
+
+// ─── Scaled preview for Justiça ───────────────────────────────────────────────
+
+function JusticaScaledPreview({ data, cardRef }: { data: JusticaReportData; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}>
+          <JusticaReportCard data={data} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Justiça Generator ────────────────────────────────────────────────────────
+
+function JusticaGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef  = useRef<HTMLDivElement>(null);
+  const [data, setData]               = useState<JusticaReportData>(emptyJusticaReport());
+  const [downloading, setDownloading] = useState(false);
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      const tipo = TIPO_DOCUMENTO_MAP[data.tipoDocumento].toLowerCase().replace(/ /g, '_');
+      link.download = `justica-neext-${tipo}-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <Scale size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Justiça NeexT</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Tipo de Documento */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />TIPO DE DOCUMENTO<span className="h-px flex-1 bg-primary/15" /></p>
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Selecione o documento</label>
+              <div className="relative">
+                <select
+                  value={data.tipoDocumento}
+                  onChange={e => setData(d => ({ ...d, tipoDocumento: e.target.value as TipoDocumento }))}
+                  className={`${inp} appearance-none pr-8`}
+                >
+                  {(Object.entries(TIPO_DOCUMENTO_MAP) as [TipoDocumento, string][]).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nome do Destinatário / Acusado</label>
+              <input
+                value={data.nome}
+                onChange={e => setData(d => ({ ...d, nome: e.target.value }))}
+                placeholder="Nome completo..."
+                className={inp}
+              />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data de Emissão</label>
+              <input
+                type="date"
+                value={data.dataEmissao}
+                onChange={e => setData(d => ({ ...d, dataEmissao: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`}
+              />
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DESCRIÇÃO / MOTIVO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea
+              value={data.descricao}
+              onChange={e => setData(d => ({ ...d, descricao: e.target.value }))}
+              placeholder="Descreva o motivo do documento..."
+              rows={5}
+              className={`${inp} resize-none w-full`}
+            />
+          </div>
+
+          {/* Assinatura */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />ASSINATURA<span className="h-px flex-1 bg-primary/15" /></p>
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nome do Signatário</label>
+              <input
+                value={data.assinatura}
+                onChange={e => setData(d => ({ ...d, assinatura: e.target.value }))}
+                placeholder="Nome de quem assina..."
+                className={inp}
+              />
+            </div>
+          </div>
+
+          {/* Download */}
+          <button
+            onClick={download}
+            disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}
+          >
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Documento como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <JusticaScaledPreview data={data} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const REPORT_TYPES = [
   {
     id: 'ceo-regente',
@@ -3664,6 +4014,13 @@ const REPORT_TYPES = [
     description: 'Relatório médico com pacientes, diagnósticos, dias de afastamento e assinatura cursiva.',
     gradient: 'linear-gradient(135deg,#450a0a 0%,#dc2626 50%,#f87171 100%)',
     Icon: Stethoscope,
+  },
+  {
+    id: 'justica',
+    title: 'Justiça NeexT',
+    description: 'Documentos oficiais: mandado de prisão, notificações, pedidos regulatórios e mais.',
+    gradient: 'linear-gradient(135deg,#0d1238 0%,#1a237e 50%,#ffab00 100%)',
+    Icon: Scale,
   },
 ];
 
@@ -3949,5 +4306,6 @@ export default function VaultRelatorios() {
   if (view === 'defesa') return <DefesaGenerator onBack={() => setView('hub')} />;
   if (view === 'parlamento') return <ParlamentoGenerator onBack={() => setView('hub')} />;
   if (view === 'hospital')  return <HospitalGenerator  onBack={() => setView('hub')} />;
+  if (view === 'justica')   return <JusticaGenerator   onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }

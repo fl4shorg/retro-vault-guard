@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Documento Justiça Neext</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #3949ab;
+            --accent-color: #ffab00;
+            --dark-color: #0d1238;
+            --light-color: #f8f9fa;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 42px;
+            color: var(--accent-color);
+            margin-right: 15px;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: rotate(-15deg);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .form-section, .preview-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        select, input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.2);
+            background-color: white;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #ffc107;
+        }
+        
+        .document-preview {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            display: none;
+        }
+        
+        .document-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+        }
+        
+        .justice-symbol {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 60px;
+            color: rgba(25, 118, 210, 0.1);
+            z-index: 0;
+        }
+        
+        .document-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .document-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .document-type {
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            margin: 20px 0;
+            padding: 10px;
+            background-color: rgba(57, 73, 171, 0.1);
+            border-radius: var(--border-radius);
+            font-weight: 600;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            margin: 20px 0;
+        }
+        
+        .document-content {
+            text-align: left;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .document-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .document-item i {
+            margin-right: 10px;
+            color: var(--accent-color);
+            margin-top: 3px;
+        }
+        
+        .signature-line {
+            margin-top: 40px;
+            border-top: 2px solid var(--dark-color);
+            padding-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .signature-line i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .stamp {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-weight: bold;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .form-section, .preview-section {
+                max-width: 100%;
+            }
+        }
+        
+        /* Efeito 3D no documento */
+        .document-preview {
+            transition: transform 0.5s ease;
+        }
+        
+        .document-preview:hover {
+            transform: rotateY(10deg) rotateX(5deg) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Efeito de relevo no cabeçalho */
+        .document-header {
+            position: relative;
+        }
+        
+        .document-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+            right: 25%;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Efeito de papel dobrado */
+        .document-preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 40px 40px 0;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.1) #f8f9fa;
+            box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-balance-scale logo-icon"></i>
+                <h1>Justiça NeexT</h1>
+            </div>
+            <p class="subtitle">Sistema Oficial de Geração de Documentos Judiciais</p>
+        </header>
+        
+        <div class="main-content">
+            <section class="form-section">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-file-alt"></i> Dados do Documento</h2>
+                    
+                    <div class="form-group">
+                        <label for="tituloDocumentoEscolha"><i class="fas fa-balance-scale"></i> Tipo de Documento:</label>
+                        <select id="tituloDocumentoEscolha" onchange="alterarTituloDocumento()">
+                            <option value="mandadoPrissao">Mandado de Prisão</option>
+                            <option value="pedidoRegulatorio">Pedido Regulatório</option>
+                            <option value="notificacaoAviso">Notificação de Aviso</option>
+                            <option value="notificacaoRegras">Notificação de Regras Novas</option>
+                            <option value="burlamentoRegras">Notificação de Burlamento de Regras</option>
+                            <option value="pedidoAlteracao">Pedido de Alteração</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nome"><i class="fas fa-user"></i> Nome:</label>
+                        <input type="text" id="nome" placeholder="Nome completo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descricao"><i class="fas fa-notes-medical"></i> Descrição:</label>
+                        <textarea id="descricao" rows="4" placeholder="Descreva o motivo do documento"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="data"><i class="fas fa-calendar-alt"></i> Data de Emissão:</label>
+                        <input type="date" id="data">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assinatura"><i class="fas fa-signature"></i> Assinatura:</label>
+                        <input type="text" id="assinatura" placeholder="Nome do signatário">
+                    </div>
+                    
+                    <button onclick="gerarDocumento()" class="btn"><i class="fas fa-file-contract"></i> Gerar Documento</button>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-download"></i> Exportar Documento</h2>
+                    <p>Após gerar o documento, você pode baixá-lo no formato desejado.</p>
+                    <button onclick="baixarDocumento()" class="btn btn-secondary"><i class="fas fa-file-download"></i> Baixar Documento</button>
+                </div>
+            </section>
+            
+            <section class="preview-section">
+                <div class="document-preview" id="documento">
+                    <div class="justice-symbol"><i class="fas fa-balance-scale"></i></div>
+                    
+                    <div class="document-header">
+                        <h2 class="document-title">Justiça NeexT</h2>
+                        <p>Sistema Judicial Oficial</p>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <h3 class="document-type" id="previewTipo">DOCUMENTO</h3>
+                    
+                    <div class="document-content">
+                        <div class="document-item">
+                            <i class="fas fa-user"></i>
+                            <p><strong>Nome:</strong> <span id="previewNome"></span></p>
+                        </div>
+                        
+                        <div class="document-item">
+                            <i class="fas fa-notes-medical"></i>
+                            <p><strong>Descrição:</strong> <span id="previewDescricao"></span></p>
+                        </div>
+                        
+                        <div class="document-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <p><strong>Data de Emissão:</strong> <span id="previewData"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="signature-line">
+                        <i class="fas fa-signature"></i>
+                        <p><strong>Assinatura:</strong> <span id="previewAssinatura"></span></p>
+                    </div>
+                    
+                    <div class="stamp">SELO OFICIAL<br>JUSTIÇA NEEXT</div>
+                    <div class="watermark">Documento gerado eletronicamente - Sistema Justiça NeexT</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function alterarTituloDocumento() {
+            const tipoDocumentoEscolhido = document.getElementById("tituloDocumentoEscolha").value;
+            const tituloDocumento = document.getElementById("previewTipo");
+
+            if (tipoDocumentoEscolhido === "mandadoPrissao") {
+                tituloDocumento.innerText = "MANDADO DE PRISÃO";
+            } else if (tipoDocumentoEscolhido === "pedidoRegulatorio") {
+                tituloDocumento.innerText = "PEDIDO REGULATÓRIO";
+            } else if (tipoDocumentoEscolhido === "notificacaoAviso") {
+                tituloDocumento.innerText = "NOTIFICAÇÃO DE AVISO";
+            } else if (tipoDocumentoEscolhido === "notificacaoRegras") {
+                tituloDocumento.innerText = "NOTIFICAÇÃO DE REGRAS NOVAS";
+            } else if (tipoDocumentoEscolhido === "burlamentoRegras") {
+                tituloDocumento.innerText = "NOTIFICAÇÃO DE BURLAMENTO DE REGRAS";
+            } else if (tipoDocumentoEscolhido === "pedidoAlteracao") {
+                tituloDocumento.innerText = "PEDIDO DE ALTERAÇÃO";
+            }
+        }
+
+        function gerarDocumento() {
+            document.getElementById("documento").style.display = "block";
+            document.getElementById("previewNome").innerText = document.getElementById("nome").value || "[NÃO INFORMADO]";
+            document.getElementById("previewDescricao").innerText = document.getElementById("descricao").value || "[DESCRIÇÃO NÃO INFORMADA]";
+            document.getElementById("previewData").innerText = document.getElementById("data").value || "[DATA NÃO INFORMADA]";
+            document.getElementById("previewAssinatura").innerText = document.getElementById("assinatura").value || "[ASSINATURA NÃO INFORMADA]";
+
+            const tipoDocumentoEscolhido = document.getElementById("tituloDocumentoEscolha").value;
+            const previewTipo = document.getElementById("previewTipo");
+
+            if (tipoDocumentoEscolhido === "mandadoPrissao") {
+                previewTipo.innerText = "MANDADO DE PRISÃO";
+            } else if (tipoDocumentoEscolhido === "pedidoRegulatorio") {
+                previewTipo.innerText = "PEDIDO REGULATÓRIO";
+            } else if (tipoDocumentoEscolhido === "notificacaoAviso") {
+                previewTipo.innerText = "NOTIFICAÇÃO DE AVISO";
+            } else if (tipoDocumentoEscolhido === "notificacaoRegras") {
+                previewTipo.innerText = "NOTIFICAÇÃO DE REGRAS NOVAS";
+            } else if (tipoDocumentoEscolhido === "burlamentoRegras") {
+                previewTipo.innerText = "NOTIFICAÇÃO DE BURLAMENTO DE REGRAS";
+            } else if (tipoDocumentoEscolhido === "pedidoAlteracao") {
+                previewTipo.innerText = "PEDIDO DE ALTERAÇÃO";
+            }
+            
+            // Adiciona animação
+            const docElement = document.getElementById("documento");
+            docElement.style.animation = "none";
+            void docElement.offsetWidth; // Trigger reflow
+            docElement.style.animation = "fadeIn 0.5s ease-out";
+        }
+
+        function baixarDocumento() {
+            const docElement = document.getElementById("documento");
+            if (docElement.style.display !== "block") {
+                alert("Por favor, gere o documento primeiro antes de baixar.");
+                return;
+            }
+            
+            const confirmar = window.confirm("Você tem certeza que deseja baixar o documento?");
+            if (confirmar) {
+                // Adiciona efeito visual antes de baixar
+                docElement.style.transform = "scale(0.98)";
+                setTimeout(() => {
+                    docElement.style.transform = "";
+                    
+                    html2canvas(document.querySelector("#documento"), { 
+                        scale: 2, 
+                        useCORS: true,
+                        logging: false,
+                        allowTaint: true,
+                        backgroundColor: null
+                    }).then(canvas => {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.href = dataUrl;
+                        
+                        const tipoDocumento = document.getElementById("previewTipo").innerText.toLowerCase().replace(/ /g, "_");
+                        const nomeArquivo = `documento_justica_neext_${tipoDocumento}.png`;
+                        
+                        link.download = nomeArquivo;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }).catch(error => {
+                        console.error('Erro ao gerar o documento:', error);
+                        alert("Ocorreu um erro ao gerar o documento. Por favor, tente novamente.");
+                    });
+                }, 200);
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        // Adiciona a data atual como padrão
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toISOString().substr(0, 10);
+            document.getElementById('data').value = formattedDate;
+            
+            // Inicializa o tipo de documento
+            alterarTituloDocumento();
+        });
+    </script>
+</body>
+</html>
