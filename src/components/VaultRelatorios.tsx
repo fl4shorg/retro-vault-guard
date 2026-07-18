@@ -5,7 +5,7 @@ import {
   Loader2, Camera, UserCheck, TrendingUp, Users,
   Building2, Shield, Radiation, ChevronDown, Crown, Star, MessageSquare, Ban, Gavel, Landmark,
   CheckCircle2, XCircle, ShieldCheck, Sword, Vote, Stethoscope,
-  Scale, Calendar, PenLine,
+  Scale, Calendar, PenLine, Clock, Key, Flag,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -3935,6 +3935,408 @@ function JusticaGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── Unidades de Defesa (Tático) Report ──────────────────────────────────────
+
+type TaticoUnitId = 'swat' | 'ssa' | 'gign' | 'bope' | 'defesa';
+
+interface TaticoUnit {
+  id: TaticoUnitId;
+  name: string;
+  main: string;
+  secondary: string;
+  accent: string;
+}
+
+const TATICO_UNITS: TaticoUnit[] = [
+  { id: 'swat',   name: 'SWAT',   main: '#1a2a6c', secondary: '#0a0e23', accent: '#d4af37' },
+  { id: 'ssa',    name: 'SSA',    main: '#8B0000', secondary: '#400000', accent: '#ffd700' },
+  { id: 'gign',   name: 'GIGN',   main: '#2F4F4F', secondary: '#111',   accent: '#c0c0c0' },
+  { id: 'bope',   name: 'BOPE',   main: '#006400', secondary: '#003300', accent: '#32cd32' },
+  { id: 'defesa', name: 'DEFESA', main: '#000080', secondary: '#00004d', accent: '#add8e6' },
+];
+
+type NivelConfidencialidade = 'normal' | 'confidencial' | 'ultrassecreto';
+
+const NIVEL_LABEL: Record<NivelConfidencialidade, string> = {
+  normal:        '',
+  confidencial:  'CONFIDENCIAL',
+  ultrassecreto: 'ULTRA-SECRETO',
+};
+
+interface TaticoReportData {
+  unitId: TaticoUnitId;
+  operador: string;
+  dataHoraOperacao: string;
+  codigoOperacao: string;
+  tituloRelatorio: string;
+  detalhes: string;
+  assinatura: string;
+  confidencialidade: NivelConfidencialidade;
+}
+
+function generateOpCode(): string {
+  const L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const N = '0123456789';
+  const pick = (src: string) => src[Math.floor(Math.random() * src.length)];
+  return pick(L)+pick(L) + pick(N)+pick(N)+pick(N)+pick(N) + pick(L)+pick(L);
+}
+
+function formatDateTime(iso: string): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+const emptyTaticoReport = (): TaticoReportData => ({
+  unitId: 'swat',
+  operador: '',
+  dataHoraOperacao: new Date().toISOString().slice(0, 16),
+  codigoOperacao: generateOpCode(),
+  tituloRelatorio: '',
+  detalhes: '',
+  assinatura: '',
+  confidencialidade: 'normal',
+});
+
+// ─── Tático Report Card ───────────────────────────────────────────────────────
+
+function TaticoReportCard({ data }: { data: TaticoReportData }) {
+  const unit  = TATICO_UNITS.find(u => u.id === data.unitId) ?? TATICO_UNITS[0];
+  const sans  = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+  const mono  = "'Courier New', Courier, monospace";
+  const { main, secondary, accent } = unit;
+
+  const headerGrad = `linear-gradient(135deg, ${main} 0%, ${secondary} 100%)`;
+  const footerGrad = `linear-gradient(135deg, ${secondary} 0%, ${main} 100%)`;
+
+  const stamp = NIVEL_LABEL[data.confidencialidade];
+
+  const today = new Date();
+  const reportNum = `${unit.name}-${today.getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+
+  const Field = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
+      <div style={{ width: 36, height: 36, borderRadius: '50%', background: main, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, boxShadow: `0 2px 8px ${main}55` }}>
+        {icon}
+      </div>
+      <div style={{ flex: 1, borderBottom: '1px solid #e8ecf4', paddingBottom: 12 }}>
+        <div style={{ fontFamily: sans, fontSize: 9, fontWeight: 700, color: main, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
+          {label}
+        </div>
+        <div style={{ fontFamily: sans, fontSize: 12, color: '#1a1f36', lineHeight: 1.6, whiteSpace: 'pre-wrap' as const, minHeight: 16 }}>
+          {value || '[NÃO INFORMADO]'}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ width: 400, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const, boxShadow: '0 8px 32px rgba(0,0,0,0.22)' }}>
+
+      {/* ── Accent top bar ── */}
+      <div style={{ height: 6, background: `linear-gradient(90deg, ${accent}, ${main})` }} />
+
+      {/* ── Header ── */}
+      <div style={{ background: headerGrad, padding: '22px 22px 18px', position: 'relative' as const, overflow: 'hidden' as const }}>
+        {/* Faint watermark bg text */}
+        <div style={{ position: 'absolute' as const, right: -10, bottom: -18, fontFamily: sans, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.05)', lineHeight: 1, pointerEvents: 'none' as const, letterSpacing: '-4px' }}>
+          {unit.name}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'relative' as const, zIndex: 1 }}>
+          {/* Unit badge */}
+          <div style={{
+            width: 64, height: 72,
+            background: 'rgba(0,0,0,0.35)',
+            border: `2.5px solid ${accent}`,
+            borderRadius: 10,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            flexDirection: 'column' as const,
+            gap: 4,
+            boxShadow: `inset 0 0 20px rgba(0,0,0,0.3), 0 0 12px ${accent}33`,
+          }}>
+            <Shield size={22} color={accent} />
+            <span style={{ fontFamily: sans, fontSize: 11, fontWeight: 900, color: accent, letterSpacing: '0.05em' }}>{unit.name}</span>
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: sans, fontSize: 8, color: `${accent}cc`, textTransform: 'uppercase' as const, letterSpacing: '0.28em', marginBottom: 4 }}>Unidade Tática Especial</div>
+            <div style={{ fontFamily: sans, fontSize: 16, fontWeight: 800, color: '#ffffff', textTransform: 'uppercase' as const, letterSpacing: '0.08em', lineHeight: 1.1, marginBottom: 6 }}>
+              {data.tituloRelatorio || 'RELATÓRIO DE OPERAÇÃO'}
+            </div>
+            <div style={{ fontFamily: mono, fontSize: 9, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.15em', textTransform: 'uppercase' as const }}>
+              Relatório Oficial — {unit.name}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── White body ── */}
+      <div style={{ background: '#ffffff', padding: '20px 22px 16px', position: 'relative' as const }}>
+
+        {/* Confidential stamp (diagonal) */}
+        {stamp && (
+          <div style={{
+            position: 'absolute' as const,
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%) rotate(-20deg)',
+            fontFamily: sans, fontSize: 36, fontWeight: 900,
+            color: main,
+            opacity: 0.07,
+            pointerEvents: 'none' as const,
+            whiteSpace: 'nowrap' as const,
+            letterSpacing: '0.05em',
+            zIndex: 0,
+          }}>
+            {stamp}
+          </div>
+        )}
+
+        {/* Unit watermark */}
+        <div style={{ position: 'absolute' as const, bottom: 10, right: 16, fontFamily: sans, fontSize: 56, fontWeight: 900, color: main, opacity: 0.04, lineHeight: 1, pointerEvents: 'none' as const }}>
+          {unit.name}
+        </div>
+
+        <div style={{ position: 'relative' as const, zIndex: 1 }}>
+          <Field icon={<User size={16} color="#fff" />}      label="Operador Responsável"  value={data.operador} />
+          <Field icon={<Clock size={16} color="#fff" />}     label="Data / Hora da Operação" value={formatDateTime(data.dataHoraOperacao)} />
+          <Field icon={<Key size={16} color="#fff" />}       label="Código da Operação"    value={data.codigoOperacao} />
+          <Field icon={<FileText size={16} color="#fff" />}  label="Detalhes da Operação"  value={data.detalhes} />
+        </div>
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ background: footerGrad, padding: '14px 22px 16px', textAlign: 'center' as const }}>
+        <div style={{ fontFamily: mono, fontSize: 9, color: `${accent}bb`, letterSpacing: '0.2em', textTransform: 'uppercase' as const, marginBottom: 10 }}>
+          RELATÓRIO Nº: {reportNum}
+        </div>
+
+        {/* Signature */}
+        <div style={{ borderTop: `1.5px solid ${accent}66`, width: 220, margin: '0 auto 6px', paddingTop: 8 }}>
+          <div style={{
+            fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+            fontSize: 20,
+            color: '#ffffff',
+            letterSpacing: '0.04em',
+            minHeight: 26,
+          }}>
+            {data.assinatura || 'Assinatura do Operador'}
+          </div>
+        </div>
+
+        <div style={{ fontFamily: sans, fontSize: 9, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.2em', textTransform: 'uppercase' as const }}>
+          {unit.name} — DEPARTAMENTO DE DEFESA
+        </div>
+
+        {/* Confidential badge */}
+        {stamp && (
+          <div style={{ marginTop: 8, display: 'inline-block', border: `1.5px solid ${accent}`, borderRadius: 4, padding: '2px 10px', fontFamily: sans, fontSize: 9, fontWeight: 700, color: accent, letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>
+            ⚠ {stamp}
+          </div>
+        )}
+      </div>
+
+      {/* ── Accent bottom bar ── */}
+      <div style={{ height: 4, background: `linear-gradient(90deg, ${main}, ${accent})` }} />
+    </div>
+  );
+}
+
+// ─── Scaled preview for Tático ────────────────────────────────────────────────
+
+function TaticoScaledPreview({ data, cardRef }: { data: TaticoReportData; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}>
+          <TaticoReportCard data={data} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tático Generator ─────────────────────────────────────────────────────────
+
+function TaticoGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef = useRef<HTMLDivElement>(null);
+  const [data, setData]               = useState<TaticoReportData>(emptyTaticoReport);
+  const [downloading, setDownloading] = useState(false);
+
+  const unit = TATICO_UNITS.find(u => u.id === data.unitId) ?? TATICO_UNITS[0];
+
+  const regenCode = () => setData(d => ({ ...d, codigoOperacao: generateOpCode() }));
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      link.download = `relatorio-${data.unitId}-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <Flag size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Unidades de Defesa</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Unidade */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />UNIDADE TÁTICA<span className="h-px flex-1 bg-primary/15" /></p>
+            <div className="flex flex-wrap gap-2">
+              {TATICO_UNITS.map(u => (
+                <button
+                  key={u.id}
+                  onClick={() => setData(d => ({ ...d, unitId: u.id }))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-mono text-xs font-bold uppercase tracking-widest border transition-all"
+                  style={data.unitId === u.id
+                    ? { background: u.main, borderColor: u.accent, color: u.accent }
+                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'hsl(var(--primary)/0.2)', color: 'hsl(var(--foreground)/0.6)' }
+                  }
+                >
+                  <Shield size={11} />
+                  {u.name}
+                </button>
+              ))}
+            </div>
+            {/* Unit color preview */}
+            <div className="h-1 rounded-full mt-1 transition-all" style={{ background: `linear-gradient(90deg, ${unit.main}, ${unit.accent})` }} />
+          </div>
+
+          {/* Operação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />OPERAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Título do Relatório</label>
+              <input value={data.tituloRelatorio} onChange={e => setData(d => ({ ...d, tituloRelatorio: e.target.value }))}
+                placeholder="Título da operação..." className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nome do Operador</label>
+              <input value={data.operador} onChange={e => setData(d => ({ ...d, operador: e.target.value }))}
+                placeholder="Nome do operador responsável..." className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data e Hora da Operação</label>
+              <input type="datetime-local" value={data.dataHoraOperacao}
+                onChange={e => setData(d => ({ ...d, dataHoraOperacao: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Código da Operação</label>
+              <div className="flex gap-2">
+                <input value={data.codigoOperacao} onChange={e => setData(d => ({ ...d, codigoOperacao: e.target.value }))}
+                  placeholder="AUTO" className={`${inp} flex-1 font-mono tracking-widest`} />
+                <button onClick={regenCode}
+                  className="px-3 rounded-lg border border-primary/30 text-primary/60 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest shrink-0">
+                  Gerar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Detalhes */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DETALHES DA OPERAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.detalhes} onChange={e => setData(d => ({ ...d, detalhes: e.target.value }))}
+              placeholder="Descreva os detalhes da operação..." rows={5}
+              className={`${inp} resize-none w-full`} />
+          </div>
+
+          {/* Assinatura + Confidencialidade */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />FINALIZAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Assinatura do Operador</label>
+              <input value={data.assinatura} onChange={e => setData(d => ({ ...d, assinatura: e.target.value }))}
+                placeholder="Assine aqui..." className={`${inp}`}
+                style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive", fontSize: '1.1rem' }} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nível de Confidencialidade</label>
+              <div className="relative">
+                <select value={data.confidencialidade}
+                  onChange={e => setData(d => ({ ...d, confidencialidade: e.target.value as NivelConfidencialidade }))}
+                  className={`${inp} appearance-none pr-8`}>
+                  <option value="normal">Normal</option>
+                  <option value="confidencial">Confidencial</option>
+                  <option value="ultrassecreto">Ultra-secreto</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Download */}
+          <button onClick={download} disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}>
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Relatório como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <TaticoScaledPreview data={data} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 const REPORT_TYPES = [
@@ -4021,6 +4423,13 @@ const REPORT_TYPES = [
     description: 'Documentos oficiais: mandado de prisão, notificações, pedidos regulatórios e mais.',
     gradient: 'linear-gradient(135deg,#0d1238 0%,#1a237e 50%,#ffab00 100%)',
     Icon: Scale,
+  },
+  {
+    id: 'tatico',
+    title: 'Unidades de Defesa',
+    description: 'Relatório tático oficial para SWAT, SSA, GIGN, BOPE e DEFESA com código de operação e confidencialidade.',
+    gradient: 'linear-gradient(135deg,#0a0e23 0%,#1a2a6c 50%,#d4af37 100%)',
+    Icon: Flag,
   },
 ];
 
@@ -4307,5 +4716,6 @@ export default function VaultRelatorios() {
   if (view === 'parlamento') return <ParlamentoGenerator onBack={() => setView('hub')} />;
   if (view === 'hospital')  return <HospitalGenerator  onBack={() => setView('hub')} />;
   if (view === 'justica')   return <JusticaGenerator   onBack={() => setView('hub')} />;
+  if (view === 'tatico')    return <TaticoGenerator    onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }

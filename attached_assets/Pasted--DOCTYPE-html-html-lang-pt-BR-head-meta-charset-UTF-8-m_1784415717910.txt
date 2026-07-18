@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Relatórios Táticos</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --main-color: #1a2a6c;
+            --secondary-color: #0a0e23;
+            --accent-color: #d4af37;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        h1 {
+            color: var(--main-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        .controls-panel {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--main-color);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--main-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .signature-input {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 20px;
+            height: 50px;
+        }
+        
+        .unit-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .unit-option {
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+        
+        .unit-option.active {
+            background-color: var(--main-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .theme-option {
+            height: 60px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            color: white;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .theme-option:hover, .theme-option.selected {
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--main-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Estilos do Relatório */
+        .report-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .tactical-report {
+            position: relative;
+            background: linear-gradient(to right, var(--main-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .report-header {
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .unit-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 90px;
+            background-color: rgba(0,0,0,0.3);
+            border: 3px solid var(--accent-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .unit-badge::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0) 45%,
+                rgba(255,255,255,0.15) 50%,
+                rgba(255,255,255,0) 55%,
+                rgba(255,255,255,0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .unit-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .report-title {
+            font-size: 20px;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+        
+        .report-body {
+            padding: 30px;
+            background-color: white;
+            color: #333;
+        }
+        
+        .report-field {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .field-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--main-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .field-content {
+            flex: 1;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .field-label {
+            font-weight: 600;
+            color: var(--main-color);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .field-value {
+            font-size: 16px;
+            line-height: 1.5;
+            min-height: 24px;
+            color: #333;
+        }
+        
+        .report-footer {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(to right, var(--secondary-color), var(--main-color));
+            color: white;
+            font-size: 14px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid var(--accent-color);
+            width: 250px;
+            margin: 20px auto;
+            padding-top: 10px;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 24px;
+            font-style: italic;
+            color: white;
+        }
+        
+        .confidential-stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 60px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+            text-transform: uppercase;
+        }
+        
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.05;
+            font-size: 120px;
+            font-weight: bold;
+            z-index: 0;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls-panel {
+                padding: 15px;
+            }
+            
+            .unit-selector {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .report-header {
+                padding: 20px;
+            }
+            
+            .report-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-file-alt"></i> Gerador de Relatórios Táticos</h1>
+        
+        <div class="controls-panel">
+            <div class="form-group">
+                <label>Unidade Tática:</label>
+                <div class="unit-selector">
+                    <div class="unit-option active" onclick="changeUnit('swat', 'SWAT', '#1a2a6c', '#0a0e23', '#d4af37')">
+                        <i class="fas fa-shield-alt"></i> SWAT
+                    </div>
+                    <div class="unit-option" onclick="changeUnit('ssa', 'SSA', '#8B0000', '#400000', '#ffd700')">
+                        <i class="fas fa-helmet-battle"></i> SSA
+                    </div>
+                    <div class="unit-option" onclick="changeUnit('gign', 'GIGN', '#2F4F4F', '#000', '#c0c0c0')">
+                        <i class="fas fa-hat-cowboy-side"></i> GIGN
+                    </div>
+                    <div class="unit-option" onclick="changeUnit('bope', 'BOPE', '#006400', '#003300', '#32cd32')">
+                        <i class="fas fa-skull"></i> BOPE
+                    </div>
+                    <div class="unit-option" onclick="changeUnit('defesa', 'DEFESA', '#000080', '#00004d', '#add8e6')">
+                        <i class="fas fa-flag"></i> DEFESA
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Tema do Relatório:</label>
+                <div class="theme-selector">
+                    <div class="theme-option selected" style="background: linear-gradient(135deg, #1a2a6c 0%, #0a0e23 100%);" onclick="changeTheme('#1a2a6c', '#0a0e23')">
+                        Azul Tático
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #8B0000 0%, #400000 100%);" onclick="changeTheme('#8B0000', '#400000')">
+                        Vermelho Emergência
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #2F4F4F 0%, #000 100%);" onclick="changeTheme('#2F4F4F', '#000')">
+                        Verde Militar
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #4B0082 0%, #1a0033 100%);" onclick="changeTheme('#4B0082', '#1a0033')">
+                        Roxo Operacional
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #000 0%, #333 100%);" onclick="changeTheme('#000', '#333')">
+                        Preto Furtivo
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #006400 0%, #003300 100%);" onclick="changeTheme('#006400', '#003300')">
+                        Verde Floresta
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #800000 0%, #400000 100%);" onclick="changeTheme('#800000', '#400000')">
+                        Marrom Tático
+                    </div>
+                    <div class="theme-option" style="background: linear-gradient(135deg, #000080 0%, #00004d 100%);" onclick="changeTheme('#000080', '#00004d')">
+                        Azul Marinho
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="agentName"><i class="fas fa-user-tie"></i> Nome do Operador:</label>
+                <input type="text" id="agentName" placeholder="Digite o nome do operador">
+            </div>
+            
+            <div class="form-group">
+                <label for="operationDate"><i class="fas fa-calendar-alt"></i> Data e Hora da Operação:</label>
+                <input type="datetime-local" id="operationDate">
+            </div>
+            
+            <div class="form-group">
+                <label for="operationCode"><i class="fas fa-key"></i> Código da Operação:</label>
+                <input type="text" id="operationCode" placeholder="Código será gerado automaticamente" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="reportTitle"><i class="fas fa-heading"></i> Título do Relatório:</label>
+                <input type="text" id="reportTitle" placeholder="Digite o título do relatório">
+            </div>
+            
+            <div class="form-group">
+                <label for="reportDetails"><i class="fas fa-file-alt"></i> Detalhes da Operação:</label>
+                <textarea id="reportDetails" placeholder="Descreva os detalhes da operação"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="agentSignature"><i class="fas fa-signature"></i> Assinatura do Operador:</label>
+                <input type="text" id="agentSignature" class="signature-input" placeholder="Assine aqui">
+            </div>
+            
+            <div class="form-group">
+                <label for="confidentialLevel"><i class="fas fa-lock"></i> Nível de Confidencialidade:</label>
+                <select id="confidentialLevel">
+                    <option value="normal">Normal</option>
+                    <option value="confidential">Confidencial</option>
+                    <option value="topsecret">Ultra-secreto</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateReport()">
+                    <i class="fas fa-file-alt"></i> Gerar Relatório
+                </button>
+                <button class="btn-secondary" onclick="exportAsImage()">
+                    <i class="fas fa-download"></i> Exportar como Imagem
+                </button>
+            </div>
+        </div>
+        
+        <div class="report-container" id="reportContainer">
+            <div class="tactical-report" id="tacticalReport">
+                <div class="report-header">
+                    <div class="unit-badge" id="unitBadge">SWAT</div>
+                    <div class="unit-title" id="unitTitle">UNIDADE TÁTICA ESPECIAL - SWAT</div>
+                    <div class="report-title" id="displayReportTitleHeader">RELATÓRIO OFICIAL DE OPERAÇÃO</div>
+                </div>
+                
+                <div class="report-body">
+                    <div class="report-field">
+                        <div class="field-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="field-content">
+                            <div class="field-label">
+                                <i class="fas fa-id-card"></i> OPERADOR RESPONSÁVEL:
+                            </div>
+                            <div class="field-value" id="displayAgentName">[NÃO INFORMADO]</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-field">
+                        <div class="field-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="field-content">
+                            <div class="field-label">
+                                <i class="fas fa-clock"></i> DATA/HORA DA OPERAÇÃO:
+                            </div>
+                            <div class="field-value" id="displayOperationDate">[NÃO INFORMADO]</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-field">
+                        <div class="field-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="field-content">
+                            <div class="field-label">
+                                <i class="fas fa-barcode"></i> CÓDIGO DA OPERAÇÃO:
+                            </div>
+                            <div class="field-value" id="displayOperationCode">[NÃO INFORMADO]</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-field">
+                        <div class="field-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="field-content">
+                            <div class="field-label">
+                                <i class="fas fa-align-left"></i> DETALHES DA OPERAÇÃO:
+                            </div>
+                            <div class="field-value" id="displayReportDetails">[NÃO INFORMADO]</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-footer">
+                    <div>RELATÓRIO Nº: <span id="reportNumber">SWAT-2023-001</span></div>
+                    <div class="signature-line" id="displaySignature">Assinatura do Operador</div>
+                    <div id="unitFooter">SWAT - DEPARTAMENTO DE DEFESA</div>
+                </div>
+                
+                <div class="confidential-stamp" id="confidentialStamp"></div>
+                <div class="watermark" id="watermark">SWAT</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let currentUnit = 'swat';
+        let currentUnitName = 'SWAT';
+        let currentAccentColor = '#d4af37';
+        
+        // Função para gerar código de operação aleatório
+        function generateOperationCode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            let code = '';
+            
+            // 2 letras aleatórias
+            for (let i = 0; i < 2; i++) {
+                code += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+            
+            // 4 números aleatórios
+            for (let i = 0; i < 4; i++) {
+                code += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+            
+            // 2 letras aleatórias
+            for (let i = 0; i < 2; i++) {
+                code += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+            
+            return code;
+        }
+
+        // Função para gerar o relatório com os dados inseridos
+        function generateReport() {
+            // Obter valores dos campos
+            const agentName = document.getElementById('agentName').value || '[NÃO INFORMADO]';
+            const operationDate = formatDateTime(document.getElementById('operationDate').value) || '[NÃO INFORMADO]';
+            let operationCode = document.getElementById('operationCode').value;
+            if (!operationCode) {
+                operationCode = generateOperationCode();
+                document.getElementById('operationCode').value = operationCode;
+            }
+            const reportTitle = document.getElementById('reportTitle').value || '[NÃO INFORMADO]';
+            const reportDetails = document.getElementById('reportDetails').value || '[NÃO INFORMADO]';
+            const agentSignature = document.getElementById('agentSignature').value || 'Assinatura do Operador';
+            const confidentialLevel = document.getElementById('confidentialLevel').value;
+            
+            // Atualizar o relatório
+            document.getElementById('displayAgentName').textContent = agentName;
+            document.getElementById('displayOperationDate').textContent = operationDate;
+            document.getElementById('displayOperationCode').textContent = operationCode;
+            document.getElementById('displayReportTitleHeader').textContent = reportTitle;
+            document.getElementById('displayReportDetails').textContent = reportDetails;
+            document.getElementById('displaySignature').textContent = agentSignature;
+            
+            // Gerar número de relatório aleatório
+            const randomNum = Math.floor(Math.random() * 1000);
+            const today = new Date();
+            document.getElementById('reportNumber').textContent = `${currentUnit.toUpperCase()}-${today.getFullYear()}-${randomNum.toString().padStart(3, '0')}`;
+            
+            // Atualizar selo de confidencialidade
+            const stamp = document.getElementById('confidentialStamp');
+            stamp.textContent = '';
+            stamp.style.color = currentAccentColor;
+            
+            if (confidentialLevel === 'confidential') {
+                stamp.textContent = 'CONFIDENCIAL';
+                stamp.style.opacity = '0.2';
+            } else if (confidentialLevel === 'topsecret') {
+                stamp.textContent = 'ULTRA-SECRETO';
+                stamp.style.opacity = '0.3';
+            }
+            
+            // Atualizar watermark
+            document.getElementById('watermark').textContent = currentUnitName;
+        }
+        
+        // Função para exportar como imagem
+        function exportAsImage() {
+            generateReport(); // Atualiza o relatório antes de exportar
+            
+            // Criar um clone do elemento para captura
+            const element = document.getElementById('tacticalReport');
+            const clone = element.cloneNode(true);
+            clone.style.position = 'absolute';
+            clone.style.left = '-9999px';
+            clone.style.top = '0';
+            clone.style.zIndex = '9999';
+            document.body.appendChild(clone);
+            
+            // Forçar estilos no clone para garantir que apareçam corretamente na imagem
+            clone.style.width = element.offsetWidth + 'px';
+            clone.style.height = 'auto';
+            clone.style.background = window.getComputedStyle(element).background;
+            
+            // Garantir que o texto está visível no clone
+            const textElements = clone.querySelectorAll('*');
+            textElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                el.style.color = computedStyle.color;
+                el.style.backgroundColor = computedStyle.backgroundColor;
+                el.style.fontFamily = computedStyle.fontFamily;
+                el.style.fontSize = computedStyle.fontSize;
+                el.style.fontWeight = computedStyle.fontWeight;
+            });
+            
+            // Configurações do html2canvas para melhor qualidade
+            html2canvas(clone, {
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                letterRendering: true,
+                onclone: function(clonedDoc) {
+                    // Garantir que os estilos são aplicados no clone
+                    const clonedElement = clonedDoc.getElementById('tacticalReport');
+                    clonedElement.style.width = element.offsetWidth + 'px';
+                    clonedElement.style.height = 'auto';
+                }
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `relatorio-${currentUnit}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Remover o clone após a captura
+                document.body.removeChild(clone);
+            });
+        }
+        
+        // Função para formatar data/hora
+        function formatDateTime(datetimeStr) {
+            if (!datetimeStr) return '';
+            
+            const date = new Date(datetimeStr);
+            return date.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Função para mudar o tema
+        function changeTheme(mainColor, secondaryColor) {
+            document.documentElement.style.setProperty('--main-color', mainColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            
+            // Atualizar ícones
+            const icons = document.querySelectorAll('.field-icon');
+            icons.forEach(icon => {
+                icon.style.backgroundColor = mainColor;
+            });
+            
+            // Atualizar seleção de tema
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            generateReport();
+        }
+        
+        // Função para mudar a unidade
+        function changeUnit(unit, unitName, mainColor, secondaryColor, accentColor) {
+            currentUnit = unit;
+            currentUnitName = unitName;
+            currentAccentColor = accentColor;
+            
+            // Atualizar cores
+            document.documentElement.style.setProperty('--main-color', mainColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.documentElement.style.setProperty('--accent-color', accentColor);
+            
+            // Atualizar interface
+            document.getElementById('unitBadge').textContent = unitName;
+            document.getElementById('unitTitle').textContent = `UNIDADE TÁTICA ESPECIAL - ${unitName}`;
+            document.getElementById('unitFooter').textContent = `${unitName} - DEPARTAMENTO DE DEFESA`;
+            document.getElementById('watermark').textContent = unitName;
+            
+            // Atualizar ícones
+            const icons = document.querySelectorAll('.field-icon');
+            icons.forEach(icon => {
+                icon.style.backgroundColor = mainColor;
+            });
+            
+            // Ativar botão selecionado
+            document.querySelectorAll('.unit-option').forEach(opt => opt.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            generateReport();
+        }
+        
+        // Gerar relatório inicial
+        window.onload = function() {
+            // Definir data/hora atual como padrão
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('operationDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            // Gerar código de operação inicial
+            document.getElementById('operationCode').value = generateOperationCode();
+            
+            generateReport();
+        };
+    </script>
+</body>
+</html>
