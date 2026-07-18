@@ -340,14 +340,13 @@ interface CeoReportData {
   descricao: string;
   recrutamentos: Recruta[];
   subiuDeCargo: string[];
-  totalOligaras: string;
-  nomeOligaras: string;
+  oligarcas: string[];
 }
 
 const emptyCeoReport = (): CeoReportData => ({
   responsavel: '', fotoResponsavel: null, dataRelatorio: '',
   descricao: '', recrutamentos: [], subiuDeCargo: [],
-  totalOligaras: '', nomeOligaras: '',
+  oligarcas: [],
 });
 
 // ─── CEO Report Card ──────────────────────────────────────────────────────────
@@ -402,19 +401,41 @@ function CeoReportCard({ data, theme }: { data: CeoReportData; theme: Theme }) {
 
         <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
 
-        {/* ── Oligarcas ── */}
-        <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Crown size={15} color={w} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 2 }}>
-            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1, display: 'block' }}>Total Oligarcas</span>
-            <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, lineHeight: 1, display: 'block' }}>{data.totalOligaras || '—'}</span>
-            {data.nomeOligaras.trim() && (
-              <span style={{ fontFamily: mono, fontSize: 10, color: wA(0.65), lineHeight: 1, display: 'block', marginTop: 2 }}>{data.nomeOligaras}</span>
-            )}
-          </div>
+        {/* ── Contadores ── */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+          {[
+            { label: 'Total Oligarcas', value: data.oligarcas.length, Icon: Crown },
+            { label: 'Total Recrutados', value: data.recrutamentos.length, Icon: Users },
+          ].map(({ label, value, Icon }) => (
+            <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon size={15} color={w} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 3 }}>
+                <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1, display: 'block' }}>{label}</span>
+                <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, lineHeight: 1, display: 'block' }}>{value}</span>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* ── Oligarcas ── */}
+        {data.oligarcas.length > 0 && (
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+              <Crown size={13} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Oligarcas</span>
+              <div style={{ fontFamily: mono, fontSize: 9, background: c18, borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.oligarcas.length}</div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
+              {data.oligarcas.map((nome, i) => (
+                <div key={i} style={{ background: c18, border: `1px solid ${c22}`, borderRadius: 6, padding: '3px 8px', fontFamily: mono, fontSize: 11, color: w }}>
+                  {nome}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Descrição ── */}
         {data.descricao.trim() && (
@@ -530,6 +551,8 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
   const removeRecruta = (id: string) => setData(d => ({ ...d, recrutamentos: d.recrutamentos.filter(x => x.id !== id) }));
   const addSubiu      = (v: string) => setData(d => ({ ...d, subiuDeCargo: [...d.subiuDeCargo, v] }));
   const removeSubiu   = (i: number) => setData(d => ({ ...d, subiuDeCargo: d.subiuDeCargo.filter((_, idx) => idx !== i) }));
+  const addOligarca    = (v: string) => setData(d => ({ ...d, oligarcas: [...d.oligarcas, v] }));
+  const removeOligarca = (i: number) => setData(d => ({ ...d, oligarcas: d.oligarcas.filter((_, idx) => idx !== i) }));
 
   const download = async () => {
     if (!captureRef.current) return;
@@ -645,18 +668,8 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
           {/* Oligarcas */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />OLIGARCAS<span className="h-px flex-1 bg-primary/15" /></p>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Total</label>
-                <input type="number" min={0} value={data.totalOligaras} onChange={e => setData(d => ({ ...d, totalOligaras: e.target.value }))}
-                  placeholder="0" className={inp} />
-              </div>
-              <div>
-                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nome</label>
-                <input value={data.nomeOligaras} onChange={e => setData(d => ({ ...d, nomeOligaras: e.target.value }))}
-                  placeholder="Nome do oligarca" className={inp} />
-              </div>
-            </div>
+            <ListSection icon={Crown} label="Oligarcas" items={data.oligarcas}
+              placeholder="Nome do oligarca..." onAdd={addOligarca} onRemove={removeOligarca} />
           </div>
 
           {/* Descrição */}
