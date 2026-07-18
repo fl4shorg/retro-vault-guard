@@ -3726,7 +3726,7 @@ function JusticaReportCard({ data }: { data: JusticaReportData }) {
           </div>
           <div>
             <div style={{ fontFamily: sans, fontSize: 8, fontWeight: 700, color: indigo, textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Assinatura</div>
-            <div style={{ fontFamily: sans, fontSize: 13, fontWeight: 700, color: dark, fontStyle: 'italic' as const }}>{data.assinatura || '[NÃO INFORMADA]'}</div>
+            <div style={{ fontFamily: "'Brush Script MT', 'Segoe Script', 'Dancing Script', cursive", fontSize: 18, fontWeight: 700, color: dark }}>{data.assinatura || '[NÃO INFORMADA]'}</div>
           </div>
         </div>
 
