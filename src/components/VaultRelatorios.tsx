@@ -3,7 +3,7 @@ import { toPng } from 'html-to-image';
 import {
   FileText, Plus, Trash2, Download, User,
   Loader2, Camera, UserCheck, TrendingUp, Users,
-  Building2, Shield, Radiation, ChevronDown, Crown,
+  Building2, Shield, Radiation, ChevronDown, Crown, Star,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -726,6 +726,296 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── ADM Report ───────────────────────────────────────────────────────────────
+
+interface AdmReportData {
+  responsavel: string;
+  fotoResponsavel: string | null;
+  dataRelatorio: string;
+  descricao: string;
+  amigosRecrutados: string[];
+}
+
+const emptyAdmReport = (): AdmReportData => ({
+  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  descricao: '', amigosRecrutados: [],
+});
+
+function AdmReportCard({ data, theme }: { data: AdmReportData; theme: Theme }) {
+  const mono = "'Courier New', Courier, monospace";
+  const w = '#ffffff';
+  const wA = (a: number) => `rgba(255,255,255,${a})`;
+
+  const base  = gradientBase(theme.gradient);
+  const panel = kOver(0.28, base);
+  const bdr   = wOver(0.14, base);
+  const c18   = wOver(0.18, base);
+  const c35   = wOver(0.35, base);
+  const c12   = wOver(0.12, base);
+  const c10   = wOver(0.10, base);
+  const c50   = wOver(0.50, base);
+
+  return (
+    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+      <div style={{ height: 3, background: c35 }} />
+      <div style={{ padding: '24px 22px' }}>
+
+        {/* ── Header ── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', background: c18, border: `1.5px solid ${c35}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Star size={18} color={w} />
+            </div>
+            <div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.25em', marginBottom: 2 }}>Sistema Operacional</div>
+              <div style={{ fontFamily: mono, fontSize: 14, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>ADM</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ textAlign: 'right' as const }}>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Responsável</div>
+              <div style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
+              <div style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), marginTop: 2 }}>{formatDate(data.dataRelatorio)}</div>
+            </div>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: `2px solid ${c50}`, overflow: 'hidden', background: c12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {data.fotoResponsavel
+                ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
+                : <User size={20} color={wA(0.5)} />
+              }
+            </div>
+          </div>
+        </div>
+
+        <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
+
+        {/* ── Descrição ── */}
+        {data.descricao.trim() && (
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+            <p style={{ fontFamily: mono, fontSize: 11, color: w, lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap' as const }}>{data.descricao}</p>
+          </div>
+        )}
+
+        {/* ── Amigos Recrutados ── */}
+        {data.amigosRecrutados.length > 0 && (
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+              <Users size={13} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Amigos Recrutados</span>
+              <div style={{ fontFamily: mono, fontSize: 9, background: c18, borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.amigosRecrutados.length}</div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
+              {data.amigosRecrutados.map((nome, i) => (
+                <div key={i} style={{ background: c18, border: `1px solid ${bdr}`, borderRadius: 6, padding: '3px 10px', fontFamily: mono, fontSize: 11, color: w, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ color: wA(0.55), fontSize: 9 }}>●</span>{nome}
+                </div>
+              ))}
+            </div>
+            {/* divisor list style for overflow */}
+            {data.amigosRecrutados.length > 6 && (
+              <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${c10}` }}>
+                {data.amigosRecrutados.slice(6).map((nome, i) => (
+                  <div key={i} style={{ fontFamily: mono, fontSize: 11, color: w, paddingBottom: 4 }}>
+                    <span style={{ color: wA(0.4), marginRight: 6 }}>{String(i + 7).padStart(2, '0')}.</span>{nome}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${bdr}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>VAULT-TEC</span>
+        </div>
+      </div>
+      <div style={{ height: 3, background: c18 }} />
+    </div>
+  );
+}
+
+function AdmScaledPreview({ data, theme, cardRef }: { data: AdmReportData; theme: Theme; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}><AdmReportCard data={data} theme={theme} /></div>
+      </div>
+    </div>
+  );
+}
+
+function AdmGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef  = useRef<HTMLDivElement>(null);
+  const fotoRef     = useRef<HTMLInputElement>(null);
+  const [data, setData]               = useState<AdmReportData>(emptyAdmReport());
+  const [themeId, setThemeId]         = useState('emerald-tech');
+  const [themeOpen, setThemeOpen]     = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const theme = THEMES.find(t => t.id === themeId) ?? THEMES[0];
+
+  const handleFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setData(d => ({ ...d, fotoResponsavel: null }));
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const addAmigo    = (v: string) => setData(d => ({ ...d, amigosRecrutados: [...d.amigosRecrutados, v] }));
+  const removeAmigo = (i: number) => setData(d => ({ ...d, amigosRecrutados: d.amigosRecrutados.filter((_, idx) => idx !== i) }));
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      link.download = `relatorio-adm-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <Star size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">ADM</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <div className="flex items-end gap-3">
+              <div className="shrink-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Foto</label>
+                <button onClick={() => fotoRef.current?.click()}
+                  className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center relative group transition-opacity hover:opacity-80"
+                  style={{ border: '1.5px solid hsl(var(--primary)/0.45)', background: 'hsl(var(--primary)/0.08)' }}>
+                  {data.fotoResponsavel
+                    ? <img src={data.fotoResponsavel} className="w-full h-full object-cover" alt="" />
+                    : <Camera size={18} className="text-primary/50 group-hover:text-primary transition-colors" />
+                  }
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                    <Camera size={14} className="text-white" />
+                  </div>
+                </button>
+                <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Responsável</label>
+                <input value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))}
+                  placeholder="Seu nome" className={inp} />
+              </div>
+            </div>
+            {data.fotoResponsavel && (
+              <button onClick={() => setData(d => ({ ...d, fotoResponsavel: null }))}
+                className="font-mono text-[10px] text-destructive/50 hover:text-destructive transition-colors">
+                Remover foto
+              </button>
+            )}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
+              <input type="date" value={data.dataRelatorio} onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`} />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Tema do Relatório</label>
+              <div className="relative">
+                <button onClick={() => setThemeOpen(o => !o)}
+                  className="w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 flex items-center gap-3 hover:border-primary/40 transition-colors">
+                  <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: theme.gradient }} />
+                  <span className="flex-1 text-left truncate">{theme.name}</span>
+                  <ChevronDown size={14} className={`text-primary/50 shrink-0 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {themeOpen && (
+                  <div className="absolute top-full mt-1 w-full z-20 rounded-xl border border-primary/20 overflow-hidden shadow-2xl max-h-56 overflow-y-auto"
+                    style={{ background: 'hsl(220 35% 8%)' }}>
+                    {THEMES.map(t => (
+                      <button key={t.id} onClick={() => { setThemeId(t.id); setThemeOpen(false); }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm hover:bg-primary/10 transition-colors ${t.id === themeId ? 'text-primary' : 'text-foreground/70'}`}>
+                        <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: t.gradient }} />
+                        <span className="truncate">{t.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DESCRIÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.descricao} onChange={e => setData(d => ({ ...d, descricao: e.target.value }))}
+              placeholder="Escreva aqui o texto do relatório..." rows={5}
+              className={`${inp} resize-none w-full`} />
+          </div>
+
+          {/* Amigos Recrutados */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />AMIGOS RECRUTADOS<span className="h-px flex-1 bg-primary/15" /></p>
+            <ListSection icon={Users} label="Amigos Recrutados" items={data.amigosRecrutados}
+              placeholder="Nome do amigo recrutado..." onAdd={addAmigo} onRemove={removeAmigo} />
+          </div>
+
+          {/* Download */}
+          <button onClick={download} disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}>
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Relatório como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <AdmScaledPreview data={data} theme={theme} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Report Hub (landing) ─────────────────────────────────────────────────────
 
 const REPORT_TYPES = [
@@ -742,6 +1032,13 @@ const REPORT_TYPES = [
     description: 'Relatório executivo com oligarcas, promoções e recrutamentos.',
     gradient: 'linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4f46e5 100%)',
     Icon: Crown,
+  },
+  {
+    id: 'adm',
+    title: 'ADM',
+    description: 'Relatório administrativo com descrição e amigos recrutados.',
+    gradient: 'linear-gradient(135deg,#052e16 0%,#059669 50%,#10b981 100%)',
+    Icon: Star,
   },
 ];
 
@@ -1018,5 +1315,6 @@ export default function VaultRelatorios() {
 
   if (view === 'ceo-regente') return <CeoRegenteGenerator onBack={() => setView('hub')} />;
   if (view === 'ceo') return <CeoGenerator onBack={() => setView('hub')} />;
+  if (view === 'adm') return <AdmGenerator onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }
