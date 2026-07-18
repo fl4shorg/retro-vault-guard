@@ -236,37 +236,40 @@ function RecrutaCard({ recruta, onChange, onRemove }: {
   const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2 font-mono text-xs text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
 
   return (
-    <div className="rounded-xl p-3 sm:p-4 space-y-3 relative"
+    <div className="rounded-xl p-3 sm:p-4 space-y-2.5 relative"
       style={{ background: 'hsl(220 35% 8%)', border: '1px solid hsl(var(--primary)/0.2)' }}>
       <button onClick={onRemove} className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded text-destructive/50 hover:text-destructive hover:bg-destructive/10 transition-colors">
         <Trash2 size={12} />
       </button>
 
-      <div className="flex items-start gap-3 pr-8">
-        {/* Avatar picker */}
-        <button onClick={() => fileRef.current?.click()}
-          className="w-14 h-14 rounded-full shrink-0 overflow-hidden flex items-center justify-center relative group transition-opacity hover:opacity-80"
-          style={{ border: '1.5px solid hsl(var(--primary)/0.4)', background: 'hsl(var(--primary)/0.08)' }}>
-          {recruta.foto
-            ? <img src={recruta.foto} className="w-full h-full object-cover" alt="" />
-            : <Camera size={18} className="text-primary/50 group-hover:text-primary transition-colors" />}
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
-            <Camera size={14} className="text-white" />
-          </div>
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-
-        <div className="flex-1 min-w-0 space-y-2">
-          <input value={recruta.nome} onChange={e => onChange({ ...recruta, nome: e.target.value })}
-            placeholder="Nome do recrutado" className={inp} />
-          <input type="date" value={recruta.data} onChange={e => onChange({ ...recruta, data: e.target.value })}
-            className={`${inp} [color-scheme:dark]`} />
-        </div>
+      {/* Fields — no avatar display here, photo only shows in the report card */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-8">
+        <input value={recruta.nome} onChange={e => onChange({ ...recruta, nome: e.target.value })}
+          placeholder="Nome do recrutado" className={inp} />
+        <input type="date" value={recruta.data} onChange={e => onChange({ ...recruta, data: e.target.value })}
+          className={`${inp} [color-scheme:dark]`} />
       </div>
 
       <textarea value={recruta.descricao} onChange={e => onChange({ ...recruta, descricao: e.target.value })}
         placeholder="Descrição (opcional)..." rows={2}
         className={`${inp} resize-none`} />
+
+      {/* Photo upload — compact, result only visible in the report preview */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => fileRef.current?.click()}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-wider border transition-colors hover:bg-primary/10"
+          style={{ borderColor: recruta.foto ? 'hsl(var(--primary)/0.6)' : 'hsl(var(--primary)/0.25)', color: recruta.foto ? 'hsl(var(--primary))' : 'hsl(var(--primary)/0.5)' }}>
+          <Camera size={11} />
+          {recruta.foto ? 'Foto adicionada' : 'Adicionar foto'}
+        </button>
+        {recruta.foto && (
+          <button onClick={() => onChange({ ...recruta, foto: null })}
+            className="font-mono text-[10px] text-destructive/50 hover:text-destructive transition-colors">
+            remover
+          </button>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      </div>
     </div>
   );
 }
