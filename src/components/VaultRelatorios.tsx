@@ -33,7 +33,6 @@ interface Recruta {
   id: string;
   nome: string;
   data: string;
-  descricao: string;
 }
 
 interface ReportData {
@@ -170,13 +169,10 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
                 marginBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
                 borderBottom: i < data.recrutamentos.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: r.descricao ? 3 : 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w, lineHeight: 1, display: 'block' }}>{r.nome || '—'}</span>
                   <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55), lineHeight: 1 }}>{formatDate(r.data)}</span>
                 </div>
-                {r.descricao && (
-                  <p style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), lineHeight: 1.55, margin: 0 }}>{r.descricao}</p>
-                )}
               </div>
             ))}
           </div>
@@ -217,8 +213,6 @@ function RecrutaCard({ recruta, onChange, onRemove }: {
         <input type="date" value={recruta.data} onChange={e => onChange({ ...recruta, data: e.target.value })}
           className={`${inp} [color-scheme:dark]`} />
       </div>
-      <textarea value={recruta.descricao} onChange={e => onChange({ ...recruta, descricao: e.target.value })}
-        placeholder="Descrição (opcional)..." rows={2} className={`${inp} resize-none`} />
     </div>
   );
 }
@@ -314,7 +308,7 @@ export default function VaultRelatorios() {
     e.target.value = '';
   };
 
-  const addRecruta    = () => setData(d => ({ ...d, recrutamentos: [...d.recrutamentos, { id: uid(), nome: '', data: '', descricao: '' }] }));
+  const addRecruta    = () => setData(d => ({ ...d, recrutamentos: [...d.recrutamentos, { id: uid(), nome: '', data: '' }] }));
   const updateRecruta = (id: string, r: Recruta) => setData(d => ({ ...d, recrutamentos: d.recrutamentos.map(x => x.id === id ? r : x) }));
   const removeRecruta = (id: string) => setData(d => ({ ...d, recrutamentos: d.recrutamentos.filter(x => x.id !== id) }));
   const addSubiu      = (v: string) => setData(d => ({ ...d, subiuDeCargo: [...d.subiuDeCargo, v] }));
