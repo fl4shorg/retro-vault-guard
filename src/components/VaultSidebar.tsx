@@ -1,4 +1,4 @@
-import { Briefcase, ShieldAlert, X, Radiation, ChevronRight, MessageSquare, Gavel, Home, Trophy } from 'lucide-react';
+import { Briefcase, ShieldAlert, X, Radiation, ChevronRight, MessageSquare, Gavel, Home, Trophy, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VaultSidebarProps {
@@ -16,6 +16,7 @@ const sections = [
   { id: 'regras', label: 'REGRAS', desc: 'Regulamento Oficial Vault-Tec', icon: Gavel },
   { id: 'chat', label: 'VAULT COMMS', desc: 'Canal de Comunicação Operacional', icon: MessageSquare },
   { id: 'rank', label: 'RANKING', desc: 'Top 10 Operadores do Vault', icon: Trophy },
+  { id: 'relatorios', label: 'RELATÓRIOS', desc: 'Geração de Relatórios Operacionais', icon: FileText },
 ];
 
 const VaultSidebar = ({ open, activeSection, onSectionChange, onClose }: VaultSidebarProps) => (

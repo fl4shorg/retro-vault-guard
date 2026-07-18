@@ -13,6 +13,7 @@ import VaultRulesList from '@/components/VaultRulesList';
 import VaultChat from '@/components/VaultChat';
 import VaultHome from '@/components/VaultHome';
 import VaultRank from '@/components/VaultRank';
+import VaultRelatorios from '@/components/VaultRelatorios';
 import { useUserAccess } from '@/hooks/useUserAccess';
 import { Loader2, Zap } from 'lucide-react';
 
@@ -214,6 +215,8 @@ const Index = () => {
               currentUserId={user.id}
               onRefresh={fetchRanking}
             />
+          ) : activeSection === 'relatorios' ? (
+            <VaultRelatorios />
           ) : null}
         </main>
       </div>
