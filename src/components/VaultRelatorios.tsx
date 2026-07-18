@@ -36,90 +36,95 @@ const emptyData = (): SectionData => ({
   recruitment: [], movement: [], promotion: [], totalMembers: [], description: [],
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatDate(iso: string) {
   if (!iso) return '—';
   const [y, m, d] = iso.split('-').map(Number);
   return new Date(y, m - 1, d).toLocaleDateString('pt-BR');
 }
 
-// ─── Report Preview (captured by html2canvas) ─────────────────────────────────
-interface PreviewProps {
+// ─── Report card — captured by html2canvas ────────────────────────────────────
+function ReportCard({
+  divRef, name, date, title, theme, data,
+}: {
+  divRef: React.RefObject<HTMLDivElement>;
   name: string; date: string; title: string;
   theme: typeof THEMES[number];
   data: SectionData;
-  ref?: React.Ref<HTMLDivElement>;
-}
-
-function ReportPreview({ name, date, title, theme, data }: PreviewProps & { divRef: React.RefObject<HTMLDivElement> }) {
+}) {
   return (
     <div
-      style={{
-        background: `${theme.gradient}`,
-        fontFamily: "'Courier New', Courier, monospace",
-        minWidth: 640,
-      }}
-      className="w-full rounded-xl p-8 text-white shadow-2xl"
+      ref={divRef}
+      style={{ background: theme.gradient, fontFamily: "'Courier New', Courier, monospace" }}
+      className="w-full rounded-xl p-4 sm:p-6 text-white shadow-2xl"
     >
-      {/* ── Header row ── */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-full">
-            <User className="h-5 w-5 text-white" />
+      {/* Header */}
+      <div className="flex flex-col xs:flex-row gap-3 justify-between items-start mb-5 sm:mb-7">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 sm:p-2 bg-white/20 rounded-full shrink-0">
+            <User className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div>
-            <p className="text-white/70 text-xs uppercase tracking-widest">Responsável</p>
-            <p className="text-white font-bold text-base">{name || 'Nome do Responsável'}</p>
+            <p className="text-white/70 text-[10px] sm:text-xs uppercase tracking-widest">Responsável</p>
+            <p className="text-white font-bold text-sm sm:text-base leading-tight">
+              {name || 'Nome do Responsável'}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-full">
-            <Calendar className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-2 xs:text-right">
+          <div className="p-1.5 sm:p-2 bg-white/20 rounded-full shrink-0">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
-          <div className="text-right">
-            <p className="text-white/70 text-xs uppercase tracking-widest">Data do Relatório</p>
-            <p className="text-white font-bold text-base">{formatDate(date)}</p>
+          <div>
+            <p className="text-white/70 text-[10px] sm:text-xs uppercase tracking-widest">Data</p>
+            <p className="text-white font-bold text-sm sm:text-base leading-tight">{formatDate(date)}</p>
           </div>
         </div>
       </div>
 
-      {/* ── Title block ── */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <div className="p-3 bg-white/20 rounded-full">
-            <Radiation className="h-7 w-7 text-white" />
+      {/* Title block */}
+      <div className="text-center mb-5 sm:mb-7">
+        <div className="flex items-center justify-center mb-2 sm:mb-3">
+          <div className="p-2 sm:p-3 bg-white/20 rounded-full">
+            <Radiation className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
           </div>
         </div>
-        <div className="inline-block bg-white/20 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest mb-3">
+        <span className="inline-block bg-white/20 rounded-full px-3 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3">
           Documento Oficial
-        </div>
-        <h1 className="text-2xl font-black uppercase tracking-wider mb-1">
+        </span>
+        <h1 className="text-base sm:text-2xl font-black uppercase tracking-wider leading-tight mb-1">
           {title || 'Título do Relatório'}
         </h1>
-        <p className="text-white/70 text-xs uppercase tracking-[0.3em]">Relatório Oficial — NEEXT LTDA</p>
-        <div className="h-px bg-white/20 mt-5" />
+        <p className="text-white/70 text-[10px] sm:text-xs uppercase tracking-widest">
+          Relatório Oficial — NEEXT LTDA
+        </p>
+        <div className="h-px bg-white/20 mt-4" />
       </div>
 
-      {/* ── Sections ── */}
-      <div className="space-y-4">
+      {/* Sections */}
+      <div className="space-y-3">
         {SECTIONS.map(({ key, title: sTitle, icon: Icon }) => {
           const items = data[key];
           return (
-            <div key={key} className="bg-white/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Icon className="h-4 w-4 text-white/80" />
-                <span className="text-xs font-bold uppercase tracking-widest text-white/90">{sTitle}</span>
-                <div className="flex-1 h-px bg-white/20" />
-                <span className="text-xs bg-white/20 rounded-full px-2 py-0.5 font-mono">{items.length}</span>
+            <div key={key} className="bg-white/10 rounded-lg p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4 text-white/80 shrink-0" />
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white/90 flex-1 min-w-0 truncate">
+                  {sTitle}
+                </span>
+                <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5 font-mono shrink-0">
+                  {items.length}
+                </span>
               </div>
               {items.length === 0 ? (
-                <p className="text-white/40 text-xs italic">Nenhum item registrado.</p>
+                <p className="text-white/40 text-[10px] sm:text-xs italic">Nenhum item registrado.</p>
               ) : (
                 <ul className="space-y-1">
                   {items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-white/90">
-                      <span className="text-white/50 font-mono shrink-0 mt-0.5 text-xs">{String(i + 1).padStart(2, '0')}.</span>
-                      <span>{item}</span>
+                    <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-white/90">
+                      <span className="text-white/50 font-mono shrink-0 text-[10px] mt-0.5">
+                        {String(i + 1).padStart(2, '0')}.
+                      </span>
+                      <span className="break-words min-w-0">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -129,21 +134,21 @@ function ReportPreview({ name, date, title, theme, data }: PreviewProps & { divR
         })}
       </div>
 
-      {/* ── Footer ── */}
-      <div className="mt-8 pt-4 border-t border-white/20 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Shield className="h-3 w-3 text-white/50" />
-          <p className="text-white/50 text-[10px] uppercase tracking-widest">
-            Relatório gerado automaticamente pelo Sistema Neext
+      {/* Footer */}
+      <div className="mt-5 sm:mt-7 pt-3 border-t border-white/20 flex flex-col xs:flex-row gap-1 justify-between items-start xs:items-center">
+        <div className="flex items-center gap-1.5">
+          <Shield className="h-3 w-3 text-white/50 shrink-0" />
+          <p className="text-white/50 text-[9px] sm:text-[10px] uppercase tracking-wider">
+            Gerado automaticamente pelo Sistema Neext
           </p>
         </div>
-        <p className="text-white/40 text-[10px] font-mono">Sistema Avançado v2.0</p>
+        <p className="text-white/40 text-[9px] sm:text-[10px] font-mono">Sistema Avançado v2.0</p>
       </div>
     </div>
   );
 }
 
-// ─── Section input row ────────────────────────────────────────────────────────
+// ─── Section input ────────────────────────────────────────────────────────────
 function SectionInput({
   section, items, onAdd, onRemove,
 }: {
@@ -165,14 +170,16 @@ function SectionInput({
       className="rounded-lg border border-primary/20 overflow-hidden"
       style={{ background: 'hsl(220 35% 8%)' }}
     >
-      {/* Section header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-primary/15"
-        style={{ background: 'hsl(var(--primary) / 0.07)' }}>
-        <Icon size={14} className="text-primary/70" />
-        <span className="font-mono text-[11px] text-primary/80 uppercase tracking-[0.2em] font-bold">
+      {/* Header */}
+      <div
+        className="flex items-center gap-2 px-3 py-2.5 border-b border-primary/15"
+        style={{ background: 'hsl(var(--primary) / 0.07)' }}
+      >
+        <Icon size={13} className="text-primary/70 shrink-0" />
+        <span className="font-mono text-[11px] text-primary/80 uppercase tracking-[0.15em] font-bold flex-1 min-w-0 truncate">
           {section.title}
         </span>
-        <span className="ml-auto font-mono text-[10px] bg-primary/15 text-primary/70 rounded-full px-2 py-0.5">
+        <span className="font-mono text-[10px] bg-primary/15 text-primary/70 rounded-full px-2 py-0.5 shrink-0">
           {items.length}
         </span>
       </div>
@@ -181,12 +188,18 @@ function SectionInput({
       {items.length > 0 && (
         <ul className="px-3 py-2 space-y-1.5">
           {items.map((item, i) => (
-            <li key={i} className="flex items-center gap-2 group">
-              <span className="font-mono text-[10px] text-primary/40 shrink-0">{String(i + 1).padStart(2, '0')}.</span>
-              <span className="flex-1 font-mono text-xs text-foreground/80 truncate">{item}</span>
+            <li key={i} className="flex items-center gap-2">
+              <span className="font-mono text-[10px] text-primary/40 shrink-0">
+                {String(i + 1).padStart(2, '0')}.
+              </span>
+              <span className="flex-1 font-mono text-xs text-foreground/80 min-w-0 break-words">
+                {item}
+              </span>
+              {/* Always visible on touch; hover-based on desktop */}
               <button
                 onClick={() => onRemove(i)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center rounded text-destructive/60 hover:text-destructive hover:bg-destructive/10"
+                className="w-6 h-6 flex items-center justify-center rounded text-destructive/50 hover:text-destructive hover:bg-destructive/10 active:bg-destructive/20 transition-colors shrink-0"
+                aria-label="Remover"
               >
                 <Trash2 size={11} />
               </button>
@@ -202,36 +215,36 @@ function SectionInput({
           onChange={e => setVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && commit()}
           placeholder={section.placeholder}
-          className="flex-1 bg-transparent font-mono text-xs text-foreground/70 placeholder:text-muted-foreground/40 outline-none"
+          className="flex-1 min-w-0 bg-transparent font-mono text-xs text-foreground/70 placeholder:text-muted-foreground/40 outline-none"
         />
         <button
           onClick={commit}
           disabled={!val.trim()}
-          className="w-6 h-6 rounded flex items-center justify-center border border-primary/30 text-primary hover:bg-primary/15 disabled:opacity-30 transition-all"
+          className="w-7 h-7 rounded flex items-center justify-center border border-primary/30 text-primary hover:bg-primary/15 active:bg-primary/25 disabled:opacity-30 transition-all shrink-0"
         >
-          <Plus size={12} />
+          <Plus size={13} />
         </button>
       </div>
     </div>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function VaultRelatorios() {
   const reportRef = useRef<HTMLDivElement>(null);
 
-  const [name,  setName]  = useState('');
-  const [date,  setDate]  = useState('');
-  const [title, setTitle] = useState('');
-  const [themeId, setThemeId] = useState('vault-amber');
-  const [data,  setData]  = useState<SectionData>(emptyData());
+  const [name,      setName]      = useState('');
+  const [date,      setDate]      = useState('');
+  const [title,     setTitle]     = useState('');
+  const [themeId,   setThemeId]   = useState('vault-amber');
+  const [data,      setData]      = useState<SectionData>(emptyData());
   const [downloading, setDownloading] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
 
   const theme = THEMES.find(t => t.id === themeId) ?? THEMES[0];
 
-  const addItem    = (key: SectionKey, val: string) =>
-    setData(d => ({ ...d, [key]: [...d[key], val] }));
+  const addItem    = (key: SectionKey, v: string) =>
+    setData(d => ({ ...d, [key]: [...d[key], v] }));
   const removeItem = (key: SectionKey, i: number) =>
     setData(d => ({ ...d, [key]: d[key].filter((_, idx) => idx !== i) }));
 
@@ -257,22 +270,22 @@ export default function VaultRelatorios() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
 
-      {/* ── Page title ── */}
+      {/* Page header */}
       <div
-        className="vault-scanline rounded-xl px-5 py-4"
+        className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
         style={{
           border: '1px solid hsl(var(--primary) / 0.35)',
           background: 'linear-gradient(135deg, hsl(220 35% 8% / 0.97) 0%, hsl(220 30% 11% / 0.92) 100%)',
         }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
-            <FileText size={16} className="text-primary" />
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <FileText size={15} className="text-primary" />
           </div>
-          <div>
-            <p className="font-display text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">
+          <div className="min-w-0">
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase truncate">
               Gerador de Relatório de CTO
             </p>
             <p className="font-mono text-[10px] text-muted-foreground tracking-widest">
@@ -282,24 +295,24 @@ export default function VaultRelatorios() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
 
-        {/* ── LEFT: form ── */}
+        {/* ── Form ── */}
         <div className="space-y-4">
 
-          {/* Basic fields */}
+          {/* Identity fields */}
           <div
-            className="rounded-xl p-5 space-y-4"
+            className="rounded-xl p-4 sm:p-5 space-y-4"
             style={{
               border: '1px solid hsl(var(--primary) / 0.2)',
               background: 'linear-gradient(135deg, hsl(220 35% 8%) 0%, hsl(220 30% 10%) 100%)',
             }}
           >
-            <p className="font-mono text-[10px] text-primary/60 tracking-[0.3em] uppercase flex items-center gap-2">
+            <p className="font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2">
               <span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" />
             </p>
 
-            {/* Title */}
+            {/* Report title */}
             <div>
               <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
                 Título do Relatório
@@ -308,12 +321,12 @@ export default function VaultRelatorios() {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Ex: Relatório Semanal — FBI"
-                className="w-full bg-black/30 border border-primary/20 rounded-lg px-4 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-black/30 border border-primary/20 rounded-lg px-3 sm:px-4 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors"
               />
             </div>
 
-            {/* Name + Date */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Name + Date — stack on very small screens */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
                   Responsável
@@ -338,36 +351,42 @@ export default function VaultRelatorios() {
               </div>
             </div>
 
-            {/* Theme selector */}
+            {/* Theme picker */}
             <div>
               <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
-                Escolha o Tema
+                Tema
               </label>
               <div className="relative">
                 <button
                   onClick={() => setThemeOpen(o => !o)}
-                  className="w-full bg-black/30 border border-primary/20 rounded-lg px-4 py-2.5 font-mono text-sm text-foreground/90 flex items-center gap-3 hover:border-primary/40 transition-colors"
+                  className="w-full bg-black/30 border border-primary/20 rounded-lg px-3 sm:px-4 py-2.5 font-mono text-sm text-foreground/90 flex items-center gap-3 hover:border-primary/40 active:border-primary/50 transition-colors"
                 >
                   <span
                     className="w-5 h-5 rounded-full shrink-0 border border-white/20"
                     style={{ background: theme.gradient }}
                   />
-                  <span className="flex-1 text-left">{theme.name}</span>
-                  <ChevronDown size={14} className={`text-primary/50 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
+                  <span className="flex-1 text-left truncate">{theme.name}</span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-primary/50 transition-transform shrink-0 ${themeOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 {themeOpen && (
                   <div
-                    className="absolute top-full mt-1 w-full z-10 rounded-xl border border-primary/20 overflow-hidden shadow-2xl"
+                    className="absolute top-full mt-1 w-full z-20 rounded-xl border border-primary/20 overflow-hidden shadow-2xl max-h-56 overflow-y-auto"
                     style={{ background: 'hsl(220 35% 8%)' }}
                   >
                     {THEMES.map(t => (
                       <button
                         key={t.id}
                         onClick={() => { setThemeId(t.id); setThemeOpen(false); }}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm hover:bg-primary/10 transition-colors ${t.id === themeId ? 'text-primary' : 'text-foreground/70'}`}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm hover:bg-primary/10 active:bg-primary/15 transition-colors text-left ${t.id === themeId ? 'text-primary' : 'text-foreground/70'}`}
                       >
-                        <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: t.gradient }} />
-                        {t.name}
+                        <span
+                          className="w-5 h-5 rounded-full shrink-0 border border-white/20"
+                          style={{ background: t.gradient }}
+                        />
+                        <span className="truncate">{t.name}</span>
                       </button>
                     ))}
                   </div>
@@ -378,14 +397,14 @@ export default function VaultRelatorios() {
 
           {/* Section inputs */}
           <div
-            className="rounded-xl p-5 space-y-3"
+            className="rounded-xl p-4 sm:p-5 space-y-3"
             style={{
               border: '1px solid hsl(var(--primary) / 0.2)',
               background: 'linear-gradient(135deg, hsl(220 35% 8%) 0%, hsl(220 30% 10%) 100%)',
             }}
           >
-            <p className="font-mono text-[10px] text-primary/60 tracking-[0.3em] uppercase flex items-center gap-2">
-              <span className="h-px flex-1 bg-primary/15" />SEÇÕES DO RELATÓRIO<span className="h-px flex-1 bg-primary/15" />
+            <p className="font-mono text-[10px] text-primary/60 tracking-[0.2em] uppercase flex items-center gap-2">
+              <span className="h-px flex-1 bg-primary/15" />SEÇÕES<span className="h-px flex-1 bg-primary/15" />
             </p>
             {SECTIONS.map(section => (
               <SectionInput
@@ -398,39 +417,35 @@ export default function VaultRelatorios() {
             ))}
           </div>
 
-          {/* Download button */}
+          {/* Download */}
           <button
             onClick={download}
             disabled={downloading}
-            className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-display font-bold tracking-widest text-sm uppercase border transition-all"
+            className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98]"
             style={{
               background: 'hsl(var(--primary) / 0.15)',
               borderColor: 'hsl(var(--primary) / 0.5)',
               color: 'hsl(var(--primary))',
               boxShadow: '0 0 20px hsl(var(--primary) / 0.1)',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'hsl(var(--primary) / 0.25)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'hsl(var(--primary) / 0.15)')}
           >
             {downloading
-              ? <><Loader2 size={16} className="animate-spin" /> Gerando Imagem...</>
-              : <><Download size={16} /> Baixar Relatório como Imagem</>
+              ? <><Loader2 size={15} className="animate-spin" /> Gerando Imagem...</>
+              : <><Download size={15} /> Baixar Relatório como Imagem</>
             }
           </button>
         </div>
 
-        {/* ── RIGHT: report preview ── */}
-        <div className="overflow-auto">
-          <p className="font-mono text-[10px] text-primary/40 tracking-[0.3em] uppercase mb-3">
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">
             — Pré-visualização —
           </p>
-          <div ref={reportRef}>
-            <ReportPreview
-              divRef={reportRef as React.RefObject<HTMLDivElement>}
-              name={name} date={date} title={title}
-              theme={theme} data={data}
-            />
-          </div>
+          <ReportCard
+            divRef={reportRef}
+            name={name} date={date} title={title}
+            theme={theme} data={data}
+          />
         </div>
       </div>
     </div>
