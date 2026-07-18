@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { API_CARGOS_FBI, API_CARGOS_SKUR } from '@/lib/supabase';
 
-const API_REGRAS = 'https://www.api.neext.online/api/regras';
+const API_REGRAS = 'https://www.esdeath-api.com.br/api/regras';
 
 export interface CargoItem {
   id: string;

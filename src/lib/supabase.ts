@@ -11,5 +11,5 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   },
 });
 
-export const API_CARGOS_FBI = "https://www.api.neext.online/api/cargosfbi";
-export const API_CARGOS_SKUR = "https://www.api.neext.online/api/cargosskur";
+export const API_CARGOS_FBI = "https://www.esdeath-api.com.br/api/cargosfbi";
+export const API_CARGOS_SKUR = "https://www.esdeath-api.com.br/api/cargosskur";
