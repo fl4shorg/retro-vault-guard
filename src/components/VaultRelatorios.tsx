@@ -227,11 +227,8 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Footer ── */}
         <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${bdr}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 10, height: 10, background: c45, clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', flexShrink: 0 }} />
-            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
-          </div>
-          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>CEO Regente v1.0</span>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>VAULT-TEC</span>
         </div>
       </div>
 
