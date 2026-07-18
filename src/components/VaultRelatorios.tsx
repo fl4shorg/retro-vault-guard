@@ -1418,10 +1418,11 @@ function ParlamentoReportCard({ data, theme }: { data: ParlamentoReportData; the
         <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
 
         {/* ── Totais gerais ── */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
           {[
-            { label: 'Total de Membros', value: totalMembros, Icon: Users },
-            { label: 'Total de ADMs',    value: totalAdms,    Icon: Building2 },
+            { label: 'Grupos',           value: data.grupos.length, Icon: Vote },
+            { label: 'Total de Membros', value: totalMembros,       Icon: Users },
+            { label: 'Total de ADMs',    value: totalAdms,          Icon: Building2 },
           ].map(({ label, value, Icon }) => (
             <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
