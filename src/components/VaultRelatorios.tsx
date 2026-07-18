@@ -152,7 +152,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
               <TrendingUp size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Subiu de Cargo</span>
-              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, display: 'inline-block' }}>{data.subiuDeCargo.length}</span>
+              <div style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.subiuDeCargo.length}</div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
               {data.subiuDeCargo.map((nome, i) => (
@@ -170,7 +170,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
               <Users size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutamentos</span>
-              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, display: 'inline-block' }}>{data.recrutamentos.length}</span>
+              <div style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.recrutamentos.length}</div>
             </div>
             {data.recrutamentos.map((r, i) => (
               <div key={r.id} style={{
