@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_URL = 'https://www.api.neext.online/api/regras';
+const API_URL = 'https://www.esdeath-api.com.br/api/regras';
 
 interface Rule {
   id: string;
