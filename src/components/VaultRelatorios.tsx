@@ -52,6 +52,35 @@ type Theme = typeof THEMES[number];
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+/** Average all hex stops in a CSS gradient → one representative base colour */
+function gradientBase(gradient: string): string {
+  const hits = [...gradient.matchAll(/#([0-9a-f]{6})/gi)].map(m => m[1]);
+  if (!hits.length) return '000000';
+  const sum = hits.reduce((a, h) => ({
+    r: a.r + parseInt(h.slice(0,2),16),
+    g: a.g + parseInt(h.slice(2,4),16),
+    b: a.b + parseInt(h.slice(4,6),16),
+  }), { r:0, g:0, b:0 });
+  const n = hits.length;
+  const hex = (v: number) => Math.round(v/n).toString(16).padStart(2,'0');
+  return `#${hex(sum.r)}${hex(sum.g)}${hex(sum.b)}`;
+}
+
+/** Alpha-blend an rgba colour over a solid #rrggbb background → solid rgb() string */
+function solidOver(fgR: number, fgG: number, fgB: number, alpha: number, bg: string): string {
+  const br = parseInt(bg.slice(1,3),16);
+  const bg_ = parseInt(bg.slice(3,5),16);
+  const bb = parseInt(bg.slice(5,7),16);
+  const r = Math.round(alpha*fgR + (1-alpha)*br);
+  const g = Math.round(alpha*fgG + (1-alpha)*bg_);
+  const b = Math.round(alpha*fgB + (1-alpha)*bb);
+  return `rgb(${r},${g},${b})`;
+}
+/** Shorthand: white × alpha over bg */
+const wOver = (alpha: number, bg: string) => solidOver(255,255,255,alpha,bg);
+/** Shorthand: black × alpha over bg */
+const kOver = (alpha: number, bg: string) => solidOver(0,0,0,alpha,bg);
+
 function formatDate(iso: string) {
   if (!iso) return '—';
   const [y, m, d] = iso.split('-').map(Number);
@@ -80,21 +109,31 @@ const emptyReport = (): ReportData => ({
 function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
   const mono = "'Courier New', Courier, monospace";
   const w = '#ffffff';
-  const wA = (a: number) => `rgba(255,255,255,${a})`;
-  const panel = 'rgba(0,0,0,0.28)';
-  const border = 'rgba(255,255,255,0.14)';
+  const wA = (a: number) => `rgba(255,255,255,${a})`; // safe for text colour only
+
+  // Compute ALL background/border colours as solids so html-to-image renders
+  // them identically to the browser preview (no rgba compositing against white).
+  const base   = gradientBase(theme.gradient);
+  const panel  = kOver(0.28, base);
+  const bdr    = wOver(0.14, base);
+  const c18    = wOver(0.18, base);
+  const c35    = wOver(0.35, base);
+  const c12    = wOver(0.12, base);
+  const c22    = wOver(0.22, base);
+  const c10    = wOver(0.10, base);
+  const c50    = wOver(0.50, base);
+  const c45    = wOver(0.45, base);
 
   return (
     <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
-      <div style={{ height: 3, background: 'rgba(255,255,255,0.35)' }} />
+      <div style={{ height: 3, background: c35 }} />
 
       <div style={{ padding: '24px 22px' }}>
 
-        {/* ── Header: logo left / foto+nome right ── */}
+        {/* ── Header ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-          {/* Left */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', background: c18, border: `1.5px solid ${c35}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Radiation size={18} color={w} />
             </div>
             <div>
@@ -103,14 +142,13 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             </div>
           </div>
 
-          {/* Right: foto + nome + data */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ textAlign: 'right' as const }}>
               <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Responsável</div>
               <div style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
               <div style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), marginTop: 2 }}>{formatDate(data.dataRelatorio)}</div>
             </div>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: '2px solid rgba(255,255,255,0.5)', overflow: 'hidden', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: `2px solid ${c50}`, overflow: 'hidden', background: c12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {data.fotoResponsavel
                 ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
                 : <User size={20} color={wA(0.5)} />
@@ -119,7 +157,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
           </div>
         </div>
 
-        <div style={{ height: 1, background: border, marginBottom: 16 }} />
+        <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
 
         {/* ── Contagens ── */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
@@ -127,8 +165,8 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             { label: 'Membros no Grupo', value: data.totalGrupo, Icon: Users },
             { label: 'Membros NYPD',     value: data.totalNYPD,  Icon: Building2 },
           ].map(({ label, value, Icon }) => (
-            <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon size={15} color={w} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 3 }}>
@@ -141,22 +179,22 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Descrição ── */}
         {data.descricao.trim() && (
-          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
             <p style={{ fontFamily: mono, fontSize: 11, color: w, lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap' as const }}>{data.descricao}</p>
           </div>
         )}
 
         {/* ── Subiu de Cargo ── */}
         {data.subiuDeCargo.length > 0 && (
-          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
               <TrendingUp size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Subiu de Cargo</span>
-              <div style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.subiuDeCargo.length}</div>
+              <div style={{ fontFamily: mono, fontSize: 9, background: c18, borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.subiuDeCargo.length}</div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
               {data.subiuDeCargo.map((nome, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 6, padding: '3px 8px', fontFamily: mono, fontSize: 11, color: w, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div key={i} style={{ background: c18, border: `1px solid ${c22}`, borderRadius: 6, padding: '3px 8px', fontFamily: mono, fontSize: 11, color: w, display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span>&#8593;</span>{nome}
                 </div>
               ))}
@@ -166,17 +204,17 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Recrutamentos ── */}
         {data.recrutamentos.length > 0 && (
-          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px' }}>
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
               <Users size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutamentos</span>
-              <div style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.recrutamentos.length}</div>
+              <div style={{ fontFamily: mono, fontSize: 9, background: c18, borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, textAlign: 'center' as const, flexShrink: 0 }}>{data.recrutamentos.length}</div>
             </div>
             {data.recrutamentos.map((r, i) => (
               <div key={r.id} style={{
                 paddingBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
                 marginBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
-                borderBottom: i < data.recrutamentos.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                borderBottom: i < data.recrutamentos.length - 1 ? `1px solid ${c10}` : 'none',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w, lineHeight: 1, display: 'block' }}>{r.nome || '—'}</span>
@@ -188,16 +226,16 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         )}
 
         {/* ── Footer ── */}
-        <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${bdr}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 10, height: 10, background: wA(0.45), clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', flexShrink: 0 }} />
+            <div style={{ width: 10, height: 10, background: c45, clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', flexShrink: 0 }} />
             <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
           </div>
           <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>CEO Regente v1.0</span>
         </div>
       </div>
 
-      <div style={{ height: 3, background: 'rgba(255,255,255,0.18)' }} />
+      <div style={{ height: 3, background: c18 }} />
     </div>
   );
 }
