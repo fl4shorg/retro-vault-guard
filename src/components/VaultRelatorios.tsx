@@ -1016,6 +1016,303 @@ function AdmGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── Recrutamento Report ──────────────────────────────────────────────────────
+
+interface RecrutamentoReportData {
+  responsavel: string;
+  fotoResponsavel: string | null;
+  dataRelatorio: string;
+  recrutamentos: Recruta[];
+}
+
+const emptyRecrutamentoReport = (): RecrutamentoReportData => ({
+  responsavel: '', fotoResponsavel: null, dataRelatorio: '', recrutamentos: [],
+});
+
+function RecrutamentoReportCard({ data, theme }: { data: RecrutamentoReportData; theme: Theme }) {
+  const mono = "'Courier New', Courier, monospace";
+  const w = '#ffffff';
+  const wA = (a: number) => `rgba(255,255,255,${a})`;
+
+  const base  = gradientBase(theme.gradient);
+  const panel = kOver(0.28, base);
+  const bdr   = wOver(0.14, base);
+  const c18   = wOver(0.18, base);
+  const c35   = wOver(0.35, base);
+  const c12   = wOver(0.12, base);
+  const c10   = wOver(0.10, base);
+  const c50   = wOver(0.50, base);
+
+  return (
+    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+      <div style={{ height: 3, background: c35 }} />
+      <div style={{ padding: '24px 22px' }}>
+
+        {/* ── Header ── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', background: c18, border: `1.5px solid ${c35}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <UserCheck size={18} color={w} />
+            </div>
+            <div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.25em', marginBottom: 2 }}>Sistema Operacional</div>
+              <div style={{ fontFamily: mono, fontSize: 14, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>RECRUTAMENTO</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ textAlign: 'right' as const }}>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Responsável</div>
+              <div style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
+              <div style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), marginTop: 2 }}>{formatDate(data.dataRelatorio)}</div>
+            </div>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: `2px solid ${c50}`, overflow: 'hidden', background: c12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {data.fotoResponsavel
+                ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
+                : <User size={20} color={wA(0.5)} />
+              }
+            </div>
+          </div>
+        </div>
+
+        <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
+
+        {/* ── Total recrutados ── */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Users size={15} color={w} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 3 }}>
+              <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1, display: 'block' }}>Total Recrutados</span>
+              <span style={{ fontFamily: mono, fontSize: 22, fontWeight: 900, color: w, lineHeight: 1, display: 'block' }}>{data.recrutamentos.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Lista de recrutados ── */}
+        {data.recrutamentos.length > 0 && (
+          <div style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+              <UserCheck size={13} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutados</span>
+            </div>
+            {data.recrutamentos.map((r, i) => (
+              <div key={r.id} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                paddingBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
+                marginBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
+                borderBottom: i < data.recrutamentos.length - 1 ? `1px solid ${c10}` : 'none',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.4), minWidth: 20 }}>{String(i + 1).padStart(2, '0')}.</span>
+                  <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w }}>{r.nome || '—'}</span>
+                </div>
+                {r.data && (
+                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.5), flexShrink: 0 }}>{formatDate(r.data)}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${bdr}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>VAULT-TEC</span>
+        </div>
+      </div>
+      <div style={{ height: 3, background: c18 }} />
+    </div>
+  );
+}
+
+function RecrutamentoScaledPreview({ data, theme, cardRef }: { data: RecrutamentoReportData; theme: Theme; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}><RecrutamentoReportCard data={data} theme={theme} /></div>
+      </div>
+    </div>
+  );
+}
+
+function RecrutamentoGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef  = useRef<HTMLDivElement>(null);
+  const fotoRef     = useRef<HTMLInputElement>(null);
+  const [data, setData]               = useState<RecrutamentoReportData>(emptyRecrutamentoReport());
+  const [themeId, setThemeId]         = useState('cyber-blue');
+  const [themeOpen, setThemeOpen]     = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const theme = THEMES.find(t => t.id === themeId) ?? THEMES[0];
+
+  const handleFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setData(d => ({ ...d, fotoResponsavel: null }));
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const addRecruta    = () => setData(d => ({ ...d, recrutamentos: [...d.recrutamentos, { id: uid(), nome: '', data: '' }] }));
+  const updateRecruta = (id: string, r: Recruta) => setData(d => ({ ...d, recrutamentos: d.recrutamentos.map(x => x.id === id ? r : x) }));
+  const removeRecruta = (id: string) => setData(d => ({ ...d, recrutamentos: d.recrutamentos.filter(x => x.id !== id) }));
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      link.download = `relatorio-recrutamento-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <UserCheck size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Recrutamento</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <div className="flex items-end gap-3">
+              <div className="shrink-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Foto</label>
+                <button onClick={() => fotoRef.current?.click()}
+                  className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center relative group transition-opacity hover:opacity-80"
+                  style={{ border: '1.5px solid hsl(var(--primary)/0.45)', background: 'hsl(var(--primary)/0.08)' }}>
+                  {data.fotoResponsavel
+                    ? <img src={data.fotoResponsavel} className="w-full h-full object-cover" alt="" />
+                    : <Camera size={18} className="text-primary/50 group-hover:text-primary transition-colors" />
+                  }
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                    <Camera size={14} className="text-white" />
+                  </div>
+                </button>
+                <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Responsável</label>
+                <input value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))}
+                  placeholder="Seu nome" className={inp} />
+              </div>
+            </div>
+            {data.fotoResponsavel && (
+              <button onClick={() => setData(d => ({ ...d, fotoResponsavel: null }))}
+                className="font-mono text-[10px] text-destructive/50 hover:text-destructive transition-colors">
+                Remover foto
+              </button>
+            )}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
+              <input type="date" value={data.dataRelatorio} onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`} />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Tema do Relatório</label>
+              <div className="relative">
+                <button onClick={() => setThemeOpen(o => !o)}
+                  className="w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 flex items-center gap-3 hover:border-primary/40 transition-colors">
+                  <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: theme.gradient }} />
+                  <span className="flex-1 text-left truncate">{theme.name}</span>
+                  <ChevronDown size={14} className={`text-primary/50 shrink-0 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {themeOpen && (
+                  <div className="absolute top-full mt-1 w-full z-20 rounded-xl border border-primary/20 overflow-hidden shadow-2xl max-h-56 overflow-y-auto"
+                    style={{ background: 'hsl(220 35% 8%)' }}>
+                    {THEMES.map(t => (
+                      <button key={t.id} onClick={() => { setThemeId(t.id); setThemeOpen(false); }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm hover:bg-primary/10 transition-colors ${t.id === themeId ? 'text-primary' : 'text-foreground/70'}`}>
+                        <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: t.gradient }} />
+                        <span className="truncate">{t.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recrutamentos */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />RECRUTAMENTOS<span className="h-px flex-1 bg-primary/15" /></p>
+            {data.recrutamentos.length === 0 && (
+              <p className="font-mono text-[11px] text-muted-foreground/50 text-center py-1">Nenhum recrutado adicionado.</p>
+            )}
+            <div className="space-y-3">
+              {data.recrutamentos.map(r => (
+                <RecrutaCard key={r.id} recruta={r}
+                  onChange={updated => updateRecruta(r.id, updated)}
+                  onRemove={() => removeRecruta(r.id)} />
+              ))}
+            </div>
+            <button onClick={addRecruta}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-mono text-xs uppercase tracking-widest border border-dashed border-primary/30 text-primary/60 hover:border-primary/60 hover:text-primary hover:bg-primary/5 transition-all">
+              <UserCheck size={13} />Adicionar Recrutado
+            </button>
+          </div>
+
+          {/* Download */}
+          <button onClick={download} disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}>
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Relatório como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <RecrutamentoScaledPreview data={data} theme={theme} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Report Hub (landing) ─────────────────────────────────────────────────────
 
 const REPORT_TYPES = [
@@ -1039,6 +1336,13 @@ const REPORT_TYPES = [
     description: 'Relatório administrativo com descrição e amigos recrutados.',
     gradient: 'linear-gradient(135deg,#052e16 0%,#059669 50%,#10b981 100%)',
     Icon: Star,
+  },
+  {
+    id: 'recrutamento',
+    title: 'Recrutamento',
+    description: 'Relatório de recrutamento com lista de recrutados e datas.',
+    gradient: 'linear-gradient(135deg,#0c1445 0%,#1d4ed8 50%,#3b82f6 100%)',
+    Icon: UserCheck,
   },
 ];
 
@@ -1316,5 +1620,6 @@ export default function VaultRelatorios() {
   if (view === 'ceo-regente') return <CeoRegenteGenerator onBack={() => setView('hub')} />;
   if (view === 'ceo') return <CeoGenerator onBack={() => setView('hub')} />;
   if (view === 'adm') return <AdmGenerator onBack={() => setView('hub')} />;
+  if (view === 'recrutamento') return <RecrutamentoGenerator onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }
