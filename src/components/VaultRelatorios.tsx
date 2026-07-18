@@ -94,7 +94,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
           {/* Left */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'Arial, sans-serif', fontSize: 16, fontWeight: 900, color: w, lineHeight: 1 }}>V</span>
+              <Radiation size={18} color={w} />
             </div>
             <div>
               <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.25em', marginBottom: 2 }}>Sistema Operacional</div>
@@ -112,7 +112,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: '2px solid rgba(255,255,255,0.5)', overflow: 'hidden', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {data.fotoResponsavel
                 ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
-                : <span style={{ fontFamily: 'Arial, sans-serif', fontSize: 18, color: wA(0.5), lineHeight: 1 }}>?</span>
+                : <User size={20} color={wA(0.5)} />
               }
             </div>
           </div>
@@ -123,16 +123,16 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         {/* ── Contagens ── */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
           {[
-            { label: 'Membros no Grupo', value: data.totalGrupo, abbr: 'GR' },
-            { label: 'Membros NYPD',     value: data.totalNYPD,  abbr: 'NY' },
-          ].map(({ label, value, abbr }) => (
+            { label: 'Membros no Grupo', value: data.totalGrupo, Icon: Users },
+            { label: 'Membros NYPD',     value: data.totalNYPD,  Icon: Building2 },
+          ].map(({ label, value, Icon }) => (
             <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontFamily: 'Arial, sans-serif', fontSize: 10, fontWeight: 900, color: w, lineHeight: 1 }}>{abbr}</span>
+                <Icon size={15} color={w} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 3 }}>
-                <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>{label}</span>
-                <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, lineHeight: 1 }}>{value || '—'}</span>
+                <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1, display: 'block' }}>{label}</span>
+                <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, lineHeight: 1, display: 'block' }}>{value || '—'}</span>
               </div>
             </div>
           ))}
@@ -142,14 +142,14 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         {data.subiuDeCargo.length > 0 && (
           <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-              <span style={{ fontFamily: 'Arial, sans-serif', fontSize: 12, color: w, lineHeight: 1 }}>&#9650;</span>
+              <TrendingUp size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Subiu de Cargo</span>
-              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w }}>{data.subiuDeCargo.length}</span>
+              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, display: 'inline-block' }}>{data.subiuDeCargo.length}</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
               {data.subiuDeCargo.map((nome, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 6, padding: '3px 8px', fontFamily: mono, fontSize: 11, color: w, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ lineHeight: 1 }}>&#8593;</span>{nome}
+                  <span>&#8593;</span>{nome}
                 </div>
               ))}
             </div>
@@ -160,9 +160,9 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         {data.recrutamentos.length > 0 && (
           <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-              <span style={{ fontFamily: 'Arial, sans-serif', fontSize: 13, fontWeight: 900, color: w, lineHeight: 1 }}>+</span>
+              <Users size={13} color={w} />
               <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutamentos</span>
-              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w }}>{data.recrutamentos.length}</span>
+              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w, lineHeight: 1, display: 'inline-block' }}>{data.recrutamentos.length}</span>
             </div>
             {data.recrutamentos.map((r, i) => (
               <div key={r.id} style={{
@@ -171,8 +171,8 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
                 borderBottom: i < data.recrutamentos.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: r.descricao ? 3 : 0 }}>
-                  <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w }}>{r.nome || '—'}</span>
-                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55) }}>{formatDate(r.data)}</span>
+                  <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w, lineHeight: 1, display: 'block' }}>{r.nome || '—'}</span>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55), lineHeight: 1 }}>{formatDate(r.data)}</span>
                 </div>
                 {r.descricao && (
                   <p style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), lineHeight: 1.55, margin: 0 }}>{r.descricao}</p>
@@ -184,8 +184,11 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Footer ── */}
         <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>Documento Oficial — NEEXT LTDA</span>
-          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3) }}>CEO Regente v1.0</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 10, height: 10, background: wA(0.45), clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', flexShrink: 0 }} />
+            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
+          </div>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>CEO Regente v1.0</span>
         </div>
       </div>
 
