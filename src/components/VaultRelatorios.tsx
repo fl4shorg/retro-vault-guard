@@ -331,9 +331,69 @@ function ScaledPreview({ data, theme, cardRef }: { data: ReportData; theme: Them
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// ─── Report Hub (landing) ─────────────────────────────────────────────────────
 
-export default function VaultRelatorios() {
+const REPORT_TYPES = [
+  {
+    id: 'ceo-regente',
+    title: 'CEO Regente',
+    description: 'Relatório de gestão semanal com recrutamentos, promoções e estatísticas do grupo.',
+    gradient: 'linear-gradient(135deg,#78350f 0%,#b45309 50%,#d97706 100%)',
+    Icon: Shield,
+  },
+];
+
+function RelatoriosHub({ onOpen }: { onOpen: (id: string) => void }) {
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <FileText size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">
+              Gerador de Relatórios
+            </p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">SELECIONE O TIPO DE RELATÓRIO</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {REPORT_TYPES.map(rt => (
+          <button
+            key={rt.id}
+            onClick={() => onOpen(rt.id)}
+            className="group text-left rounded-xl overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.99]"
+            style={{ border: '1px solid hsl(var(--primary)/0.25)' }}
+          >
+            {/* Gradient banner */}
+            <div className="h-20 flex items-center justify-center relative" style={{ background: rt.gradient }}>
+              <rt.Icon size={32} color="rgba(255,255,255,0.85)" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+            </div>
+            {/* Info */}
+            <div className="p-4 space-y-1" style={{ background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' }}>
+              <p className="font-display font-bold text-sm tracking-widest text-primary uppercase">{rt.title}</p>
+              <p className="font-mono text-[11px] text-muted-foreground/70 leading-relaxed">{rt.description}</p>
+              <p className="font-mono text-[10px] text-primary/50 uppercase tracking-widest pt-1 group-hover:text-primary transition-colors">
+                Abrir gerador →
+              </p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── CEO Regente generator ────────────────────────────────────────────────────
+
+function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
   const captureRef  = useRef<HTMLDivElement>(null);
   const fotoRef     = useRef<HTMLInputElement>(null);
   const [data, setData]           = useState<ReportData>(emptyReport());
@@ -346,7 +406,8 @@ export default function VaultRelatorios() {
   const handleFotoResponsavel = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try { setData(d => ({ ...d, fotoResponsavel: null })); // reset first so img re-renders
+    try {
+      setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
     } catch { /* ignore */ }
@@ -381,17 +442,21 @@ export default function VaultRelatorios() {
   return (
     <div className="space-y-4 sm:space-y-6">
 
-
-      {/* Page header */}
+      {/* Header with back button */}
       <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
         style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
         <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
           <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
-            <FileText size={15} className="text-primary" />
+            <Shield size={15} className="text-primary" />
           </div>
           <div>
             <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">
-              Gerador de Relatório — CEO Regente
+              CEO Regente
             </p>
             <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
           </div>
@@ -407,9 +472,7 @@ export default function VaultRelatorios() {
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
 
-            {/* Foto do responsável + nome lado a lado */}
             <div className="flex items-end gap-3">
-              {/* Avatar picker */}
               <div className="shrink-0">
                 <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Foto</label>
                 <button onClick={() => fotoRef.current?.click()}
@@ -426,7 +489,6 @@ export default function VaultRelatorios() {
                 <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFotoResponsavel} />
               </div>
 
-              {/* Nome */}
               <div className="flex-1 min-w-0">
                 <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Responsável</label>
                 <input value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))}
@@ -441,14 +503,12 @@ export default function VaultRelatorios() {
               </button>
             )}
 
-            {/* Data */}
             <div>
               <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
               <input type="date" value={data.dataRelatorio} onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
                 className={`${inp} [color-scheme:dark]`} />
             </div>
 
-            {/* Tema */}
             <div>
               <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Tema do Relatório</label>
               <div className="relative">
@@ -484,7 +544,7 @@ export default function VaultRelatorios() {
                   placeholder="0" className={inp} />
               </div>
               <div>
-                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Membros NYPD</label>
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Quadro Diretivo</label>
                 <input type="number" min={0} value={data.totalNYPD} onChange={e => setData(d => ({ ...d, totalNYPD: e.target.value }))}
                   placeholder="0" className={inp} />
               </div>
@@ -547,4 +607,13 @@ export default function VaultRelatorios() {
       </div>
     </div>
   );
+}
+
+// ─── Main (router) ────────────────────────────────────────────────────────────
+
+export default function VaultRelatorios() {
+  const [view, setView] = useState<'hub' | string>('hub');
+
+  if (view === 'ceo-regente') return <CeoRegenteGenerator onBack={() => setView('hub')} />;
+  return <RelatoriosHub onOpen={setView} />;
 }
