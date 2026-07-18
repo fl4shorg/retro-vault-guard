@@ -84,56 +84,55 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
   const border = 'rgba(255,255,255,0.14)';
 
   return (
-    <div style={{ width: 680, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
       <div style={{ height: 3, background: 'rgba(255,255,255,0.35)' }} />
 
-      <div style={{ padding: '32px 36px' }}>
+      <div style={{ padding: '24px 22px' }}>
 
-        {/* ── Header: logo + responsável com foto ── */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          {/* Left: Vault-Tec badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Radiation size={22} color={w} />
+        {/* ── Header: logo left / foto+nome right ── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          {/* Left */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Radiation size={18} color={w} />
             </div>
             <div>
-              <div style={{ fontFamily: mono, fontSize: 9, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.3em', marginBottom: 3 }}>Sistema Operacional</div>
-              <div style={{ fontFamily: mono, fontSize: 19, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>CEO REGENTE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.25em', marginBottom: 2 }}>Sistema Operacional</div>
+              <div style={{ fontFamily: mono, fontSize: 14, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>CEO REGENTE</div>
             </div>
           </div>
 
           {/* Right: foto + nome + data */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ textAlign: 'right' as const }}>
-              <div style={{ fontFamily: mono, fontSize: 9, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.2em', marginBottom: 4 }}>Responsável</div>
-              <div style={{ fontFamily: mono, fontSize: 15, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
-              <div style={{ fontFamily: mono, fontSize: 11, color: wA(0.6), marginTop: 3 }}>{formatDate(data.dataRelatorio)}</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Responsável</div>
+              <div style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
+              <div style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), marginTop: 2 }}>{formatDate(data.dataRelatorio)}</div>
             </div>
-            {/* Foto do responsável */}
-            <div style={{ width: 52, height: 52, borderRadius: '50%', flexShrink: 0, border: '2px solid rgba(255,255,255,0.5)', overflow: 'hidden', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: '2px solid rgba(255,255,255,0.5)', overflow: 'hidden', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {data.fotoResponsavel
-                ? <img src={data.fotoResponsavel} width={52} height={52} style={{ objectFit: 'cover', display: 'block', width: 52, height: 52 }} alt="" />
-                : <User size={24} color={wA(0.5)} />
+                ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
+                : <User size={20} color={wA(0.5)} />
               }
             </div>
           </div>
         </div>
 
-        <div style={{ height: 1, background: border, marginBottom: 20 }} />
+        <div style={{ height: 1, background: border, marginBottom: 16 }} />
 
         {/* ── Contagens ── */}
-        <div style={{ display: 'flex', gap: 14, marginBottom: 18 }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
           {[
             { label: 'Membros no Grupo', value: data.totalGrupo, Icon: Users },
             { label: 'Membros NYPD',     value: data.totalNYPD,  Icon: Building2 },
           ].map(({ label, value, Icon }) => (
-            <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon size={18} color={w} />
+            <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon size={15} color={w} />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 4 }}>
-                <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.2em' }}>{label}</span>
-                <span style={{ fontFamily: mono, fontSize: 20, fontWeight: 900, color: w }}>{value || '—'}</span>
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 3 }}>
+                <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>{label}</span>
+                <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w }}>{value || '—'}</span>
               </div>
             </div>
           ))}
@@ -141,15 +140,15 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Subiu de Cargo ── */}
         {data.subiuDeCargo.length > 0 && (
-          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <TrendingUp size={14} color={w} />
-              <span style={{ fontFamily: mono, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Subiu de Cargo</span>
-              <span style={{ fontFamily: mono, fontSize: 10, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 10px', color: w }}>{data.subiuDeCargo.length}</span>
+          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+              <TrendingUp size={13} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Subiu de Cargo</span>
+              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w }}>{data.subiuDeCargo.length}</span>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 6 }}>
               {data.subiuDeCargo.map((nome, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 6, padding: '4px 10px', fontFamily: mono, fontSize: 12, color: w, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div key={i} style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 6, padding: '3px 8px', fontFamily: mono, fontSize: 11, color: w, display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span>&#8593;</span>{nome}
                 </div>
               ))}
@@ -159,24 +158,24 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Recrutamentos ── */}
         {data.recrutamentos.length > 0 && (
-          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <Users size={14} color={w} />
-              <span style={{ fontFamily: mono, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutamentos</span>
-              <span style={{ fontFamily: mono, fontSize: 10, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 10px', color: w }}>{data.recrutamentos.length}</span>
+          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+              <Users size={13} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: w, flex: 1 }}>Recrutamentos</span>
+              <span style={{ fontFamily: mono, fontSize: 9, background: 'rgba(255,255,255,0.18)', borderRadius: 99, padding: '2px 8px', color: w }}>{data.recrutamentos.length}</span>
             </div>
             {data.recrutamentos.map((r, i) => (
               <div key={r.id} style={{
-                paddingBottom: i < data.recrutamentos.length - 1 ? 12 : 0,
-                marginBottom: i < data.recrutamentos.length - 1 ? 12 : 0,
+                paddingBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
+                marginBottom: i < data.recrutamentos.length - 1 ? 10 : 0,
                 borderBottom: i < data.recrutamentos.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: r.descricao ? 4 : 0 }}>
-                  <span style={{ fontFamily: mono, fontSize: 14, fontWeight: 700, color: w }}>{r.nome || '—'}</span>
-                  <span style={{ fontFamily: mono, fontSize: 10, color: wA(0.55) }}>{formatDate(r.data)}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: r.descricao ? 3 : 0 }}>
+                  <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w }}>{r.nome || '—'}</span>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55) }}>{formatDate(r.data)}</span>
                 </div>
                 {r.descricao && (
-                  <p style={{ fontFamily: mono, fontSize: 11, color: wA(0.6), lineHeight: 1.55, margin: 0 }}>{r.descricao}</p>
+                  <p style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), lineHeight: 1.55, margin: 0 }}>{r.descricao}</p>
                 )}
               </div>
             ))}
@@ -184,12 +183,12 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         )}
 
         {/* ── Footer ── */}
-        <div style={{ marginTop: 22, paddingTop: 14, borderTop: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Shield size={11} color={wA(0.45)} />
-            <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>Documento Oficial — NEEXT LTDA</span>
+        <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Shield size={10} color={wA(0.45)} />
+            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>Documento Oficial — NEEXT LTDA</span>
           </div>
-          <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.3) }}>CEO Regente v1.0</span>
+          <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3) }}>CEO Regente v1.0</span>
         </div>
       </div>
 
@@ -278,7 +277,7 @@ function ScaledPreview({ data, theme }: { data: ReportData; theme: Theme }) {
     if (!el) return;
     const obs = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      setZoom(Math.min(1, w / 680));
+      setZoom(Math.min(1, w / 400));
     });
     obs.observe(el);
     return () => obs.disconnect();
