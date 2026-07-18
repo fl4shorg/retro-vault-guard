@@ -4,7 +4,7 @@ import {
   FileText, Plus, Trash2, Download, User,
   Loader2, Camera, UserCheck, TrendingUp, Users,
   Building2, Shield, Radiation, ChevronDown, Crown, Star, MessageSquare, Ban, Gavel, Landmark,
-  CheckCircle2, XCircle, ShieldCheck, Sword, Vote,
+  CheckCircle2, XCircle, ShieldCheck, Sword, Vote, Stethoscope,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -3292,6 +3292,299 @@ function ContadorMsgGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── Hospital NEEXT ──────────────────────────────────────────────────────────
+
+interface PacienteHospital {
+  id: string;
+  nome: string;
+  diagnostico: string;
+  afastamento: string;
+}
+
+interface HospitalData {
+  responsavel: string;
+  fotoResponsavel: string | null;
+  dataRelatorio: string;
+  assinaturaMedico: string;
+  pacientes: PacienteHospital[];
+}
+
+const AFASTAMENTO_OPCOES = [
+  'Indeterminado',
+  '7 dias',
+  '15 dias',
+  '30 dias',
+  '45 dias',
+  '60 dias',
+  '3 meses',
+  '6 meses',
+  '1 ano',
+];
+
+function emptyHospitalData(): HospitalData {
+  return {
+    responsavel: '',
+    fotoResponsavel: null,
+    dataRelatorio: new Date().toLocaleDateString('pt-BR'),
+    assinaturaMedico: '',
+    pacientes: [],
+  };
+}
+
+function HospitalReportCard({ data }: { data: HospitalData }) {
+  const red     = '#dc2626';
+  const dark    = '#111827';
+  const gray    = '#6b7280';
+  const border  = '#e5e7eb';
+  const sans    = "'Segoe UI', Arial, sans-serif";
+  const cursive = "'Dancing Script', 'Brush Script MT', 'Comic Sans MS', cursive";
+
+  return (
+    <div style={{ width: 440, background: '#ffffff', borderRadius: 12, overflow: 'hidden', fontFamily: sans, boxShadow: '0 4px 32px rgba(0,0,0,0.22)' }}>
+
+      {/* ── Red header ── */}
+      <div style={{ background: red, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* CSS cross */}
+        <div style={{ position: 'relative', width: 38, height: 38, flexShrink: 0 }}>
+          <div style={{ position: 'absolute', background: '#fff', width: 14, height: 38, left: 12, top: 0, borderRadius: 3 }} />
+          <div style={{ position: 'absolute', background: '#fff', width: 38, height: 14, left: 0, top: 12, borderRadius: 3 }} />
+        </div>
+        <div>
+          <div style={{ color: '#fff', fontSize: 19, fontWeight: 800, letterSpacing: 3, textTransform: 'uppercase' as const }}>Hospital NEEXT</div>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, letterSpacing: 2, textTransform: 'uppercase' as const, marginTop: 2 }}>Relatório Médico Oficial</div>
+        </div>
+      </div>
+
+      {/* ── Identity row ── */}
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${border}`, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', border: `2.5px solid ${red}`, flexShrink: 0, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {data.fotoResponsavel
+            ? <img src={data.fotoResponsavel} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: 26, color: gray }}>👤</span>}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: dark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{data.responsavel || 'Nome do Responsável'}</div>
+          <div style={{ fontSize: 11, color: gray, marginTop: 3 }}>Data: <strong>{data.dataRelatorio}</strong></div>
+        </div>
+      </div>
+
+      {/* ── Patients table ── */}
+      {data.pacientes.length > 0 && (
+        <div style={{ padding: '14px 20px' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: red, textTransform: 'uppercase' as const, letterSpacing: 1.5, marginBottom: 10 }}>
+            Pacientes em Afastamento
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#fef2f2' }}>
+                {(['Paciente', 'Diagnóstico', 'Afastamento'] as const).map(h => (
+                  <th key={h} style={{ padding: '6px 8px', textAlign: 'left' as const, fontSize: 10, color: gray, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: 0.5, borderBottom: `2px solid ${border}` }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.pacientes.map((p, i) => (
+                <tr key={p.id} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <td style={{ padding: '7px 8px', fontSize: 12, color: dark, fontWeight: 600, borderBottom: `1px solid ${border}` }}>{p.nome || '—'}</td>
+                  <td style={{ padding: '7px 8px', fontSize: 12, color: gray, borderBottom: `1px solid ${border}` }}>{p.diagnostico || '—'}</td>
+                  <td style={{ padding: '7px 8px', fontSize: 11, color: red, fontWeight: 700, borderBottom: `1px solid ${border}` }}>{p.afastamento}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── Signature ── */}
+      <div style={{ padding: '16px 20px 20px', borderTop: `1px solid ${border}`, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 6 }}>
+        <div style={{ fontFamily: cursive, fontSize: 30, color: dark, letterSpacing: 1, lineHeight: 1.2, minHeight: 40 }}>
+          {data.assinaturaMedico || 'Assinatura do Médico'}
+        </div>
+        <div style={{ width: 180, height: 1, background: dark, opacity: 0.25 }} />
+        <div style={{ fontSize: 10, color: gray, textTransform: 'uppercase' as const, letterSpacing: 1.5 }}>Assinatura do Responsável</div>
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ background: dark, padding: '8px 20px', textAlign: 'center' as const, fontSize: 10, color: 'rgba(255,255,255,0.45)', letterSpacing: 2, textTransform: 'uppercase' as const }}>
+        Hospital NEEXT • Documento Oficial
+      </div>
+    </div>
+  );
+}
+
+function HospitalScaledPreview({ data, cardRef }: { data: HospitalData; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 440)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}><HospitalReportCard data={data} /></div>
+      </div>
+    </div>
+  );
+}
+
+function HospitalGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef  = useRef<HTMLDivElement>(null);
+  const fotoRef     = useRef<HTMLInputElement>(null);
+  const [data, setData]               = useState<HospitalData>(emptyHospitalData);
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    if (!document.getElementById('dancing-script-font')) {
+      const link = document.createElement('link');
+      link.id   = 'dancing-script-font';
+      link.rel  = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
+
+  const handleFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setData(d => ({ ...d, fotoResponsavel: null }));
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const addPaciente    = () => setData(d => ({ ...d, pacientes: [...d.pacientes, { id: uid(), nome: '', diagnostico: '', afastamento: 'Indeterminado' }] }));
+  const updatePaciente = (id: string, k: keyof PacienteHospital, v: string) =>
+    setData(d => ({ ...d, pacientes: d.pacientes.map(p => p.id === id ? { ...p, [k]: v } : p) }));
+  const removePaciente = (id: string) =>
+    setData(d => ({ ...d, pacientes: d.pacientes.filter(p => p.id !== id) }));
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      link.download = `hospital-neext-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp      = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec      = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* ── Header bar ── */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <Stethoscope size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Hospital NEEXT</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+          <button onClick={download} disabled={downloading}
+            className="ml-auto flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50">
+            {downloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+            Baixar PNG
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><User size={11} /> Identificação</p>
+            <input className={inp} value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))} placeholder="Nome do responsável" />
+            <input className={inp} value={data.dataRelatorio} onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))} placeholder="Data (DD/MM/AAAA)" />
+            <div>
+              <p className="font-mono text-[10px] text-primary/60 tracking-[0.2em] uppercase mb-1.5">Foto de Perfil</p>
+              <div className="flex items-center gap-2">
+                <button onClick={() => fotoRef.current?.click()} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold border border-primary/25 text-primary/70 hover:border-primary/50 hover:text-primary hover:bg-primary/10 transition-all">
+                  <Camera size={13} /> Carregar foto
+                </button>
+                {data.fotoResponsavel && <span className="text-xs text-emerald-400 font-mono">✓ carregada</span>}
+              </div>
+              <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+            </div>
+          </div>
+
+          {/* Assinatura */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}>✍ Assinatura do Médico</p>
+            <input
+              className={inp}
+              value={data.assinaturaMedico}
+              onChange={e => setData(d => ({ ...d, assinaturaMedico: e.target.value }))}
+              placeholder="Digite o nome em cursivo..."
+              style={{ fontFamily: "'Dancing Script', 'Brush Script MT', cursive", fontSize: 22 }}
+            />
+            <p className="font-mono text-[10px] text-muted-foreground/40">A assinatura aparece em letra cursiva no relatório.</p>
+          </div>
+
+          {/* Pacientes */}
+          <div className={sec} style={secStyle}>
+            <div className="flex items-center justify-between">
+              <p className={secLabel}><Users size={11} /> Pacientes ({data.pacientes.length})</p>
+              <button onClick={addPaciente} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold bg-red-600/15 text-red-400 border border-red-500/20 hover:bg-red-600/25 transition-all">
+                <Plus size={12} /> Adicionar
+              </button>
+            </div>
+            <div className="space-y-3">
+              {data.pacientes.map((p, i) => (
+                <div key={p.id} className="rounded-lg p-3 space-y-2" style={{ border: '1px solid hsl(var(--primary)/0.12)', background: 'hsl(220 35% 6%)' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-primary/40 shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                    <input className={inp} value={p.nome} onChange={e => updatePaciente(p.id, 'nome', e.target.value)} placeholder="Nome do paciente" />
+                    <button onClick={() => removePaciente(p.id)} className="text-red-400/60 hover:text-red-400 transition-colors shrink-0"><Trash2 size={14} /></button>
+                  </div>
+                  <input className={inp} value={p.diagnostico} onChange={e => updatePaciente(p.id, 'diagnostico', e.target.value)} placeholder="Diagnóstico" />
+                  <select className={inp} value={p.afastamento} onChange={e => updatePaciente(p.id, 'afastamento', e.target.value)}>
+                    {AFASTAMENTO_OPCOES.map(op => <option key={op} value={op}>{op}</option>)}
+                  </select>
+                </div>
+              ))}
+              {data.pacientes.length === 0 && (
+                <p className="text-center font-mono text-[10px] text-muted-foreground/40 py-4">Nenhum paciente adicionado</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Preview ── */}
+        <div className="rounded-xl overflow-hidden sticky top-4" style={{ border: '1px solid hsl(var(--primary)/0.2)', background: 'hsl(220 25% 5%)' }}>
+          <div className="px-4 py-2 border-b border-primary/10">
+            <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase">Pré-visualização</p>
+          </div>
+          <div className="p-4">
+            <HospitalScaledPreview data={data} cardRef={captureRef} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Report Hub (landing) ─────────────────────────────────────────────────────
 
 const REPORT_TYPES = [
@@ -3364,6 +3657,13 @@ const REPORT_TYPES = [
     description: 'Relatório de grupos com total de ADMs e membros somados automaticamente.',
     gradient: 'linear-gradient(135deg,#1e1b4b 0%,#581c87 30%,#be185d 70%,#f97316 100%)',
     Icon: Vote,
+  },
+  {
+    id: 'hospital',
+    title: 'Hospital NEEXT',
+    description: 'Relatório médico com pacientes, diagnósticos, dias de afastamento e assinatura cursiva.',
+    gradient: 'linear-gradient(135deg,#450a0a 0%,#dc2626 50%,#f87171 100%)',
+    Icon: Stethoscope,
   },
 ];
 
@@ -3648,5 +3948,6 @@ export default function VaultRelatorios() {
   if (view === 'premiere') return <PremiereGenerator onBack={() => setView('hub')} />;
   if (view === 'defesa') return <DefesaGenerator onBack={() => setView('hub')} />;
   if (view === 'parlamento') return <ParlamentoGenerator onBack={() => setView('hub')} />;
+  if (view === 'hospital')  return <HospitalGenerator  onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }
