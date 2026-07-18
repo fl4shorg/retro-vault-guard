@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import {
   FileText, Plus, Trash2, Download, User,
   Loader2, Camera, UserCheck, TrendingUp, Users,
@@ -328,15 +328,10 @@ export default function VaultRelatorios() {
     setDownloading(true);
     try {
       const el = captureRef.current;
-      const canvas = await html2canvas(el, {
-        scale: 2, useCORS: true, allowTaint: true,
-        backgroundColor: null, logging: false,
-        width: el.scrollWidth, height: el.scrollHeight,
-        windowWidth: el.scrollWidth, imageTimeout: 0,
-      });
+      const dataUrl = await toPng(el, { pixelRatio: 2, skipAutoScale: true });
       const link = document.createElement('a');
       link.download = `relatorio-ceo-regente-${new Date().toISOString().split('T')[0]}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
     } catch (e) { console.error(e); }
     finally { setDownloading(false); }
