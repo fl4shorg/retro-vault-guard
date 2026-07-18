@@ -5,7 +5,7 @@ import {
   Loader2, Camera, UserCheck, TrendingUp, Users,
   Building2, Shield, Radiation, ChevronDown, Crown, Star, MessageSquare, Ban, Gavel, Landmark,
   CheckCircle2, XCircle, ShieldCheck, Sword, Vote, Stethoscope,
-  Scale, Calendar, PenLine, Clock, Key, Flag,
+  Scale, Calendar, PenLine, Clock, Key, Flag, Megaphone,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -4337,6 +4337,411 @@ function TaticoGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── Relatório de Divulgação ──────────────────────────────────────────────────
+
+interface DivulgacaoData {
+  foto: string | null;
+  responsavel: string;
+  cargo: string;
+  dataRelatorio: string;
+  totalNovos: number;
+  totalAtual: number;
+  meta: number;
+  descricao: string;
+  assinatura: string;
+}
+
+const emptyDivulgacao = (): DivulgacaoData => ({
+  foto: null,
+  responsavel: '',
+  cargo: 'Divulgador',
+  dataRelatorio: new Date().toISOString().split('T')[0],
+  totalNovos: 0,
+  totalAtual: 0,
+  meta: 100,
+  descricao: '',
+  assinatura: '',
+});
+
+// SVG donut chart — works perfectly with html-to-image (pure markup, no canvas)
+function DonutChart({
+  atual, meta, cor, tamanho = 140,
+}: { atual: number; meta: number; cor: string; tamanho?: number }) {
+  const pct      = meta > 0 ? Math.min(atual / meta, 1) : 0;
+  const r        = 48;
+  const cx       = tamanho / 2;
+  const circ     = 2 * Math.PI * r;
+  const dash     = pct * circ;
+  const gap      = circ - dash;
+  const pctLabel = Math.round(pct * 100);
+
+  return (
+    <svg width={tamanho} height={tamanho} viewBox={`0 0 ${tamanho} ${tamanho}`}>
+      {/* Background track */}
+      <circle cx={cx} cy={cx} r={r} fill="none" stroke="#e8ecf4" strokeWidth={14} />
+      {/* Progress arc */}
+      <circle
+        cx={cx} cy={cx} r={r}
+        fill="none"
+        stroke={cor}
+        strokeWidth={14}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${gap}`}
+        strokeDashoffset={circ / 4}   /* start at top */
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
+      {/* Centre label */}
+      <text x={cx} y={cx - 6} textAnchor="middle" fontFamily='"Helvetica Neue",Helvetica,Arial,sans-serif' fontSize={22} fontWeight={800} fill={cor}>{pctLabel}%</text>
+      <text x={cx} y={cx + 12} textAnchor="middle" fontFamily='"Helvetica Neue",Helvetica,Arial,sans-serif' fontSize={9} fontWeight={600} fill="#8892a4" letterSpacing="0.1em">DA META</text>
+    </svg>
+  );
+}
+
+// ─── Divulgação Card ──────────────────────────────────────────────────────────
+
+function DivulgacaoReportCard({ data }: { data: DivulgacaoData }) {
+  const sans    = '"Helvetica Neue",Helvetica,Arial,sans-serif';
+  const mono    = "'Courier New',Courier,monospace";
+  const cor1    = '#4f46e5';   // indigo
+  const cor2    = '#7c3aed';   // violet
+  const accent  = '#a78bfa';
+  const gold    = '#fbbf24';
+
+  const pct     = data.meta > 0 ? Math.min(data.totalAtual / data.meta, 1) : 0;
+  const faltam  = Math.max(data.meta - data.totalAtual, 0);
+
+  const formatDate = (s: string) => {
+    if (!s) return '—';
+    const [y, m, d] = s.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
+  return (
+    <div style={{ width: 400, borderRadius: 18, overflow: 'hidden', boxShadow: '0 12px 40px rgba(79,70,229,0.22)', boxSizing: 'border-box' as const }}>
+
+      {/* ── Accent stripe ── */}
+      <div style={{ height: 5, background: `linear-gradient(90deg,${cor1},${cor2},${accent})` }} />
+
+      {/* ── Header ── */}
+      <div style={{ background: `linear-gradient(135deg,${cor1} 0%,${cor2} 100%)`, padding: '24px 24px 20px', position: 'relative' as const, overflow: 'hidden' as const }}>
+        {/* watermark */}
+        <div style={{ position: 'absolute' as const, right: -16, top: -10, fontFamily: sans, fontSize: 90, fontWeight: 900, color: 'rgba(255,255,255,0.05)', lineHeight: 1, pointerEvents: 'none' as const, letterSpacing: '-6px' }}>DIVULG</div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18, position: 'relative' as const, zIndex: 1 }}>
+          {/* Profile photo */}
+          <div style={{ width: 72, height: 72, borderRadius: '50%', border: `3px solid ${accent}`, overflow: 'hidden' as const, flexShrink: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 18px ${accent}55` }}>
+            {data.foto
+              ? <img src={data.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' as const }} />
+              : <span style={{ fontFamily: sans, fontSize: 28, color: accent, fontWeight: 700, lineHeight: 1 }}>?</span>
+            }
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: sans, fontSize: 8, color: `${accent}cc`, textTransform: 'uppercase' as const, letterSpacing: '0.28em', marginBottom: 4 }}>Relatório de Divulgação</div>
+            <div style={{ fontFamily: sans, fontSize: 17, fontWeight: 800, color: '#ffffff', lineHeight: 1.15, marginBottom: 4 }}>{data.responsavel || 'Nome do Responsável'}</div>
+            <div style={{ fontFamily: sans, fontSize: 10, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.1em' }}>{data.cargo || 'Cargo'}</div>
+          </div>
+
+          {/* Date badge */}
+          <div style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${accent}55`, borderRadius: 10, padding: '6px 10px', textAlign: 'center' as const, flexShrink: 0 }}>
+            <div style={{ fontFamily: mono, fontSize: 8, color: `${accent}aa`, textTransform: 'uppercase' as const, letterSpacing: '0.15em', marginBottom: 2 }}>DATA</div>
+            <div style={{ fontFamily: mono, fontSize: 11, color: '#fff', fontWeight: 700 }}>{formatDate(data.dataRelatorio)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div style={{ background: '#ffffff', padding: '20px 22px', position: 'relative' as const }}>
+
+        {/* ── Pizza + stats row ── */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+
+          {/* Donut */}
+          <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 4 }}>
+            <DonutChart atual={data.totalAtual} meta={data.meta} cor={cor1} tamanho={130} />
+            <div style={{ fontFamily: sans, fontSize: 8, color: '#8892a4', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>progresso</div>
+          </div>
+
+          {/* Stat cards */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+
+            {/* Novos membros */}
+            <div style={{ background: `${cor1}12`, border: `1.5px solid ${cor1}30`, borderRadius: 10, padding: '8px 12px' }}>
+              <div style={{ fontFamily: sans, fontSize: 8, color: cor1, textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Novos membros</div>
+              <div style={{ fontFamily: sans, fontSize: 26, fontWeight: 900, color: cor1, lineHeight: 1 }}>+{data.totalNovos}</div>
+            </div>
+
+            {/* Total atual */}
+            <div style={{ background: `${cor2}12`, border: `1.5px solid ${cor2}30`, borderRadius: 10, padding: '8px 12px' }}>
+              <div style={{ fontFamily: sans, fontSize: 8, color: cor2, textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Total atual</div>
+              <div style={{ fontFamily: sans, fontSize: 26, fontWeight: 900, color: cor2, lineHeight: 1 }}>{data.totalAtual}</div>
+            </div>
+
+            {/* Meta */}
+            <div style={{ background: `${gold}18`, border: `1.5px solid ${gold}50`, borderRadius: 10, padding: '8px 12px' }}>
+              <div style={{ fontFamily: sans, fontSize: 8, color: '#b45309', textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Meta</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontFamily: sans, fontSize: 26, fontWeight: 900, color: '#b45309', lineHeight: 1 }}>{data.meta}</span>
+                <span style={{ fontFamily: sans, fontSize: 10, color: '#b45309', fontWeight: 600 }}>({faltam} faltam)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Progress bar ── */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+            <span style={{ fontFamily: sans, fontSize: 9, color: '#8892a4', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>Progresso para a meta</span>
+            <span style={{ fontFamily: mono, fontSize: 9, color: cor1, fontWeight: 700 }}>{data.totalAtual}/{data.meta}</span>
+          </div>
+          <div style={{ background: '#e8ecf4', borderRadius: 99, height: 8, overflow: 'hidden' as const }}>
+            <div style={{ height: '100%', width: `${Math.round(pct * 100)}%`, background: `linear-gradient(90deg,${cor1},${cor2})`, borderRadius: 99, transition: 'width 0.6s ease' }} />
+          </div>
+        </div>
+
+        {/* ── Descrição ── */}
+        {data.descricao ? (
+          <div style={{ borderTop: '1px solid #e8ecf4', paddingTop: 14, marginBottom: 0 }}>
+            <div style={{ fontFamily: sans, fontSize: 8, color: cor1, textTransform: 'uppercase' as const, letterSpacing: '0.2em', fontWeight: 700, marginBottom: 6 }}>Observações</div>
+            <div style={{ fontFamily: sans, fontSize: 11, color: '#2d3748', lineHeight: 1.65, whiteSpace: 'pre-wrap' as const }}>{data.descricao}</div>
+          </div>
+        ) : null}
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ background: `linear-gradient(135deg,${cor2} 0%,${cor1} 100%)`, padding: '14px 22px 16px', textAlign: 'center' as const }}>
+        <div style={{ borderBottom: `1px solid ${accent}55`, width: 200, margin: '0 auto 6px', paddingBottom: 8 }}>
+          <div style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontSize: 22, color: '#fff', letterSpacing: '0.04em', minHeight: 28 }}>
+            {data.assinatura || 'Assinatura'}
+          </div>
+        </div>
+        <div style={{ fontFamily: sans, fontSize: 9, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.2em', textTransform: 'uppercase' as const }}>
+          Divulgação — NEEXT
+        </div>
+      </div>
+
+      {/* ── Accent bottom ── */}
+      <div style={{ height: 4, background: `linear-gradient(90deg,${cor2},${accent})` }} />
+    </div>
+  );
+}
+
+// ─── Divulgação Scaled Preview ────────────────────────────────────────────────
+
+function DivulgacaoScaledPreview({ data, cardRef }: { data: DivulgacaoData; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}>
+          <DivulgacaoReportCard data={data} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Divulgação Generator ─────────────────────────────────────────────────────
+
+function DivulgacaoGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef = useRef<HTMLDivElement>(null);
+  const fotoRef    = useRef<HTMLInputElement>(null);
+  const [data, setData]               = useState<DivulgacaoData>(emptyDivulgacao);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => setData(d => ({ ...d, foto: ev.target?.result as string }));
+    reader.readAsDataURL(file);
+  };
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const url = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const a = document.createElement('a');
+      a.download = `divulgacao-${data.dataRelatorio}.png`;
+      a.href = url;
+      a.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const sec = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <Megaphone size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Relatório de Divulgação</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+
+            {/* Foto */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Foto de Perfil</label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => fotoRef.current?.click()}
+                  className="group w-14 h-14 rounded-full border-2 border-primary/30 border-dashed flex items-center justify-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all overflow-hidden shrink-0 relative"
+                >
+                  {data.foto
+                    ? <img src={data.foto} className="w-full h-full object-cover rounded-full" alt="" />
+                    : <Camera size={18} className="text-primary/50 group-hover:text-primary transition-colors" />
+                  }
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => fotoRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> Carregar foto
+                  </button>
+                  {data.foto && (
+                    <button onClick={() => setData(d => ({ ...d, foto: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Nome do Responsável</label>
+              <input value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))}
+                placeholder="Seu nome aqui..." className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Cargo</label>
+              <input value={data.cargo} onChange={e => setData(d => ({ ...d, cargo: e.target.value }))}
+                placeholder="Divulgador..." className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
+              <input type="date" value={data.dataRelatorio}
+                onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`} />
+            </div>
+          </div>
+
+          {/* Membros */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />MEMBROS<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Novos Membros (entradas)</label>
+              <input type="number" min={0} value={data.totalNovos}
+                onChange={e => setData(d => ({ ...d, totalNovos: Number(e.target.value) }))}
+                placeholder="0" className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Total de Membros Atual</label>
+              <input type="number" min={0} value={data.totalAtual}
+                onChange={e => setData(d => ({ ...d, totalAtual: Number(e.target.value) }))}
+                placeholder="0" className={inp} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Meta de Membros</label>
+              <input type="number" min={1} value={data.meta}
+                onChange={e => setData(d => ({ ...d, meta: Number(e.target.value) || 1 }))}
+                placeholder="100" className={inp} />
+            </div>
+
+            {/* Mini progress preview */}
+            <div className="mt-1">
+              <div className="flex justify-between mb-1">
+                <span className="font-mono text-[10px] text-muted-foreground tracking-widest">Progresso</span>
+                <span className="font-mono text-[10px] text-primary font-bold">{Math.round(Math.min(data.totalAtual / (data.meta || 1), 1) * 100)}%</span>
+              </div>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${Math.round(Math.min(data.totalAtual / (data.meta || 1), 1) * 100)}%`, background: 'linear-gradient(90deg, #4f46e5, #7c3aed)' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Descrição + Assinatura */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />FINALIZAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Observações</label>
+              <textarea value={data.descricao} onChange={e => setData(d => ({ ...d, descricao: e.target.value }))}
+                placeholder="Observações sobre a divulgação..." rows={4}
+                className={`${inp} resize-none w-full`} />
+            </div>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Assinatura</label>
+              <input value={data.assinatura} onChange={e => setData(d => ({ ...d, assinatura: e.target.value }))}
+                placeholder="Assine aqui..." className={inp}
+                style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontSize: '1.1rem' }} />
+            </div>
+          </div>
+
+          {/* Download */}
+          <button onClick={download} disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}>
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Relatório como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <DivulgacaoScaledPreview data={data} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 const REPORT_TYPES = [
@@ -4430,6 +4835,13 @@ const REPORT_TYPES = [
     description: 'Relatório tático oficial para SWAT, SSA, GIGN, BOPE e DEFESA com código de operação e confidencialidade.',
     gradient: 'linear-gradient(135deg,#0a0e23 0%,#1a2a6c 50%,#d4af37 100%)',
     Icon: Flag,
+  },
+  {
+    id: 'divulgacao',
+    title: 'Divulgação',
+    description: 'Relatório de divulgação com foto de perfil, novos membros, total atual, meta e gráfico de pizza.',
+    gradient: 'linear-gradient(135deg,#1e1b4b 0%,#4f46e5 50%,#a78bfa 100%)',
+    Icon: Megaphone,
   },
 ];
 
@@ -4716,6 +5128,7 @@ export default function VaultRelatorios() {
   if (view === 'parlamento') return <ParlamentoGenerator onBack={() => setView('hub')} />;
   if (view === 'hospital')  return <HospitalGenerator  onBack={() => setView('hub')} />;
   if (view === 'justica')   return <JusticaGenerator   onBack={() => setView('hub')} />;
-  if (view === 'tatico')    return <TaticoGenerator    onBack={() => setView('hub')} />;
+  if (view === 'tatico')      return <TaticoGenerator      onBack={() => setView('hub')} />;
+  if (view === 'divulgacao')  return <DivulgacaoGenerator  onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }
