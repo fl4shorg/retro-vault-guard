@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import {
   FileText, Plus, Trash2, Download, User,
@@ -267,6 +267,32 @@ function ListSection({ icon: Icon, label, items, placeholder, onAdd, onRemove }:
   );
 }
 
+// ─── Scaled preview wrapper ───────────────────────────────────────────────────
+
+function ScaledPreview({ data, theme }: { data: ReportData; theme: Theme }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width;
+      setZoom(Math.min(1, w / 680));
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <ReportCard data={data} theme={theme} />
+      </div>
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function VaultRelatorios() {
@@ -475,9 +501,7 @@ export default function VaultRelatorios() {
         {/* ── Preview ── */}
         <div>
           <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
-          <div className="overflow-x-auto pb-2 rounded-xl">
-            <ReportCard data={data} theme={theme} />
-          </div>
+          <ScaledPreview data={data} theme={theme} />
         </div>
       </div>
     </div>
