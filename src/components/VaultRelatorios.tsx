@@ -163,7 +163,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
         <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
           {[
             { label: 'Membros no Grupo', value: data.totalGrupo, Icon: Users },
-            { label: 'Membros NYPD',     value: data.totalNYPD,  Icon: Building2 },
+            { label: 'Quadro Diretivo',   value: data.totalNYPD,  Icon: Building2 },
           ].map(({ label, value, Icon }) => (
             <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -218,7 +218,6 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontFamily: mono, fontSize: 13, fontWeight: 700, color: w, lineHeight: 1, display: 'block' }}>{r.nome || '—'}</span>
-                  <span style={{ fontFamily: mono, fontSize: 9, color: wA(0.55), lineHeight: 1 }}>{formatDate(r.data)}</span>
                 </div>
               </div>
             ))}
