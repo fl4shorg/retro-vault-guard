@@ -4342,10 +4342,8 @@ function TaticoGenerator({ onBack }: { onBack: () => void }) {
 interface DivulgacaoData {
   foto: string | null;
   responsavel: string;
-  cargo: string;
   dataRelatorio: string;
   totalNovos: number;
-  totalAtual: number;
   meta: number;
   descricao: string;
   assinatura: string;
@@ -4354,10 +4352,8 @@ interface DivulgacaoData {
 const emptyDivulgacao = (): DivulgacaoData => ({
   foto: null,
   responsavel: '',
-  cargo: 'Divulgador',
   dataRelatorio: new Date().toISOString().split('T')[0],
   totalNovos: 0,
-  totalAtual: 0,
   meta: 100,
   descricao: '',
   assinatura: '',
@@ -4407,8 +4403,8 @@ function DivulgacaoReportCard({ data }: { data: DivulgacaoData }) {
   const accent  = '#a78bfa';
   const gold    = '#fbbf24';
 
-  const pct     = data.meta > 0 ? Math.min(data.totalAtual / data.meta, 1) : 0;
-  const faltam  = Math.max(data.meta - data.totalAtual, 0);
+  const pct     = data.meta > 0 ? Math.min(data.totalNovos / data.meta, 1) : 0;
+  const faltam  = Math.max(data.meta - data.totalNovos, 0);
 
   const formatDate = (s: string) => {
     if (!s) return '—';
@@ -4439,7 +4435,7 @@ function DivulgacaoReportCard({ data }: { data: DivulgacaoData }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: sans, fontSize: 8, color: `${accent}cc`, textTransform: 'uppercase' as const, letterSpacing: '0.28em', marginBottom: 4 }}>Relatório de Divulgação</div>
             <div style={{ fontFamily: sans, fontSize: 17, fontWeight: 800, color: '#ffffff', lineHeight: 1.15, marginBottom: 4 }}>{data.responsavel || 'Nome do Responsável'}</div>
-            <div style={{ fontFamily: sans, fontSize: 10, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.1em' }}>{data.cargo || 'Cargo'}</div>
+            <div style={{ fontFamily: sans, fontSize: 10, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.1em' }}>Relatório de Entradas</div>
           </div>
 
           {/* Date badge */}
@@ -4458,23 +4454,17 @@ function DivulgacaoReportCard({ data }: { data: DivulgacaoData }) {
 
           {/* Donut */}
           <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 4 }}>
-            <DonutChart atual={data.totalAtual} meta={data.meta} cor={cor1} tamanho={130} />
+            <DonutChart atual={data.totalNovos} meta={data.meta} cor={cor1} tamanho={130} />
             <div style={{ fontFamily: sans, fontSize: 8, color: '#8892a4', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>progresso</div>
           </div>
 
           {/* Stat cards */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
 
-            {/* Novos membros */}
+            {/* Entradas */}
             <div style={{ background: `${cor1}12`, border: `1.5px solid ${cor1}30`, borderRadius: 10, padding: '8px 12px' }}>
-              <div style={{ fontFamily: sans, fontSize: 8, color: cor1, textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Novos membros</div>
+              <div style={{ fontFamily: sans, fontSize: 8, color: cor1, textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Entradas</div>
               <div style={{ fontFamily: sans, fontSize: 26, fontWeight: 900, color: cor1, lineHeight: 1 }}>+{data.totalNovos}</div>
-            </div>
-
-            {/* Total atual */}
-            <div style={{ background: `${cor2}12`, border: `1.5px solid ${cor2}30`, borderRadius: 10, padding: '8px 12px' }}>
-              <div style={{ fontFamily: sans, fontSize: 8, color: cor2, textTransform: 'uppercase' as const, letterSpacing: '0.18em', fontWeight: 700, marginBottom: 2 }}>Total atual</div>
-              <div style={{ fontFamily: sans, fontSize: 26, fontWeight: 900, color: cor2, lineHeight: 1 }}>{data.totalAtual}</div>
             </div>
 
             {/* Meta */}
@@ -4492,7 +4482,7 @@ function DivulgacaoReportCard({ data }: { data: DivulgacaoData }) {
         <div style={{ marginBottom: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
             <span style={{ fontFamily: sans, fontSize: 9, color: '#8892a4', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }}>Progresso para a meta</span>
-            <span style={{ fontFamily: mono, fontSize: 9, color: cor1, fontWeight: 700 }}>{data.totalAtual}/{data.meta}</span>
+            <span style={{ fontFamily: mono, fontSize: 9, color: cor1, fontWeight: 700 }}>{data.totalNovos}/{data.meta}</span>
           </div>
           <div style={{ background: '#e8ecf4', borderRadius: 99, height: 8, overflow: 'hidden' as const }}>
             <div style={{ height: '100%', width: `${Math.round(pct * 100)}%`, background: `linear-gradient(90deg,${cor1},${cor2})`, borderRadius: 99, transition: 'width 0.6s ease' }} />
@@ -4652,12 +4642,6 @@ function DivulgacaoGenerator({ onBack }: { onBack: () => void }) {
             </div>
 
             <div>
-              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Cargo</label>
-              <input value={data.cargo} onChange={e => setData(d => ({ ...d, cargo: e.target.value }))}
-                placeholder="Divulgador..." className={inp} />
-            </div>
-
-            <div>
               <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
               <input type="date" value={data.dataRelatorio}
                 onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
@@ -4670,16 +4654,9 @@ function DivulgacaoGenerator({ onBack }: { onBack: () => void }) {
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />MEMBROS<span className="h-px flex-1 bg-primary/15" /></p>
 
             <div>
-              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Novos Membros (entradas)</label>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Entradas de Membros</label>
               <input type="number" min={0} value={data.totalNovos}
                 onChange={e => setData(d => ({ ...d, totalNovos: Number(e.target.value) }))}
-                placeholder="0" className={inp} />
-            </div>
-
-            <div>
-              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Total de Membros Atual</label>
-              <input type="number" min={0} value={data.totalAtual}
-                onChange={e => setData(d => ({ ...d, totalAtual: Number(e.target.value) }))}
                 placeholder="0" className={inp} />
             </div>
 
@@ -4694,11 +4671,11 @@ function DivulgacaoGenerator({ onBack }: { onBack: () => void }) {
             <div className="mt-1">
               <div className="flex justify-between mb-1">
                 <span className="font-mono text-[10px] text-muted-foreground tracking-widest">Progresso</span>
-                <span className="font-mono text-[10px] text-primary font-bold">{Math.round(Math.min(data.totalAtual / (data.meta || 1), 1) * 100)}%</span>
+                <span className="font-mono text-[10px] text-primary font-bold">{Math.round(Math.min(data.totalNovos / (data.meta || 1), 1) * 100)}%</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${Math.round(Math.min(data.totalAtual / (data.meta || 1), 1) * 100)}%`, background: 'linear-gradient(90deg, #4f46e5, #7c3aed)' }} />
+                  style={{ width: `${Math.round(Math.min(data.totalNovos / (data.meta || 1), 1) * 100)}%`, background: 'linear-gradient(90deg, #4f46e5, #7c3aed)' }} />
               </div>
             </div>
           </div>
