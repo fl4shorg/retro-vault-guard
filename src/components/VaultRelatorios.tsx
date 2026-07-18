@@ -43,6 +43,7 @@ interface ReportData {
   subiuDeCargo: string[];
   totalGrupo: string;
   totalNYPD: string;
+  descricao: string;
 }
 
 type Theme = typeof THEMES[number];
@@ -70,6 +71,7 @@ const emptyReport = (): ReportData => ({
   responsavel: '', fotoResponsavel: null, dataRelatorio: '',
   recrutamentos: [], subiuDeCargo: [],
   totalGrupo: '', totalNYPD: '',
+  descricao: '',
 });
 
 // ─── Report Card ─────────────────────────────────────────────────────────────
@@ -136,6 +138,13 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             </div>
           ))}
         </div>
+
+        {/* ── Descrição ── */}
+        {data.descricao.trim() && (
+          <div style={{ background: panel, border: `1px solid ${border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+            <p style={{ fontFamily: mono, fontSize: 11, color: w, lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap' as const }}>{data.descricao}</p>
+          </div>
+        )}
 
         {/* ── Subiu de Cargo ── */}
         {data.subiuDeCargo.length > 0 && (
@@ -453,6 +462,18 @@ export default function VaultRelatorios() {
                   placeholder="0" className={inp} />
               </div>
             </div>
+          </div>
+
+          {/* Descrição */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DESCRIÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea
+              value={data.descricao}
+              onChange={e => setData(d => ({ ...d, descricao: e.target.value }))}
+              placeholder="Escreva aqui o texto do relatório..."
+              rows={5}
+              className={`${inp} resize-none w-full`}
+            />
           </div>
 
           {/* Subiu de Cargo */}
