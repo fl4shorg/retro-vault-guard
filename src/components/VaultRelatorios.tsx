@@ -351,6 +351,7 @@ function ScaledPreview({ data, theme, cardRef }: { data: ReportData; theme: Them
 interface CeoReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   descricao: string;
   recrutamentos: Recruta[];
@@ -359,7 +360,7 @@ interface CeoReportData {
 }
 
 const emptyCeoReport = (): CeoReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   descricao: '', recrutamentos: [], subiuDeCargo: [],
   oligarcas: [],
 });
@@ -381,8 +382,17 @@ function CeoReportCard({ data, theme }: { data: CeoReportData; theme: Theme }) {
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
 
       <div style={{ padding: '24px 22px' }}>
@@ -507,6 +517,7 @@ function CeoReportCard({ data, theme }: { data: CeoReportData; theme: Theme }) {
       </div>
 
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -557,6 +568,18 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -680,6 +703,39 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Oligarcas */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />OLIGARCAS<span className="h-px flex-1 bg-primary/15" /></p>
@@ -746,13 +802,14 @@ function CeoGenerator({ onBack }: { onBack: () => void }) {
 interface AdmReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   descricao: string;
   amigosRecrutados: string[];
 }
 
 const emptyAdmReport = (): AdmReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   descricao: '', amigosRecrutados: [],
 });
 
@@ -770,8 +827,17 @@ function AdmReportCard({ data, theme }: { data: AdmReportData; theme: Theme }) {
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -845,6 +911,7 @@ function AdmReportCard({ data, theme }: { data: AdmReportData; theme: Theme }) {
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -885,6 +952,18 @@ function AdmGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -996,6 +1075,39 @@ function AdmGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Descrição */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DESCRIÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
@@ -1036,12 +1148,13 @@ function AdmGenerator({ onBack }: { onBack: () => void }) {
 interface RecrutamentoReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   recrutamentos: Recruta[];
 }
 
 const emptyRecrutamentoReport = (): RecrutamentoReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '', recrutamentos: [],
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '', recrutamentos: [],
 });
 
 function RecrutamentoReportCard({ data, theme }: { data: RecrutamentoReportData; theme: Theme }) {
@@ -1058,8 +1171,17 @@ function RecrutamentoReportCard({ data, theme }: { data: RecrutamentoReportData;
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -1137,6 +1259,7 @@ function RecrutamentoReportCard({ data, theme }: { data: RecrutamentoReportData;
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -1177,6 +1300,18 @@ function RecrutamentoGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -1289,6 +1424,39 @@ function RecrutamentoGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Recrutamentos */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />RECRUTAMENTOS<span className="h-px flex-1 bg-primary/15" /></p>
@@ -1340,12 +1508,13 @@ interface GrupoParlamento {
 interface ParlamentoReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   grupos: GrupoParlamento[];
 }
 
 const emptyParlamentoReport = (): ParlamentoReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '', grupos: [],
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '', grupos: [],
 });
 
 function GrupoParlamentoCard({ grupo, onChange, onRemove }: {
@@ -1398,8 +1567,17 @@ function ParlamentoReportCard({ data, theme }: { data: ParlamentoReportData; the
   const totalAdms    = data.grupos.reduce((s, g) => s + (parseInt(g.totalAdms)    || 0), 0);
   const totalMembros = data.grupos.reduce((s, g) => s + (parseInt(g.totalMembros) || 0), 0);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -1489,6 +1667,7 @@ function ParlamentoReportCard({ data, theme }: { data: ParlamentoReportData; the
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -1529,6 +1708,18 @@ function ParlamentoGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -1641,6 +1832,39 @@ function ParlamentoGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Grupos */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />GRUPOS<span className="h-px flex-1 bg-primary/15" /></p>
@@ -1685,6 +1909,7 @@ function ParlamentoGenerator({ onBack }: { onBack: () => void }) {
 interface DefesaReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   forcasAtivas: string;
   reservistas: string;
@@ -1692,7 +1917,7 @@ interface DefesaReportData {
 }
 
 const emptyDefesaReport = (): DefesaReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   forcasAtivas: '', reservistas: '', descricao: '',
 });
 
@@ -1709,8 +1934,17 @@ function DefesaReportCard({ data, theme }: { data: DefesaReportData; theme: Them
   const c12   = wOver(0.12, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -1774,6 +2008,7 @@ function DefesaReportCard({ data, theme }: { data: DefesaReportData; theme: Them
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -1814,6 +2049,18 @@ function DefesaGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -1922,6 +2169,39 @@ function DefesaGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Contagens */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />EFETIVO<span className="h-px flex-1 bg-primary/15" /></p>
@@ -1972,6 +2252,7 @@ function DefesaGenerator({ onBack }: { onBack: () => void }) {
 interface PremiereReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   descricao: string;
   presentes: string[];
@@ -1979,7 +2260,7 @@ interface PremiereReportData {
 }
 
 const emptyPremiereReport = (): PremiereReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '',
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   descricao: '', presentes: [], ausentes: [],
 });
 
@@ -1997,8 +2278,17 @@ function PremiereReportCard({ data, theme }: { data: PremiereReportData; theme: 
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -2098,6 +2388,7 @@ function PremiereReportCard({ data, theme }: { data: PremiereReportData; theme: 
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -2138,6 +2429,18 @@ function PremiereGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -2251,6 +2554,39 @@ function PremiereGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Descrição */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />DESCRIÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
@@ -2304,12 +2640,13 @@ interface PessoaKitada {
 interface ProcuradorReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   kitados: PessoaKitada[];
 }
 
 const emptyProcuradorReport = (): ProcuradorReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '', kitados: [],
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '', kitados: [],
 });
 
 function PessoaKitadaCard({ pessoa, onChange, onRemove }: {
@@ -2353,8 +2690,17 @@ function ProcuradorReportCard({ data, theme }: { data: ProcuradorReportData; the
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -2433,6 +2779,7 @@ function ProcuradorReportCard({ data, theme }: { data: ProcuradorReportData; the
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -2473,6 +2820,18 @@ function ProcuradorGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -2585,6 +2944,39 @@ function ProcuradorGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Kitados */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />PESSOAS KITADAS<span className="h-px flex-1 bg-primary/15" /></p>
@@ -2635,12 +3027,13 @@ interface PessoaBanida {
 interface BanReportData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   banidos: PessoaBanida[];
 }
 
 const emptyBanReport = (): BanReportData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '', banidos: [],
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '', banidos: [],
 });
 
 function PessoaBanidaCard({ pessoa, onChange, onRemove }: {
@@ -2684,8 +3077,17 @@ function BanReportCard({ data, theme }: { data: BanReportData; theme: Theme }) {
   const c10   = wOver(0.10, base);
   const c50   = wOver(0.50, base);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -2764,6 +3166,7 @@ function BanReportCard({ data, theme }: { data: BanReportData; theme: Theme }) {
         </div>
       </div>
       <div style={{ height: 3, background: c18 }} />
+      </div>
     </div>
   );
 }
@@ -2804,6 +3207,18 @@ function BanGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -2916,6 +3331,39 @@ function BanGenerator({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+
           {/* Banidos */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />PESSOAS BANIDAS<span className="h-px flex-1 bg-primary/15" /></p>
@@ -2966,12 +3414,13 @@ interface GrupoMensagem {
 interface ContadorMsgData {
   responsavel: string;
   fotoResponsavel: string | null;
+  wallpaper: string | null;
   dataRelatorio: string;
   grupos: GrupoMensagem[];
 }
 
 const emptyContadorMsg = (): ContadorMsgData => ({
-  responsavel: '', fotoResponsavel: null, dataRelatorio: '', grupos: [],
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '', grupos: [],
 });
 
 function GrupoCard({ grupo, onChange, onRemove }: {
@@ -3019,8 +3468,17 @@ function ContadorMsgReportCard({ data, theme }: { data: ContadorMsgData; theme: 
 
   const totalMsgs = data.grupos.reduce((sum, g) => sum + (parseInt(g.total) || 0), 0);
 
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
   return (
-    <div style={{ width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const }}>
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ height: 3, background: c35 }} />
       <div style={{ padding: '24px 22px' }}>
 
@@ -3115,6 +3573,7 @@ function ContadorMsgReportCard({ data, theme }: { data: ContadorMsgData; theme: 
         </div>
       </div>
       <div style={{ height: 3, background: c22 }} />
+      </div>
     </div>
   );
 }
@@ -3155,6 +3614,18 @@ function ContadorMsgGenerator({ onBack }: { onBack: () => void }) {
       setData(d => ({ ...d, fotoResponsavel: null }));
       const b64 = await readFileAsBase64(file);
       setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
     } catch { /* ignore */ }
     e.target.value = '';
   };
@@ -3266,6 +3737,39 @@ function ContadorMsgGenerator({ onBack }: { onBack: () => void }) {
               </div>
             </div>
           </div>
+
+            {/* ── Wallpaper (opcional) ── */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
 
           {/* Grupos */}
           <div className={sec} style={secStyle}>
