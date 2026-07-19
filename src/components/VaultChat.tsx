@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_BASE = 'https://www.api.neext.online/api/chat';
+const API_BASE = 'https://www.esdeath-api.com.br/api/chat';
 
 interface ReplyRef {
   id: string;
