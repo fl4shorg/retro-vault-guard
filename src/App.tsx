@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { WallpaperProvider } from "./contexts/WallpaperContext.tsx";
+import { WeatherProvider } from "./contexts/WeatherContext.tsx";
+import VaultWeather from "./components/VaultWeather.tsx";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -15,6 +17,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <WallpaperProvider>
+      <WeatherProvider>
+      <VaultWeather />
       <TooltipProvider>
         <Toaster />
         <Sonner
@@ -37,6 +41,7 @@ const App = () => (
           </Routes>
         </HashRouter>
       </TooltipProvider>
+      </WeatherProvider>
       </WallpaperProvider>
     </ThemeProvider>
   </QueryClientProvider>

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, Camera, Trash2, Check, Upload, RotateCcw, Loader2 } from 'lucide-react';
+import { LogOut, Camera, Trash2, Check, Upload, RotateCcw, Loader2, Snowflake, CloudRain } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useTheme, themes, type ThemeId } from '@/hooks/useTheme';
 import { WALLPAPER_PRESETS, compressImage, type WallpaperPresetId } from '@/hooks/useWallpaper';
 import { useWallpaperContext } from '@/contexts/WallpaperContext';
+import { useWeather, type WeatherEffect } from '@/contexts/WeatherContext';
 import type { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
@@ -189,6 +190,57 @@ function WallpaperPicker({ user }: { user: User | null }) {
   );
 }
 
+/* ─── Weather Picker ─────────────────────────────────────────────────── */
+
+function WeatherPicker() {
+  const { effect, setEffect } = useWeather();
+
+  const options: { id: WeatherEffect; label: string; icon: React.ReactNode; desc: string }[] = [
+    { id: 'snow', label: 'NEVE', icon: <Snowflake size={11} />, desc: 'Flocos caindo' },
+    { id: 'rain', label: 'CHUVA', icon: <CloudRain size={11} />, desc: 'Gotas em queda' },
+  ];
+
+  return (
+    <div className="px-4 py-3 border-b border-white/5">
+      <div className="flex items-center justify-between mb-2.5">
+        <p className="font-mono text-[8px] text-muted-foreground/35 tracking-[0.35em]">// EFEITOS CLIMÁTICOS</p>
+        {effect !== 'none' && (
+          <button
+            onClick={() => setEffect('none')}
+            className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground/40 hover:text-primary transition-colors"
+          >
+            <RotateCcw size={9} />
+            DESLIGAR
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-1.5">
+        {options.map(opt => {
+          const active = effect === opt.id;
+          return (
+            <button
+              key={opt.id}
+              onClick={() => setEffect(active ? 'none' : opt.id)}
+              className={`flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-lg border transition-all ${
+                active
+                  ? 'bg-primary/10 border-primary/30 text-primary'
+                  : 'border-border/30 text-muted-foreground/50 hover:border-primary/30 hover:text-primary/70 hover:bg-primary/5'
+              }`}
+            >
+              {opt.icon}
+              <span className="font-mono text-[9px] tracking-widest">{opt.label}</span>
+              <span className="font-mono text-[7px] text-muted-foreground/40">{opt.desc}</span>
+              {active && (
+                <span className="font-mono text-[7px] text-primary/60 tracking-wider animate-pulse">● ATIVO</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Component ─────────────────────────────────────────────────── */
 
 interface VaultProfileMenuProps {
@@ -318,6 +370,9 @@ const VaultSettings = ({ user, userName, onLogout }: VaultProfileMenuProps) => {
 
           {/* Wallpaper */}
           <WallpaperPicker user={user} />
+
+          {/* Weather Effects */}
+          <WeatherPicker />
 
           {/* Logout */}
           <div className="px-4 py-2.5">
