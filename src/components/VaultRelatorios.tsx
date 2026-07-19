@@ -5,7 +5,7 @@ import {
   Loader2, Camera, UserCheck, TrendingUp, Users,
   Building2, Shield, Radiation, ChevronDown, Crown, Star, MessageSquare, Ban, Gavel, Landmark,
   CheckCircle2, XCircle, ShieldCheck, Sword, Vote, Stethoscope,
-  Scale, Calendar, PenLine, Clock, Key, Flag, Megaphone,
+  Scale, Calendar, PenLine, Clock, Key, Flag, Megaphone, ClipboardCheck,
 } from 'lucide-react';
 
 // ─── Themes ──────────────────────────────────────────────────────────────────
@@ -5337,6 +5337,13 @@ const REPORT_TYPES = [
     gradient: 'linear-gradient(135deg,#1e1b4b 0%,#4f46e5 50%,#a78bfa 100%)',
     Icon: Megaphone,
   },
+  {
+    id: 'fiscalizacao',
+    title: 'Fiscalização',
+    description: 'Relatório de fiscalização com atuação, erros encontrados, solução e consequências.',
+    gradient: 'linear-gradient(135deg,#1c1917 0%,#44403c 40%,#f97316 100%)',
+    Icon: ClipboardCheck,
+  },
 ];
 
 function RelatoriosHub({ onOpen }: { onOpen: (id: string) => void }) {
@@ -5649,6 +5656,353 @@ function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ─── Fiscalização Report ──────────────────────────────────────────────────────
+
+interface FiscalizacaoReportData {
+  responsavel: string;
+  fotoResponsavel: string | null;
+  wallpaper: string | null;
+  dataRelatorio: string;
+  atuacao: string;
+  erros: string;
+  solucao: string;
+  consequencias: string;
+}
+
+const emptyFiscalizacao = (): FiscalizacaoReportData => ({
+  responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
+  atuacao: '', erros: '', solucao: '', consequencias: '',
+});
+
+function FiscalizacaoReportCard({ data, theme }: { data: FiscalizacaoReportData; theme: Theme }) {
+  const mono = "'Courier New', Courier, monospace";
+  const w = '#ffffff';
+  const wA = (a: number) => `rgba(255,255,255,${a})`;
+
+  const base  = gradientBase(theme.gradient);
+  const panel = kOver(0.28, base);
+  const bdr   = wOver(0.14, base);
+  const c18   = wOver(0.18, base);
+  const c35   = wOver(0.35, base);
+  const c12   = wOver(0.12, base);
+  const c50   = wOver(0.50, base);
+  const c10   = wOver(0.10, base);
+
+  const hasWall = !!data.wallpaper;
+  const outerStyle: React.CSSProperties = hasWall
+    ? { width: 400, backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }
+    : { width: 400, background: theme.gradient, borderRadius: 16, overflow: 'hidden', boxSizing: 'border-box' as const };
+
+  const sections: { label: string; value: string }[] = [
+    { label: 'Atuação',           value: data.atuacao },
+    { label: 'Erros Encontrados', value: data.erros },
+    { label: 'Solução',           value: data.solucao },
+    { label: 'Consequências',     value: data.consequencias },
+  ];
+
+  return (
+    <div style={outerStyle}>
+      {hasWall && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.58)', zIndex: 0 }} />
+      )}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ height: 3, background: c35 }} />
+        <div style={{ padding: '22px 22px' }}>
+
+          {/* ── Header ── */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 38, height: 38, borderRadius: '50%', background: c18, border: `1.5px solid ${c35}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <ClipboardCheck size={18} color={w} />
+              </div>
+              <div>
+                <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.6), textTransform: 'uppercase' as const, letterSpacing: '0.25em', marginBottom: 2 }}>Sistema Operacional</div>
+                <div style={{ fontFamily: mono, fontSize: 13, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>FISCALIZAÇÃO</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ textAlign: 'right' as const }}>
+                <div style={{ fontFamily: mono, fontSize: 8, color: wA(0.55), textTransform: 'uppercase' as const, letterSpacing: '0.18em', marginBottom: 3 }}>Responsável</div>
+                <div style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, color: w }}>{data.responsavel || '—'}</div>
+                <div style={{ fontFamily: mono, fontSize: 10, color: wA(0.6), marginTop: 2 }}>{formatDate(data.dataRelatorio)}</div>
+              </div>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: `2px solid ${c50}`, overflow: 'hidden', background: c12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {data.fotoResponsavel
+                  ? <img src={data.fotoResponsavel} width={44} height={44} style={{ objectFit: 'cover', display: 'block', width: 44, height: 44 }} alt="" />
+                  : <User size={20} color={wA(0.5)} />
+                }
+              </div>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: bdr, marginBottom: 14 }} />
+
+          {/* ── Sections ── */}
+          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+            {sections.map(({ label, value }) => value.trim() ? (
+              <div key={label} style={{ background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '11px 13px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
+                  <div style={{ width: 4, height: 14, borderRadius: 2, background: c35, flexShrink: 0 }} />
+                  <span style={{ fontFamily: mono, fontSize: 8, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.22em', color: wA(0.75) }}>{label}</span>
+                </div>
+                <p style={{ fontFamily: mono, fontSize: 11, color: wA(0.85), lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' as const }}>{value}</p>
+              </div>
+            ) : null)}
+          </div>
+
+          {/* ── Footer ── */}
+          <div style={{ marginTop: 16, paddingTop: 11, borderTop: `1px solid ${c10}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.45), textTransform: 'uppercase' as const, letterSpacing: '0.1em', lineHeight: 1 }}>Documento Oficial — NEEXT LTDA</span>
+            <span style={{ fontFamily: mono, fontSize: 8, color: wA(0.3), lineHeight: 1 }}>VAULT-TEC</span>
+          </div>
+        </div>
+        <div style={{ height: 3, background: c18 }} />
+      </div>
+    </div>
+  );
+}
+
+function FiscalizacaoScaledPreview({ data, theme, cardRef }: { data: FiscalizacaoReportData; theme: Theme; cardRef?: React.RefObject<HTMLDivElement> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => setZoom(Math.min(1, entry.contentRect.width / 400)));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={wrapRef} style={{ width: '100%' }}>
+      <div style={{ zoom }}>
+        <div ref={cardRef}><FiscalizacaoReportCard data={data} theme={theme} /></div>
+      </div>
+    </div>
+  );
+}
+
+function FiscalizacaoGenerator({ onBack }: { onBack: () => void }) {
+  const captureRef  = useRef<HTMLDivElement>(null);
+  const fotoRef     = useRef<HTMLInputElement>(null);
+  const wallpaperRef = useRef<HTMLInputElement>(null);
+  const [data, setData]               = useState<FiscalizacaoReportData>(emptyFiscalizacao());
+  const [themeId, setThemeId]         = useState('midnight-gold');
+  const [themeOpen, setThemeOpen]     = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const theme = THEMES.find(t => t.id === themeId) ?? THEMES[0];
+
+  const handleFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setData(d => ({ ...d, fotoResponsavel: null }));
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, fotoResponsavel: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const handleWallpaper = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const b64 = await readFileAsBase64(file);
+      setData(d => ({ ...d, wallpaper: b64 }));
+    } catch { /* ignore */ }
+    e.target.value = '';
+  };
+
+  const download = async () => {
+    if (!captureRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, skipAutoScale: true });
+      const link = document.createElement('a');
+      link.download = `relatorio-fiscalizacao-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) { console.error(e); }
+    finally { setDownloading(false); }
+  };
+
+  const inp       = "w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 placeholder:text-muted-foreground/40 outline-none focus:border-primary/50 transition-colors";
+  const inpArea   = `${inp} resize-none`;
+  const sec       = "rounded-xl p-4 sm:p-5 space-y-3";
+  const secStyle  = { border: '1px solid hsl(var(--primary)/0.2)', background: 'linear-gradient(135deg,hsl(220 35% 8%) 0%,hsl(220 30% 10%) 100%)' };
+  const secLabel  = "font-mono text-[10px] text-primary/60 tracking-[0.25em] uppercase flex items-center gap-2";
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="vault-scanline rounded-xl px-4 py-3 sm:px-5 sm:py-4"
+        style={{ border: '1px solid hsl(var(--primary)/0.35)', background: 'linear-gradient(135deg,hsl(220 35% 8%/0.97) 0%,hsl(220 30% 11%/0.92) 100%)' }}>
+        <div className="flex items-center gap-3">
+          <button onClick={onBack}
+            className="w-8 h-8 rounded-lg border border-primary/25 flex items-center justify-center shrink-0 text-primary/60 hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all"
+            title="Voltar">
+            <ChevronDown size={15} className="rotate-90" />
+          </button>
+          <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0">
+            <ClipboardCheck size={15} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary vault-text-glow uppercase">Fiscalização</p>
+            <p className="font-mono text-[10px] text-muted-foreground tracking-widest">PREENCHA OS CAMPOS E BAIXE COMO IMAGEM</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+        {/* ── Form ── */}
+        <div className="space-y-4">
+
+          {/* Identificação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />IDENTIFICAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <div className="flex items-end gap-3">
+              <div className="shrink-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Foto</label>
+                <button onClick={() => fotoRef.current?.click()}
+                  className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center relative group transition-opacity hover:opacity-80"
+                  style={{ border: '1.5px solid hsl(var(--primary)/0.45)', background: 'hsl(var(--primary)/0.08)' }}>
+                  {data.fotoResponsavel
+                    ? <img src={data.fotoResponsavel} className="w-full h-full object-cover" alt="" />
+                    : <Camera size={18} className="text-primary/50 group-hover:text-primary transition-colors" />
+                  }
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                    <Camera size={14} className="text-white" />
+                  </div>
+                </button>
+                <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Responsável</label>
+                <input value={data.responsavel} onChange={e => setData(d => ({ ...d, responsavel: e.target.value }))}
+                  placeholder="Seu nome" className={inp} />
+              </div>
+            </div>
+            {data.fotoResponsavel && (
+              <button onClick={() => setData(d => ({ ...d, fotoResponsavel: null }))}
+                className="font-mono text-[10px] text-destructive/50 hover:text-destructive transition-colors">
+                Remover foto
+              </button>
+            )}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Data do Relatório</label>
+              <input type="date" value={data.dataRelatorio} onChange={e => setData(d => ({ ...d, dataRelatorio: e.target.value }))}
+                className={`${inp} [color-scheme:dark]`} />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Tema do Relatório</label>
+              <div className="relative">
+                <button onClick={() => setThemeOpen(o => !o)}
+                  className="w-full bg-black/30 border border-primary/20 rounded-lg px-3 py-2.5 font-mono text-sm text-foreground/90 flex items-center gap-3 hover:border-primary/40 transition-colors">
+                  <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: theme.gradient }} />
+                  <span className="flex-1 text-left truncate">{theme.name}</span>
+                  <ChevronDown size={14} className={`text-primary/50 shrink-0 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {themeOpen && (
+                  <div className="absolute top-full mt-1 w-full z-20 rounded-xl border border-primary/20 overflow-hidden shadow-2xl max-h-56 overflow-y-auto"
+                    style={{ background: 'hsl(220 35% 8%)' }}>
+                    {THEMES.map(t => (
+                      <button key={t.id} onClick={() => { setThemeId(t.id); setThemeOpen(false); }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm hover:bg-primary/10 transition-colors ${t.id === themeId ? 'text-primary' : 'text-foreground/70'}`}>
+                        <span className="w-5 h-5 rounded-full shrink-0 border border-white/20" style={{ background: t.gradient }} />
+                        <span className="truncate">{t.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Wallpaper */}
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">
+                Wallpaper de Fundo <span className="text-muted-foreground/40 normal-case tracking-normal">(opcional — substitui o tema)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => wallpaperRef.current?.click()}
+                  className="w-16 h-10 rounded-lg border-2 border-dashed border-primary/30 overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary/60 transition-all shrink-0 relative group"
+                  style={data.wallpaper ? { backgroundImage: `url(${data.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                >
+                  {!data.wallpaper && <Camera size={14} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                  {data.wallpaper && <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Camera size={12} className="text-white" /></div>}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <button onClick={() => wallpaperRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/30 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all font-mono text-[10px] uppercase tracking-widest">
+                    <Camera size={11} /> {data.wallpaper ? 'Trocar wallpaper' : 'Carregar wallpaper'}
+                  </button>
+                  {data.wallpaper && (
+                    <button onClick={() => setData(d => ({ ...d, wallpaper: null }))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all font-mono text-[10px] uppercase tracking-widest">
+                      Remover wallpaper
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={wallpaperRef} type="file" accept="image/*" className="hidden" onChange={handleWallpaper} />
+              {data.wallpaper && (
+                <p className="font-mono text-[10px] text-amber-400/70 mt-1.5">⚠ Wallpaper ativo — o tema de cor é ignorado</p>
+              )}
+            </div>
+          </div>
+
+          {/* Atuação */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />ATUAÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.atuacao} onChange={e => setData(d => ({ ...d, atuacao: e.target.value }))}
+              placeholder="Descreva a atuação realizada..." rows={4}
+              className={`${inpArea} w-full`} />
+          </div>
+
+          {/* Erros Encontrados */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />ERROS ENCONTRADOS<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.erros} onChange={e => setData(d => ({ ...d, erros: e.target.value }))}
+              placeholder="Liste os erros ou irregularidades encontradas..." rows={4}
+              className={`${inpArea} w-full`} />
+          </div>
+
+          {/* Solução */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />SOLUÇÃO<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.solucao} onChange={e => setData(d => ({ ...d, solucao: e.target.value }))}
+              placeholder="Descreva a solução aplicada ou proposta..." rows={4}
+              className={`${inpArea} w-full`} />
+          </div>
+
+          {/* Consequências */}
+          <div className={sec} style={secStyle}>
+            <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />CONSEQUÊNCIAS<span className="h-px flex-1 bg-primary/15" /></p>
+            <textarea value={data.consequencias} onChange={e => setData(d => ({ ...d, consequencias: e.target.value }))}
+              placeholder="Descreva as consequências ou medidas disciplinares..." rows={4}
+              className={`${inpArea} w-full`} />
+          </div>
+
+          {/* Download */}
+          <button onClick={download} disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl font-display font-bold tracking-widest text-xs sm:text-sm uppercase border transition-all active:scale-[0.98] disabled:opacity-70"
+            style={{ background: 'hsl(var(--primary)/0.15)', borderColor: 'hsl(var(--primary)/0.5)', color: 'hsl(var(--primary))', boxShadow: '0 0 20px hsl(var(--primary)/0.1)' }}>
+            {downloading
+              ? <><Loader2 size={15} className="animate-spin" />Gerando Imagem...</>
+              : <><Download size={15} />Baixar Relatório como Imagem</>}
+          </button>
+        </div>
+
+        {/* ── Preview ── */}
+        <div>
+          <p className="font-mono text-[10px] text-primary/40 tracking-[0.25em] uppercase mb-3">— Pré-visualização —</p>
+          <FiscalizacaoScaledPreview data={data} theme={theme} cardRef={captureRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main (router) ────────────────────────────────────────────────────────────
 
 export default function VaultRelatorios() {
@@ -5667,6 +6021,7 @@ export default function VaultRelatorios() {
   if (view === 'hospital')  return <HospitalGenerator  onBack={() => setView('hub')} />;
   if (view === 'justica')   return <JusticaGenerator   onBack={() => setView('hub')} />;
   if (view === 'tatico')      return <TaticoGenerator      onBack={() => setView('hub')} />;
-  if (view === 'divulgacao')  return <DivulgacaoGenerator  onBack={() => setView('hub')} />;
+  if (view === 'divulgacao')    return <DivulgacaoGenerator    onBack={() => setView('hub')} />;
+  if (view === 'fiscalizacao')  return <FiscalizacaoGenerator  onBack={() => setView('hub')} />;
   return <RelatoriosHub onOpen={setView} />;
 }
