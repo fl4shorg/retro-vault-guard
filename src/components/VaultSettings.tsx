@@ -196,8 +196,9 @@ function WeatherPicker() {
   const { effect, setEffect } = useWeather();
 
   const options: { id: WeatherEffect; label: string; icon: React.ReactNode; desc: string }[] = [
-    { id: 'snow', label: 'NEVE', icon: <Snowflake size={11} />, desc: 'Flocos caindo' },
+    { id: 'snow', label: 'NEVE',  icon: <Snowflake size={11} />, desc: 'Flocos caindo' },
     { id: 'rain', label: 'CHUVA', icon: <CloudRain size={11} />, desc: 'Gotas em queda' },
+    { id: 'fog',  label: 'NÉVOA', icon: <Wind      size={11} />, desc: 'Névoa flutuante' },
   ];
 
   return (
