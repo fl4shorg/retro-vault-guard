@@ -149,6 +149,89 @@ function useRainCanvas(active: boolean) {
   return canvasRef;
 }
 
+/* ── Fog ────────────────────────────────────────────────────────────── */
+interface FogLayer {
+  x: number; y: number;
+  w: number; h: number;
+  opacity: number; speed: number;
+  phase: number; amp: number;
+}
+
+function useFogCanvas(active: boolean) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stateRef = useRef<{ raf: number }>({ raf: 0 });
+
+  useEffect(() => {
+    if (!active) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const COUNT = 14;
+    const layers: FogLayer[] = Array.from({ length: COUNT }, (_, i) => ({
+      x: (Math.random() - 0.3) * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      w: window.innerWidth * (1.2 + Math.random() * 1.4),
+      h: 90 + Math.random() * 200,
+      opacity: 0.04 + Math.random() * 0.10,
+      speed: 0.18 + Math.random() * 0.32,
+      phase: Math.random() * Math.PI * 2,
+      amp: 12 + Math.random() * 28,
+    }));
+
+    let t = 0;
+
+    const draw = () => {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      t += 0.004;
+
+      for (const l of layers) {
+        l.x += l.speed;
+        if (l.x > W + l.w * 0.5) l.x = -l.w * 0.8;
+
+        const cy = l.y + Math.sin(t + l.phase) * l.amp;
+
+        const grad = ctx.createRadialGradient(
+          l.x, cy, 0,
+          l.x, cy, l.w * 0.55,
+        );
+        grad.addColorStop(0,   `rgba(200,210,230,${l.opacity})`);
+        grad.addColorStop(0.5, `rgba(190,205,225,${l.opacity * 0.55})`);
+        grad.addColorStop(1,   'rgba(190,205,225,0)');
+
+        ctx.save();
+        ctx.scale(1, l.h / (l.w * 0.55));
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(l.x, cy * (l.w * 0.55) / l.h, l.w * 0.55, l.w * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      stateRef.current.raf = requestAnimationFrame(draw);
+    };
+
+    stateRef.current.raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(stateRef.current.raf);
+      window.removeEventListener('resize', resize);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+  }, [active]);
+
+  return canvasRef;
+}
+
 /* ── Portal wrapper ─────────────────────────────────────────────────── */
 const canvasStyle: React.CSSProperties = {
   position: 'fixed',
@@ -160,6 +243,11 @@ const canvasStyle: React.CSSProperties = {
   userSelect: 'none',
   zIndex: 9998,
 };
+
+function FogPortal() {
+  const ref = useFogCanvas(true);
+  return createPortal(<canvas ref={ref} style={canvasStyle} aria-hidden="true" />, document.body);
+}
 
 function SnowPortal() {
   const ref = useSnowCanvas(true);
@@ -176,5 +264,6 @@ export default function VaultWeather() {
   const { effect } = useWeather();
   if (effect === 'snow') return <SnowPortal />;
   if (effect === 'rain') return <RainPortal />;
+  if (effect === 'fog')  return <FogPortal />;
   return null;
 }

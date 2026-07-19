@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, Camera, Trash2, Check, Upload, RotateCcw, Loader2, Snowflake, CloudRain } from 'lucide-react';
+import { LogOut, Camera, Trash2, Check, Upload, RotateCcw, Loader2, Snowflake, CloudRain, Wind } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useTheme, themes, type ThemeId } from '@/hooks/useTheme';
 import { WALLPAPER_PRESETS, compressImage, type WallpaperPresetId } from '@/hooks/useWallpaper';
@@ -214,7 +214,7 @@ function WeatherPicker() {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-3 gap-1.5">
         {options.map(opt => {
           const active = effect === opt.id;
           return (
