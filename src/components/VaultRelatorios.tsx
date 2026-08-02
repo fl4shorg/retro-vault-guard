@@ -58,6 +58,16 @@ type Theme = typeof THEMES[number];
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+function toRoman(n: number): string {
+  const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let result = '';
+  for (let i = 0; i < vals.length; i++) {
+    while (n >= vals[i]) { result += syms[i]; n -= vals[i]; }
+  }
+  return result;
+}
+
 /** Average all hex stops in a CSS gradient → one representative base colour */
 function gradientBase(gradient: string): string {
   const hits = [...gradient.matchAll(/#([0-9a-f]{6})/gi)].map(m => m[1]);
@@ -184,7 +194,7 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Shield size={14} color={w} />
               <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.2em', lineHeight: 1 }}>
-                GRUPO {data.numeroGrupo}
+                GRUPO {toRoman(parseInt(data.numeroGrupo))}
               </span>
               <Shield size={14} color={w} />
             </div>
