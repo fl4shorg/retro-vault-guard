@@ -179,10 +179,16 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         {/* ── Título Grupo ── */}
         {data.numeroGrupo && (
-          <div style={{ marginBottom: 10 }}>
-            <span style={{ fontFamily: mono, fontSize: 20, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1 }}>
-              GRUPO {data.numeroGrupo}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 14, padding: '10px 0' }}>
+            <div style={{ flex: 1, height: 1, background: bdr }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shield size={14} color={w} />
+              <span style={{ fontFamily: mono, fontSize: 18, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.2em', lineHeight: 1 }}>
+                GRUPO {data.numeroGrupo}
+              </span>
+              <Shield size={14} color={w} />
+            </div>
+            <div style={{ flex: 1, height: 1, background: bdr }} />
           </div>
         )}
 
