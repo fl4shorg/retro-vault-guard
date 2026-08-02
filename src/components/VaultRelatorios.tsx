@@ -45,8 +45,10 @@ interface ReportData {
   dataRelatorio: string;
   recrutamentos: Recruta[];
   subiuDeCargo: string[];
+  numeroGrupo: string;
   totalGrupo: string;
   totalNYPD: string;
+  totalTestes: string;
   descricao: string;
 }
 
@@ -103,7 +105,8 @@ function readFileAsBase64(file: File): Promise<string> {
 const emptyReport = (): ReportData => ({
   responsavel: '', fotoResponsavel: null, wallpaper: null, dataRelatorio: '',
   recrutamentos: [], subiuDeCargo: [],
-  totalGrupo: '', totalNYPD: '',
+  numeroGrupo: '',
+  totalGrupo: '', totalNYPD: '', totalTestes: '',
   descricao: '',
 });
 
@@ -174,11 +177,21 @@ function ReportCard({ data, theme }: { data: ReportData; theme: Theme }) {
 
         <div style={{ height: 1, background: bdr, marginBottom: 16 }} />
 
+        {/* ── Título Grupo ── */}
+        {data.numeroGrupo && (
+          <div style={{ marginBottom: 10 }}>
+            <span style={{ fontFamily: mono, fontSize: 20, fontWeight: 900, color: w, textTransform: 'uppercase' as const, letterSpacing: '0.15em', lineHeight: 1 }}>
+              GRUPO {data.numeroGrupo}
+            </span>
+          </div>
+        )}
+
         {/* ── Contagens ── */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
           {[
             { label: 'Membros no Grupo', value: data.totalGrupo, Icon: Users },
             { label: 'Quadro Diretivo',   value: data.totalNYPD,  Icon: Building2 },
+            ...(data.totalTestes ? [{ label: 'Testes', value: data.totalTestes, Icon: Star }] : []),
           ].map(({ label, value, Icon }) => (
             <div key={label} style={{ flex: 1, background: panel, border: `1px solid ${bdr}`, borderRadius: 10, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 7, background: c18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -6022,6 +6035,23 @@ function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
           {/* Contagens */}
           <div className={sec} style={secStyle}>
             <p className={secLabel}><span className="h-px flex-1 bg-primary/15" />CONTAGENS<span className="h-px flex-1 bg-primary/15" /></p>
+
+            <div>
+              <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Número do Grupo <span className="normal-case tracking-normal text-muted-foreground/40">(1–10)</span></label>
+              <div className="flex gap-2 flex-wrap">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                  <button key={n} type="button"
+                    onClick={() => setData(d => ({ ...d, numeroGrupo: d.numeroGrupo === String(n) ? '' : String(n) }))}
+                    className={`w-9 h-9 rounded-lg border font-mono text-sm font-bold transition-all ${data.numeroGrupo === String(n) ? 'border-primary bg-primary/20 text-primary' : 'border-primary/20 bg-black/30 text-foreground/50 hover:border-primary/40 hover:text-foreground/80'}`}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+              {data.numeroGrupo && (
+                <p className="font-mono text-[10px] text-primary/60 mt-1.5 tracking-widest uppercase">Título: Grupo {data.numeroGrupo}</p>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Membros no Grupo</label>
@@ -6031,6 +6061,11 @@ function CeoRegenteGenerator({ onBack }: { onBack: () => void }) {
               <div>
                 <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Quadro Diretivo</label>
                 <input type="number" min={0} value={data.totalNYPD} onChange={e => setData(d => ({ ...d, totalNYPD: e.target.value }))}
+                  placeholder="0" className={inp} />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] text-primary/60 tracking-widest uppercase block mb-1.5">Testes</label>
+                <input type="number" min={0} value={data.totalTestes} onChange={e => setData(d => ({ ...d, totalTestes: e.target.value }))}
                   placeholder="0" className={inp} />
               </div>
             </div>
